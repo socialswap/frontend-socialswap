@@ -6,74 +6,81 @@ const { Title, Text } = Typography;
 
 const testimonials = [
   {
-    name: "Karan Singh",
-    date: "4 months ago",
-    content: "Very genuine platform at very reasonable price. You can easily trust for buying & selling.",
-    rating: 5,
-    youtubeUrl: "https://youtube.com/channel/123"
-  },
-  {
-    name: "Alex Thompson",
+    name: "Aarav Singh",
     date: "2 months ago",
-    content: "Amazing marketplace! The verification process made me feel secure in my purchase.",
+    content: "Selling my YouTube channel through SocialSwap was seamless. Shubham and his team handled everything with professionalism and transparency.",
     rating: 5,
-    youtubeUrl: "https://youtube.com/channel/456"
+    youtubeUrl: "https://www.youtube.com/@ronislive18"
   },
   {
-    name: "Sarah Chen",
-    date: "3 months ago",
-    content: "Excellent service and support throughout the entire buying process. Highly recommended!",
-    rating: 5,
-    youtubeUrl: "https://youtube.com/channel/789"
-  },
-  {
-    name: "Michael Brown",
+    name: "Young Mine",
     date: "1 month ago",
-    content: "Found exactly what I was looking for at a fair price. Transaction was smooth and secure.",
+    content: "The buying process was incredibly smooth. Really happy with my purchase through SocialSwap!",
     rating: 5,
-    youtubeUrl: "https://youtube.com/channel/012"
+    youtubeUrl: "https://youtube.com/@younggamer05"
   },
   {
-    name: "Karan Singh",
-    date: "4 months ago",
-    content: "Very genuine platform at very reasonable price. You can easily trust for buying & selling.",
-    rating: 5,
-    youtubeUrl: "https://youtube.com/channel/123"
-  },
-  {
-    name: "Alex Thompson",
+    name: "Anubhav Mishra",
     date: "2 months ago",
-    content: "Amazing marketplace! The verification process made me feel secure in my purchase.",
+    content: "Great experience selling my channel. The team was very professional throughout.",
     rating: 5,
-    youtubeUrl: "https://youtube.com/channel/456"
+    youtubeUrl: "https://youtube.com/@anubhavdefender100k"
   },
   {
-    name: "Sarah Chen",
-    date: "3 months ago",
-    content: "Excellent service and support throughout the entire buying process. Highly recommended!",
-    rating: 5,
-    youtubeUrl: "https://youtube.com/channel/789"
-  },
-  {
-    name: "Michael Brown",
+    name: "Yash Vegad",
     date: "1 month ago",
+    content: "Buying on SocialSwap was easy and quick. Shubham guided me throughout the process.",
+    rating: 5,
+    youtubeUrl: "https://youtube.com/@littlesingham755"
+  },
+  {
+    name: "Shaurya Singh",
+    date: "2 months ago",
+    content: "The verification process made me feel secure in my purchase. Excellent service!",
+    rating: 5,
+    youtubeUrl: "https://youtube.com/@shauryas_skits"
+  },
+  {
+    name: "Ansh Chauhan",
+    date: "1 month ago",
+    content: "SocialSwap provided a secure platform for selling my channel. Very satisfied!",
+    rating: 5,
+    youtubeUrl: "https://youtube.com/@ansh_edits108"
+  },
+  {
+    name: "Sanket Chaudhari",
+    date: "2 months ago",
     content: "Found exactly what I was looking for at a fair price. Transaction was smooth and secure.",
     rating: 5,
-    youtubeUrl: "https://youtube.com/channel/012"
+    youtubeUrl: "https://youtube.com/@anime7x3"
   },
   {
-    name: "Sarah Chen",
-    date: "3 months ago",
-    content: "Excellent service and support throughout the entire buying process. Highly recommended!",
-    rating: 5,
-    youtubeUrl: "https://youtube.com/channel/789"
-  },
-  {
-    name: "Michael Brown",
+    name: "Varun Sharma",
     date: "1 month ago",
-    content: "Found exactly what I was looking for at a fair price. Transaction was smooth and secure.",
+    content: "Team SocialSwap made selling my channel stress-free. Their support was excellent!",
     rating: 5,
-    youtubeUrl: "https://youtube.com/channel/012"
+    youtubeUrl: "https://youtube.com/@v2horror"
+  },
+  {
+    name: "Anmol Verma",
+    date: "3 months ago",
+    content: "Excellent support throughout the entire buying process. Highly recommended!",
+    rating: 5,
+    youtubeUrl: "https://youtube.com/@adgkingdom"
+  },
+  {
+    name: "Sumit Patil",
+    date: "2 months ago",
+    content: "The selling process was transparent and professional. Great platform!",
+    rating: 5,
+    youtubeUrl: "https://youtube.com/@gamingstargs19"
+  },
+  {
+    name: "Mihir Patel",
+    date: "1 month ago",
+    content: "Very satisfied with my purchase. The team made everything easy and secure.",
+    rating: 5,
+    youtubeUrl: "https://youtube.com/@daxua_playz"
   }
 ];
 

@@ -223,12 +223,8 @@ const UserProfile = () => {
             <ArrowLeftOutlined />
           </button>
           <span className="header-text">Profile</span>
-          <div className="avatar-container">
-            <Avatar 
-              size={80} 
-              src={user?.avatar}
-              icon={!user?.avatar && <UserOutlined />}
-            />
+          <div className="avatar-container m-auto flex align-center justify-center">
+            <img src="/images/userImg.jpg" alt="" style={{height:'82px'}}/>
           </div>
           <h3 className="username">{user?.name || 'User Name'}</h3>
           <p className="user-handle">@{user?.handle || user?.name?.toLowerCase().replace(/\s/g, '') || 'username'}</p>

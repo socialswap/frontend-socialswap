@@ -125,12 +125,12 @@ const ChannelList = () => {
     const [filterSelected, setFilterSelected] = useState(false);
     const [mobileDrawerVisible, setMobileDrawerVisible] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [params,] = useSearchParams();
+    const [searchParams,] = useSearchParams();
     const [filteredChannels, setFilteredChannels] = useState([]);
 
     const [filters, setFilters] = useState({
         channelName: '',
-        category: [],
+        category: searchParams.get('category') ? [searchParams.get('category')] : [],
         subscriberRange: [],
         viewCountRange: [],
         videoCountRange: [],
@@ -148,6 +148,11 @@ const ChannelList = () => {
         watchTimeRange: [],
     });
 
+    useEffect(() => {
+     console.log('channels refetech');
+     
+    }, [filterSelected])
+    
     useEffect(() => {
         fetchChannels();
     }, [filters, filterSelected]);
@@ -180,6 +185,11 @@ const ChannelList = () => {
                 });
             } else {
                 params.append('filters', null);
+                if ( searchParams.get('category')) {
+                    params.delete('filters')
+                    params.append('category',JSON.stringify( [searchParams.get('category')]));
+                }
+
             }
 
             const response = await axiosInstance.get(`${api}/channels`, { params });
@@ -441,6 +451,8 @@ const ChannelList = () => {
         </FilterSection>
     );
 
+    console.log(filteredChannels,channels);
+    
     return (
         <div className="bg-white mt-16 mb-16">
             <StyledLayout>
@@ -496,7 +508,7 @@ const ChannelList = () => {
                                 xl: 3,
                                 xxl: 4
                             }}
-                            dataSource={filteredChannels.length > 0 ? filteredChannels : channels}
+                            dataSource={channels}
                             loading={loading}
                             className='bg-white px-8'
                             renderItem={channel => (

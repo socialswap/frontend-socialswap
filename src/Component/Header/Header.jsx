@@ -127,7 +127,8 @@ const Header = () => {
                   <ShoppingCartOutlined className="text-gray-600 text-xl cursor-pointer" onClick={() => navigate('/cart')} />
                 </Badge>
                 <div className="hidden md:block" key="profile" onClick={() => navigate('/profile')}>
-                  <Avatar icon={<UserOutlined />} className="cursor-pointer bg-gray-200" />
+                  {/* <Avatar icon={<UserOutlined />} className="cursor-pointer bg-gray-200" /> */}
+                  <img src="/images/userImg.jpg" alt="" style={{height:'35px'}}/>
                 </div>
                 <div key="logout" className='cursor-pointer hidden md:block' onClick={handleLogout}>
                   <LogoutOutlined />
@@ -135,8 +136,8 @@ const Header = () => {
               </>
             ) : (
               <Link to="/login" className="text-gray-600 hover:text-gray-900 hidden md:block">
-                <UserOutlined />
-              </Link>
+                  <img src="/images/userImg.jpg" alt="" style={{height:'35px'}}/>
+                  </Link>
             )}
 
             {/* Always show hamburger menu on mobile */}
@@ -151,7 +152,7 @@ const Header = () => {
                   />
                 </Badge>
                 <div onClick={() => navigate('/profile')}>
-                  <Avatar icon={<UserOutlined />} className="cursor-pointer bg-gray-200" />
+                <img src="/images/userImg.jpg" alt="" style={{height:'35px'}}/>
                 </div>
               </>
             )}
@@ -159,8 +160,8 @@ const Header = () => {
             {/* Only show login for mobile if not logged in */}
             {isMobile && !isLoggedIn && (
               <Link to="/login" className="text-gray-600 hover:text-gray-900">
-                <UserOutlined />
-              </Link>
+                  <img src="/images/userImg.jpg" alt="" style={{height:'35px'}}/>
+                  </Link>
             )}
                 {isMobile && (
               <MenuOutlined className="text-gray-600 text-xl cursor-pointer md:hidden" onClick={showDrawer} />

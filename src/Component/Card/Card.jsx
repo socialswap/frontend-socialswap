@@ -215,6 +215,7 @@ const ChannelCard = ({ channel, updateCartStatus }) => {
       <StyledCard
         onClick={handleViewDetails}
         hoverable
+        key={channel.name}
         cover={
           <div style={{ position: 'relative' }}>
             <StyledImage 

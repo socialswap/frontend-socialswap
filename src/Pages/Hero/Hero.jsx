@@ -7,30 +7,30 @@ import { FaChevronLeft, FaChevronRight, FaPause, FaPlay } from 'react-icons/fa';
 const { Title, Paragraph } = Typography;
 
 const categories = [
-  { name: 'Gaming', icon: '/images/gaming.png' },
-  { name: 'Podcast', icon: '/images/podcast.png' },
-  { name: 'Music', icon: '/images/music.png' },
-  { name: 'Entertainment', icon: '/images/entertainment.png' },
-  { name: 'Tech', icon: '/images/tech.png' },
-  { name: 'Facts', icon: '/images/facts.png' },
-  { name: 'Finance', icon: '/images/gaming.png' },
-  { name: 'Comedy', icon: '/images/podcast.png' },
-  { name: 'Animation', icon: '/images/music.png' },
-  { name: 'lifestyle', icon: '/images/entertainment.png' },
-  { name: 'Travel', icon: '/images/tech.png' },
-  { name: 'Fashion & Beaty', icon: '/images/facts.png' },
-  { name: 'News', icon: '/images/gaming.png' },
-  { name: 'Education', icon: '/images/podcast.png' },
-  { name: 'Cooking', icon: '/images/music.png' },
-  { name: 'Movie Reviews', icon: '/images/entertainment.png' },
-  { name: 'Business', icon: '/images/tech.png' },
-  { name: 'Motivational', icon: '/images/facts.png' },
-  { name: 'Art & Design', icon: '/images/gaming.png' },
-  { name: 'Science', icon: '/images/podcast.png' },
-  { name: 'Home Decor', icon: '/images/music.png' },
-  { name: 'Challenges', icon: '/images/entertainment.png' },
-  { name: 'Reaction', icon: '/images/tech.png' },
-  { name: 'Real Estate', icon: '/images/facts.png' },
+  { name: 'Gaming', icon: '/images/gaming.PNG' },
+  { name: 'Podcast', icon: '/images/mike.PNG' },
+  { name: 'Music', icon: '/images/headphone.PNG' },
+  { name: 'Entertainment', icon: '/images/entertainment.PNG' },
+  { name: 'Tech', icon: '/images/tech.PNG' },
+  { name: 'Facts', icon: '/images/loude.PNG' },
+  { name: 'Finance', icon: '/images/dollor.PNG' },
+  { name: 'Comedy', icon: '/images/mask.PNG' },
+  { name: 'Animation', icon: '/images/animation.PNG' },
+  { name: 'Lifestyle', icon: '/images/gym.PNG' },
+  { name: 'Travel', icon: '/images/travel.PNG' },
+  { name: 'Fashion & Beaty', icon: '/images/cream.PNG' },
+  { name: 'News', icon: '/images/mike_2.PNG' },
+  { name: 'Education', icon: '/images/books.PNG' },
+  { name: 'Cooking', icon: '/images/pan.PNG' },
+  { name: 'Movie Reviews', icon: '/images/entertainment.PNG' },
+  { name: 'Business', icon: '/images/bag.png' },
+  { name: 'Motivational', icon: '/images/aim.png' },
+  { name: 'Art & Design', icon: '/images/paint.PNG' },
+  { name: 'Science', icon: '/images/flask.PNG' },
+  { name: 'Home Decor', icon: '/images/lamp.PNG' },
+  { name: 'Challenges', icon: '/images/win.PNG' },
+  { name: 'Reaction', icon: '/images/loude.PNG' },
+  { name: 'Real Estate', icon: '/images/home.PNG' },
 ];
 
 const CategoryItem = ({ name, icon }) => {
@@ -42,9 +42,11 @@ const CategoryItem = ({ name, icon }) => {
       whileHover={{ scale: 1.05 }}
       transition={{ duration: 0.2 }}
     >
-      <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+      <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-4" style={
+        {filter:'drop-shadow(black 1px 3px 3px)'}
+      }>
         <span className="text-4xl text-[#F83758]">
-          <img src={icon} alt={name} className="w-16 h-16" />
+          <img src={icon} alt={name} className="rounded-full" />
         </span>
       </div>
       <Title level={5} className="m-0 text-center">{name}</Title>
