@@ -47,7 +47,7 @@ const ChannelCard = ({ channel }) => {
     >
       <div className="relative group">
         <img
-          src={ channel.bannerUrl ? url+channel.bannerUrl : '/images/yt.png'}
+          src={ channel.bannerUrl ? channel.bannerUrl : '/images/yt.png'}
           alt={channel.name}
           className="w-full h-48 object-contain"
         />

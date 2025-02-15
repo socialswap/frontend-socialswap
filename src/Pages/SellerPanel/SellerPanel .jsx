@@ -61,28 +61,28 @@ const SellerPanel = () => {
 
   // Initial form values
   const initialValues = {
-    name: '',
-    description: '',
-    subscriberCount: 0,
-    viewCount: 0,
-    videoCount: 0,
-    estimatedEarnings: 0,
+    name: 'fdsaf',
+    description: 'fdsa',
+    subscriberCount: 100,
+    viewCount: 100,
+    videoCount: 100,
+    estimatedEarnings: 100,
     category: undefined,
     joinedDate: null,
-    country: '',
-    averageViewsPerVideo: 0,
-    language: '',
+    country: 'in',
+    averageViewsPerVideo: 100,
+    language: 'mar',
     channelType: undefined,
-    recentViews: 0,
-    copyrightStrike: '',
+    recentViews: 100,
+    copyrightStrike: '3',
     // communityStrike: '',
     monetized: false,
-    watchTimeHours: 0,
+    watchTimeHours: 100,
     organicGrowth: false,
     banner: null,
     images: [],
-     userEmail: '',
-  contactNumber: ''
+     userEmail: 'prede@fmail.com',
+  contactNumber: '5555555555'
   };
 
   // Upload configuration for banner
@@ -331,14 +331,14 @@ const showEditModal = (channel) => {
         uid: '-1',
         name: 'banner.png',
         status: 'done',
-        url: url + channel.bannerUrl,
+        url:channel.bannerUrl,
       },
     ] : undefined,
     images: channel.imageUrls ? channel.imageUrls.map((imageUrl, index) => ({
       uid: `-${index + 1}`,
       name: `image-${index + 1}.png`,
       status: 'done',
-      url: url + imageUrl,
+      url: imageUrl,
     })) : undefined
   };
   
@@ -1101,14 +1101,14 @@ return (
             uid: '-1',
             name: 'banner.png',
             status: 'done',
-            url: url + editingChannel.bannerUrl,
+            url:  editingChannel.bannerUrl,
           },
         ] : undefined,
         images: editingChannel.imageUrls ? editingChannel.imageUrls.map((imageUrl, index) => ({
           uid: `-${index + 1}`,
           name: `image-${index + 1}.png`,
           status: 'done',
-          url: url + imageUrl,
+          url: imageUrl,
         })) : undefined
       })}
     </Modal>

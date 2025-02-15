@@ -15,7 +15,7 @@ const categories = [
   { name: 'Facts', icon: '/images/loude.PNG' },
   { name: 'Finance', icon: '/images/dollor.PNG' },
   { name: 'Comedy', icon: '/images/mask.PNG' },
-  { name: 'Animation', icon: '/images/animation.png' },
+  { name: 'Animation', icon: '/images/animation.PNG' },
   { name: 'Lifestyle', icon: '/images/gym.PNG' },
   { name: 'Travel', icon: '/images/travel.PNG' },
   { name: 'Fashion & Beaty', icon: '/images/cream.PNG' },

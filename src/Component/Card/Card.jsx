@@ -209,7 +209,7 @@ const ChannelCard = ({ channel, updateCartStatus }) => {
   const shareUrl = `${window.location.origin}/channel/${channel._id}`;
   const shareTitle = `Check out this YouTube channel: ${channel.name}`;
   const shareDescription = `${channel.description.substring(0, 100)}...`;
-
+  
   return (
     <>
       <StyledCard
@@ -220,7 +220,7 @@ const ChannelCard = ({ channel, updateCartStatus }) => {
           <div style={{ position: 'relative' }}>
             <StyledImage 
               alt={channel.name} 
-              src={channel.bannerUrl ? url + channel.bannerUrl : '/images/yt.png'} 
+              src={channel.bannerUrl ? channel.bannerUrl : '/images/yt.png'} 
             />
             {/* <PremiumTag>Premium</PremiumTag> */}
             {channel.monetized && (

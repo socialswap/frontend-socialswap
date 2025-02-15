@@ -173,7 +173,7 @@ const decodeToken = () => {
             {/* Banner Image */}
             <div className="relative w-full h-[300px] mb-6 rounded-lg overflow-hidden">
               <img 
-                src={channel.bannerUrl ? url + channel.bannerUrl : '/images/yt.png'}
+                src={channel.bannerUrl ? channel.bannerUrl : '/images/yt.png'}
                 alt="Channel Banner"
                 className="w-full h-full object-cover"
               />
@@ -192,7 +192,7 @@ const decodeToken = () => {
                 {channel.imageUrls?.map((imageUrl, index) => (
                   <div key={index} className="h-[400px]">
                     <Image
-                      src={url + imageUrl}
+                      src={ imageUrl}
                       alt={`Channel Image ${index + 1}`}
                       className="w-full h-full object-contain"
                     />
