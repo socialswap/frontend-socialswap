@@ -53,21 +53,23 @@ const AdminChannels = () => {
 
   const toggleMostDemanding = async (channelId, currentValue) => {
     try {
-      const response = await fetch(`${api}/admin/channels/${channelId}/demanding`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ mostDemanding: !currentValue }),
-      });
+      const response = await axiosInstance.patch(${api}/admin/channels/${channelId}/demanding, 
+        { mostDemanding: !currentValue },
+      );
 
       if (response.ok) {
         setChannels(channels.map(channel => 
           channel._id === channelId 
             ? { ...channel, mostDemanding: !currentValue }
-            : channel
+            : channe
+Screenshot from 2025-02-23 17-44-44.png
+l
         ));
       }
+    } catch (error) {
+      console.error('Error updating channel:', error);
+    }
+  };
     } catch (error) {
       console.error('Error updating channel:', error);
     }
