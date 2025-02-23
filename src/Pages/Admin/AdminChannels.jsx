@@ -52,28 +52,26 @@ const AdminChannels = () => {
   };
 
   const toggleMostDemanding = async (channelId, currentValue) => {
-    try {
-      const response = await axiosInstance.patch(${api}/admin/channels/${channelId}/demanding, 
-        { mostDemanding: !currentValue },
-      );
+  try {
+    const response = await axiosInstance.patch(
+      `${api}/admin/channels/${channelId}/demanding`, // Fixed template literal
+      { mostDemanding: !currentValue }
+    );
 
-      if (response.ok) {
-        setChannels(channels.map(channel => 
-          channel._id === channelId 
+    if (response.status === 200) { // Correct Axios response check
+      setChannels(prevChannels =>
+        prevChannels.map(channel =>
+          channel._id === channelId
             ? { ...channel, mostDemanding: !currentValue }
-            : channe
-Screenshot from 2025-02-23 17-44-44.png
-l
-        ));
-      }
-    } catch (error) {
-      console.error('Error updating channel:', error);
-    }
-  };
-    } catch (error) {
-      console.error('Error updating channel:', error);
+            : channel // Fixed incorrect variable name
+        )
+      );
     }
-  };
+  } catch (error) {
+    console.error('Error updating channel:', error);
+  }
+};
+
 
   const handleViewChannel = (channelId) => {
     setModalVisible(true);
