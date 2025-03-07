@@ -33,7 +33,7 @@ const VideoSection = () => {
             <div className="relative w-full aspect-video">
                 <iframe
                     className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
-                    src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                    src="https://youtu.be/GAvJaEJg5II"
                     title="YouTube video player"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
