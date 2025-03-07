@@ -55,7 +55,7 @@ const ChannelCard = ({ channel }) => {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              window.open(`https://youtube.com/channel/${channel.customUrl}`, '_blank');
+              window.open(`https://youtube.com/channel/${customUrl}`, '_blank');
             }}
             className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-700 transition-colors"
           >
