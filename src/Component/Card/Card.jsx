@@ -247,8 +247,8 @@ const ChannelCard = ({ channel, updateCartStatus }) => {
         }
       >
         <Text strong className="text-lg mb-2 block">{channel.name}</Text>
-        
-        {/* Removed the Price component that was showing ₹0 */}
+        <Price>₹{formatNumber(channel.estimatedEarnings)}</Price>
+        {/* <OriginalPrice>${formatNumber(channel.estimatedEarnings * 1.2)}</OriginalPrice> */}
         
         <Stats>
           <StatItem>
