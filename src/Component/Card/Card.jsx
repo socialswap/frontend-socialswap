@@ -247,8 +247,9 @@ const ChannelCard = ({ channel, updateCartStatus }) => {
         }
       >
         <Text strong className="text-lg mb-2 block">{channel.name}</Text>
-        <Price>₹{formatNumber(channel.estimatedEarnings)}</Price>
-        {/* <OriginalPrice>${formatNumber(channel.estimatedEarnings * 1.2)}</OriginalPrice> */}
+        {channel.estimatedEarnings > 0 && (
+          <Price>₹{formatNumber(channel.estimatedEarnings)}</Price>
+        )}
         
         <Stats>
           <StatItem>
