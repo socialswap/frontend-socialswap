@@ -8,21 +8,21 @@ const banners = [
     description: "Get 50% off on all channels this summer",
     buttonText: "Shop Now",
     buttonLink: "/channels",
-    img: '/images/IMG_9788.PNG'
+    img: 'IMG_9788.PNG'
   },
   {
     title: "New Channels Added",
     description: "Explore our latest additions to find your perfect match",
     buttonText: "Explore More",
     buttonLink: "/channels",
-    img: '/images/IMG_9787.PNG'
+    img: 'IMG_9787.PNG'
   },
   {
     title: "Limited Time Offer",
     description: "Buy one channel, get another 50% off",
     buttonText: "Get Offer",
     buttonLink: "/channels",
-    img: '/images/IMG_9786.PNG'
+    img: 'IMG_9786.PNG'
   }
 ];
 
