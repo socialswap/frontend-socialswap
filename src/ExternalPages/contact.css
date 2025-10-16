@@ -1,0 +1,30 @@
+.contact-us {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .contact-us h1 {
+    text-align: center;
+    color: #333;
+  }
+  
+  .contact-us section {
+    margin-bottom: 20px;
+  }
+  
+  .contact-us p {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  .contact-us a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .contact-us a:hover {
+    text-decoration: underline;
+  }
+  
