@@ -17,7 +17,7 @@ const Channels = () => {
   useEffect(() => {
     const fetchChannels = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/channels");
+        const response = await axios.get(`${REACT_APP_API_BASE_URL}/channels`);
         setChannels(response.data);
         setFilteredChannels(response.data);
       } catch (error) {
