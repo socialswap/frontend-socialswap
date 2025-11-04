@@ -19,7 +19,7 @@ const Channels = () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/channels`);
         setChannels(response.data);
-        setFilteredChannels(response.data);
+        setFilteredChannels(response.data.channels);
       } catch (error) {
         console.error("Error fetching channels:", error);
       }
