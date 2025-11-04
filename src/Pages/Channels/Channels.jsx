@@ -102,14 +102,14 @@ const Channels = () => {
 
   const renderRangeCheckboxes = (filterName, options) => (
     <Checkbox.Group
-      value={(filters[filterName] || []).map((range) => JSON.stringify(range))}
+      value={(filters[filterName] || [])?.map((range) => JSON.stringify(range))}
       onChange={(checkedValues) => {
-        const newRanges = checkedValues.map((value) => JSON.parse(value));
+        const newRanges = checkedValues?.map((value) => JSON.parse(value));
         handleInputChange(filterName, newRanges);
       }}
     >
       <Row>
-        {options.map((option, index) => (
+        {options?.map((option, index) => (
           <Col span={24} key={index}>
             <Checkbox value={JSON.stringify(option.value)}>
               {option.label}
@@ -226,7 +226,7 @@ const Channels = () => {
         </div>
 
         <Row gutter={[16, 16]}>
-          {filteredChannels.map((channel) => (
+          {filteredChannels?.map((channel) => (
             <Col xs={24} sm={12} md={8} key={channel._id}>
               <ChannelCard channel={channel} />
             </Col>
