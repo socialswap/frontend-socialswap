@@ -8,7 +8,7 @@ const Channels = () => {
   useEffect(() => {
     const fetchChannels = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/channels`);
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/channels`);
         const data = await res.json();
 
         // Log response to verify structure
