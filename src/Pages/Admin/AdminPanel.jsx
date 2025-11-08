@@ -170,11 +170,22 @@ const AdminPanel = () => {
       </Form.Item>
       <Form.Item name="category" label="Category" rules={[{ required: true }]}>
         <Select>
-          <Option value="Pets">Pets</Option>
-          <Option value="Technology">Technology</Option>
           <Option value="Gaming">Gaming</Option>
+          <Option value="Tech">Tech</Option>
+          <Option value="Finance">Finance</Option>
+          <Option value="Artificial intelligence">Artificial intelligence</Option>
+          <Option value="Business & Entrepreneurship">Business & Entrepreneurship</Option>
+          <Option value="Education">Education</Option>
+          <Option value="Health & Fitness">Health & Fitness</Option>
           <Option value="Food">Food</Option>
-          <Option value="Health">Health</Option>
+          <Option value="Infotainment">Infotainment</Option>
+          <Option value="Vlogging">Vlogging</Option>
+          <Option value="Sports">Sports</Option>
+          <Option value="Commentary">Commentary</Option>
+          <Option value="Entertainment">Entertainment</Option>
+          <Option value="Music">Music</Option>
+          <Option value="Motivation & Self-Improvement">Motivation & Self-Improvement</Option>
+          <Option value="Other">Other</Option>
         </Select>
       </Form.Item>
       <Form.Item name="joinedDate" label="Joined Date" rules={[{ required: true }]}>

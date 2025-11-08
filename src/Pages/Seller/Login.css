@@ -1,0 +1,447 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Futuristic Login Container */
+.futuristic-login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 50%, #fafafa 100%);
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Particles Background */
+.particles-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Floating Gradient Orbits */
+.futuristic-login-container::before,
+.futuristic-login-container::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.futuristic-login-container::before {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  top: -250px;
+  left: -250px;
+  animation: orbit-float 20s ease-in-out infinite;
+}
+
+.futuristic-login-container::after {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
+  bottom: -200px;
+  right: -200px;
+  animation: orbit-float 25s ease-in-out infinite reverse;
+}
+
+@keyframes orbit-float {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate(30px, -30px) rotate(120deg);
+  }
+  66% {
+    transform: translate(-30px, 30px) rotate(240deg);
+  }
+}
+
+/* Additional Floating Orbs */
+.floating-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  filter: blur(40px);
+  opacity: 0.2;
+}
+
+.floating-orb-1 {
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+  top: 20%;
+  right: 10%;
+  animation: float 15s ease-in-out infinite;
+}
+
+.floating-orb-2 {
+  width: 250px;
+  height: 250px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.15));
+  bottom: 20%;
+  left: 10%;
+  animation: float 18s ease-in-out infinite reverse;
+}
+
+.floating-orb-3 {
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: float 12s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(50px, -50px) scale(1.1);
+  }
+}
+
+/* Glow Border Card */
+.glow-border-card {
+  position: relative;
+  width: 100%;
+  max-width: 450px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 50px 40px;
+  z-index: 10;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 
+    0 0 40px rgba(255, 255, 255, 0.4),
+    0 0 80px rgba(255, 255, 255, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    inset 0 0 40px rgba(255, 255, 255, 0.3);
+  animation: border-glow 3s ease-in-out infinite;
+}
+
+.glow-border-card::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0.05));
+  background-size: 300% 300%;
+  border-radius: 24px;
+  z-index: -1;
+  opacity: 0.6;
+  animation: gradient-shift 4s ease infinite;
+}
+
+@keyframes border-glow {
+  0%, 100% {
+    box-shadow: 
+      0 0 40px rgba(255, 255, 255, 0.4),
+      0 0 80px rgba(255, 255, 255, 0.2),
+      0 8px 32px rgba(0, 0, 0, 0.08),
+      inset 0 0 40px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 0 60px rgba(255, 255, 255, 0.5),
+      0 0 100px rgba(255, 255, 255, 0.3),
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      inset 0 0 50px rgba(255, 255, 255, 0.4);
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Title Styling */
+.futuristic-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #000000;
+  text-align: center;
+  margin-bottom: 10px;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  animation: text-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes text-glow {
+  from {
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+  }
+  to {
+    filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.15));
+  }
+}
+
+.futuristic-subtitle {
+  font-family: 'Poppins', sans-serif;
+  color: rgba(0, 0, 0, 0.6);
+  text-align: center;
+  font-size: 0.95rem;
+  margin-bottom: 40px;
+  letter-spacing: 1px;
+}
+
+/* Form Input Styling */
+.futuristic-input-wrapper {
+  margin-bottom: 24px;
+}
+
+.futuristic-input {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 2px solid rgba(0, 0, 0, 0.15) !important;
+  border-radius: 12px !important;
+  color: #000000 !important;
+  padding: 14px 16px !important;
+  font-size: 15px !important;
+  transition: all 0.3s ease !important;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.futuristic-input:hover {
+  border-color: rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1) !important;
+  background: rgba(255, 255, 255, 1) !important;
+}
+
+.futuristic-input:focus {
+  border-color: rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15) !important;
+  background: rgba(255, 255, 255, 1) !important;
+}
+
+.futuristic-input::placeholder {
+  color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.futuristic-input .ant-input-prefix {
+  color: rgba(0, 0, 0, 0.6) !important;
+  margin-right: 12px !important;
+}
+
+.futuristic-input .anticon {
+  font-size: 18px !important;
+}
+
+/* Pulsating Glow Button */
+.pulsating-glow-button {
+  width: 100%;
+  height: 50px;
+  background: #000000 !important;
+  border: none !important;
+  border-radius: 12px !important;
+  font-family: 'Orbitron', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  letter-spacing: 1.5px !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+  animation: pulsate-glow 2s ease-in-out infinite !important;
+  box-shadow: 
+    0 0 20px rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(0, 0, 0, 0.2),
+    inset 0 0 20px rgba(255, 255, 255, 0.1) !important;
+}
+
+.pulsating-glow-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.pulsating-glow-button:hover::before {
+  left: 100%;
+}
+
+.pulsating-glow-button:hover {
+  transform: translateY(-2px);
+  background: rgba(0, 0, 0, 0.9) !important;
+  box-shadow: 
+    0 0 30px rgba(0, 0, 0, 0.4),
+    0 0 60px rgba(0, 0, 0, 0.25),
+    inset 0 0 30px rgba(255, 255, 255, 0.15) !important;
+}
+
+.pulsating-glow-button:active {
+  transform: translateY(0);
+}
+
+@keyframes pulsate-glow {
+  0%, 100% {
+    box-shadow: 
+      0 0 20px rgba(0, 0, 0, 0.3),
+      0 0 40px rgba(0, 0, 0, 0.2),
+      inset 0 0 20px rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 0 30px rgba(0, 0, 0, 0.4),
+      0 0 60px rgba(0, 0, 0, 0.3),
+      inset 0 0 25px rgba(255, 255, 255, 0.15);
+  }
+}
+
+/* Google Button Styling */
+.futuristic-google-button {
+  width: 100%;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 2px solid rgba(0, 0, 0, 0.15) !important;
+  border-radius: 12px !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+  color: #1a1a2e !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+}
+
+.futuristic-google-button:hover {
+  border-color: rgba(0, 0, 0, 0.3) !important;
+  background: rgba(255, 255, 255, 1) !important;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+/* Divider Styling */
+.futuristic-divider {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  margin: 30px 0 !important;
+}
+
+.futuristic-divider-inner-text {
+  color: rgba(0, 0, 0, 0.5) !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 14px !important;
+}
+
+/* Link Styling */
+.futuristic-link {
+  color: #000000 !important;
+  text-decoration: none;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.futuristic-link:hover {
+  color: rgba(0, 0, 0, 0.7) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.futuristic-footer-text {
+  color: rgba(0, 0, 0, 0.6);
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  text-align: center;
+}
+
+.futuristic-footer-border {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 24px;
+  margin-top: 30px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .futuristic-title {
+    font-size: 2rem;
+  }
+  
+  .glow-border-card {
+    padding: 40px 30px;
+    max-width: 100%;
+  }
+  
+  .floating-orb-1,
+  .floating-orb-2,
+  .floating-orb-3 {
+    opacity: 0.2;
+  }
+}
+
+/* Tabs Styling */
+.futuristic-tabs .ant-tabs-tab {
+  color: rgba(0, 0, 0, 0.6) !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+  border: none !important;
+  padding: 12px 20px !important;
+  transition: all 0.3s ease !important;
+}
+
+.futuristic-tabs .ant-tabs-tab:hover {
+  color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.futuristic-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #000000 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+.futuristic-tabs .ant-tabs-ink-bar {
+  background: #000000 !important;
+  height: 3px !important;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2) !important;
+}
+
+.futuristic-tabs .ant-tabs-nav {
+  margin-bottom: 24px !important;
+}
+
+.futuristic-tabs .ant-tabs-nav::before {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Ant Design Form Override */
+.futuristic-login-container .ant-form-item {
+  margin-bottom: 24px;
+}
+
+.futuristic-login-container .ant-form-item-label > label {
+  color: rgba(0, 0, 0, 0.8) !important;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.futuristic-login-container .ant-input-password-icon {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.futuristic-login-container .ant-input-password-icon:hover {
+  color: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Loading State for Buttons */
+.pulsating-glow-button.ant-btn-loading {
+  opacity: 0.8;
+}
+

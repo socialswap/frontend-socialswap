@@ -11,6 +11,7 @@ import Login from '../Pages/Seller/Login';
 import Signup from '../Pages/Seller/SignUp';
 import ChannelList from '../Pages/Channels/Channels';
 import AdminDashboard from '../Pages/Admin/AdminDashboard';
+import AdminBanners from '../Pages/Admin/AdminBanners';
 import SellerPanel from '../Pages/SellerPanel/SellerPanel ';
 import UnauthorizedComponent from '../Component/UnAuthorized/UnAuthorized';
 import PurchaseSteps from '../Component/Steps/Steps/Steps';
@@ -27,6 +28,10 @@ import Confirmation from '../Component/Success/Confirmation';
 import Orders from '../Component/Orders/Orders';
 import TransactionsPanel from '../Component/Profile/Transactions';
 import MyChannels from '../Component/Profile/MyChannels';
+import PrivacyPolicy from '../ExternalPages/PrivacyPolicy';
+import TermsAndConditions from '../ExternalPages/TermsAndConditions';
+import RefundAndReturnPolicy from '../ExternalPages/RefundPolicy';
+import ShippingAndCancellationPolicy from '../ExternalPages/Cancellation';
 
 const ProtectedRoute = ({ element, isAuthRequired = false }) => {
   const token = localStorage.getItem('token');
@@ -44,6 +49,10 @@ const Routes = () => {
     { path: '/payment/success', element: <PaymentSuccessful /> },
     { path: '/confirmation/:id', element: <Confirmation /> },
     { path: '/privacy', element: <Privacy /> },
+    { path: '/privacy-policy', element: <PrivacyPolicy /> },
+    { path: '/terms-and-conditions', element: <TermsAndConditions /> },
+    { path: '/refund-policy', element: <RefundAndReturnPolicy /> },
+    { path: '/shipping-policy', element: <ShippingAndCancellationPolicy /> },
     { path: '/stats', element: <Stats /> },
     { path: '/feature', element: <FeaturedListings /> },
     { path: '/channel/:id', element: <DetailPageWrapper /> },
@@ -71,6 +80,10 @@ const Routes = () => {
     {
       path: '/admin-dashboard',
       element: <ProtectedRoute element={<AdminDashboard />} isAuthRequired={true} />
+    },
+    {
+      path: '/admin/banners',
+      element: <ProtectedRoute element={<AdminBanners />} isAuthRequired={true} />
     },
     { path: '/unauthorized', element: <UnauthorizedComponent /> },
     { 

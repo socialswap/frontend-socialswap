@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Table, Button, Modal, Form, Input, Select, message } from 'antd';
+import { PictureOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../../API/api';
 import AdminChannels from './AdminChannels';
 import AdminTransactions from './AdminTransactions';
@@ -8,6 +10,7 @@ import AdminTransactions from './AdminTransactions';
 const { Option } = Select;
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -77,7 +80,17 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-6 mt-20">
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <Button
+          type="primary"
+          icon={<PictureOutlined />}
+          onClick={() => navigate('/admin/banners')}
+          size="large"
+        >
+          Manage Banners
+        </Button>
+      </div>
       <Table 
         columns={columns} 
         dataSource={users} 

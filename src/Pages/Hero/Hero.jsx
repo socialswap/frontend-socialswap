@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Typography } from 'antd';
+import { Button, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaChevronLeft, FaChevronRight, FaPause, FaPlay } from 'react-icons/fa';
+import { ShopOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
 
@@ -35,21 +36,106 @@ const categories = [
 
 const CategoryItem = ({ name, icon }) => {
   const navigate = useNavigate();
+  const [isHovered, setIsHovered] = React.useState(false);
+
   return (
-    <motion.div 
-      className="flex flex-col items-center cursor-pointer mx-4"
+    <motion.div
+      className="flex flex-col items-center cursor-pointer mx-4 group relative"
       onClick={() => navigate(`/channels?category=${name}`)}
-      whileHover={{ scale: 1.05 }}
-      transition={{ duration: 0.2 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      whileHover={{ scale: 1.08, y: -8 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
-      <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-4" style={
-        {filter:'drop-shadow(black 1px 3px 3px)'}
-      }>
-        <span className="text-4xl text-[#F83758]">
-          <img src={icon} alt={name} className="rounded-full" />
-        </span>
-      </div>
-      <Title level={5} className="m-0 text-center">{name}</Title>
+      {/* Tooltip */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? -15 : 10 }}
+        transition={{ duration: 0.2 }}
+        className="absolute -top-12 bg-gradient-to-r from-gray-800 to-gray-900 text-white px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap shadow-xl z-20"
+      >
+        Explore {name}
+        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-gray-900"></div>
+      </motion.div>
+
+      {/* Pastel Ring Glow */}
+      <motion.div
+        className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{
+          // background: 'radial-gradient(circle, rgba(248, 55, 88, 0.15) 0%, transparent 70%)',
+          // filter: 'blur(20px)',
+          // transform: 'scale(1.3)',
+        }}
+      />
+
+      {/* Glass Card with Gradient Border */}
+      <motion.div
+        className="relative w-32 h-32 rounded-full flex items-center justify-center mb-4 overflow-hidden"
+        style={{
+          background: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+        }}
+        whileHover={{
+          boxShadow: '0 12px 40px rgba(248, 55, 88, 0.2), 0 0 0 3px rgba(248, 55, 88, 0.1)',
+        }}
+      >
+        {/* Gradient Border Ring */}
+        <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          style={{
+            background: 'linear-gradient(135deg, rgba(248, 55, 88, 0.3), rgba(255, 107, 107, 0.2), rgba(255, 159, 64, 0.2))',
+            padding: '3px',
+            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+            WebkitMaskComposite: 'xor',
+            maskComposite: 'exclude',
+          }}
+        />
+
+        {/* Icon Container */}
+        <motion.div
+          className="relative z-10 w-full h-full rounded-full flex items-center justify-center"
+          whileHover={{ rotate: [0, -5, 5, -5, 0] }}
+          transition={{ duration: 0.5 }}
+        >
+          <img
+            src={icon}
+            alt={name}
+            className="rounded-full w-24 h-24 object-cover"
+            style={{
+              filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1))',
+            }}
+          />
+        </motion.div>
+
+        {/* Shimmer Effect */}
+        <motion.div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100"
+          style={{
+            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent)',
+          }}
+          animate={{
+            x: isHovered ? [-200, 200] : 0,
+          }}
+          transition={{
+            duration: 0.8,
+            ease: "easeInOut",
+          }}
+        />
+      </motion.div>
+
+      {/* Category Name */}
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 0.2 }}
+      >
+        <Title
+          level={5}
+          className="m-0 text-center font-semibold text-gray-800 group-hover:text-[#F83758] transition-colors duration-300"
+        >
+          {name}
+        </Title>
+      </motion.div>
     </motion.div>
   );
 };
@@ -100,33 +186,31 @@ const Carousel = ({ children }) => {
     containerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
   };
 
-  const autoScroll = () => {
+  const autoScroll = React.useCallback(() => {
     if (!containerRef.current || isPaused) return;
-  
+
     const container = containerRef.current;
     const tolerance = 1; // Small value to account for precision errors
     const isAtEnd =
       container.scrollLeft + container.offsetWidth >= container.scrollWidth - tolerance;
-  
-    console.log("isAtEnd:", isAtEnd);
-  
+
     if (isAtEnd) {
       container.scrollTo({ left: 0, behavior: 'smooth' });
     } else {
       container.scrollBy({ left: 300, behavior: 'smooth' });
     }
-  };
-  
+  }, [isPaused]);
+
 
   useEffect(() => {
     autoScrollRef.current = setInterval(autoScroll, 2000);
-    
+
     return () => {
       if (autoScrollRef.current) {
         clearInterval(autoScrollRef.current);
       }
     };
-  }, [isPaused]);
+  }, [isPaused, autoScroll]);
 
   const togglePause = () => {
     setIsPaused(!isPaused);
@@ -136,7 +220,7 @@ const Carousel = ({ children }) => {
   };
 
   return (
-    <div 
+    <div
       className="relative"
       onMouseEnter={() => setShowButtons(true)}
       onMouseLeave={() => {
@@ -177,11 +261,11 @@ const Carousel = ({ children }) => {
           </>
         )}
       </AnimatePresence>
-      <div 
+      <div
         ref={containerRef}
-        className="flex overflow-x-hidden scroll-smooth touch-pan-x"
-        style={{ 
-          scrollbarWidth: 'none', 
+        className="flex overflow-x-hidden scroll-smooth touch-pan-x pt-[6rem]"
+        style={{
+          scrollbarWidth: 'none',
           msOverflowStyle: 'none',
           cursor: isDragging ? 'grabbing' : 'grab'
         }}
@@ -200,16 +284,70 @@ const Carousel = ({ children }) => {
 };
 
 const FeaturedCategories = () => {
+  const navigate = useNavigate();
   return (
-    <div className="py-12 bg-white">
-      <div className="container mx-auto px-4">
-        <Title level={2} className="text-center mb-2">
-          Explore Popular Categories
-        </Title>
-        <Paragraph className="text-center text-gray-600 mb-8">
-          Discover trending channels across various niches—where content meets passion.
-        </Paragraph>
-        <div className="pt-20">
+    <div
+      className="py-1 relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(135deg, #f8f9ff 0%, #fff5f8 25%, #ffffff 50%, #f0f9ff 75%, #fef5ff 100%)',
+      }}
+    >
+      {/* Subtle Background Orbs */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-red-100/30 to-transparent rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-100/30 to-transparent rounded-full blur-3xl" />
+      <div className='d-flex '>
+      <Button
+        className="mx-auto flex items-center justify-center mt-4 mb-4 px-8 py-6 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 transform hover:-translate-y-1"
+        style={{
+          background: 'linear-gradient(135deg, #F83758 0%, #FF6B6B 50%, #FF9F40 100%)',
+          border: 'none',
+        }}
+        onClick={() => navigate('/seller-dashboard')}
+      >
+        <ShopOutlined className="mr-2 text-xl" />
+        Sell Your Channel
+      </Button>
+
+      </div>
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Section Header with Glassmorphism */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12 max-w-3xl mx-auto"
+        >
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="inline-block mb-4 px-6 py-2 rounded-full"
+            style={{
+              background: 'rgba(255, 255, 255, 0.7)',
+              backdropFilter: 'blur(10px)',
+              boxShadow: '0 4px 24px rgba(248, 55, 88, 0.1)',
+              border: '1px solid rgba(248, 55, 88, 0.1)',
+            }}
+          >
+            <span className="text-sm font-semibold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+              ✨ Featured Categories
+            </span>
+          </motion.div>
+
+          <Title
+            level={2}
+            className="text-center mb-3 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent"
+            style={{ fontSize: '2.5rem', fontWeight: '700' }}
+          >
+            Explore Popular Categories
+          </Title>
+
+          <Paragraph className="text-center text-gray-600 text-base leading-relaxed">
+            Discover trending channels across various niches—where content meets passion.
+          </Paragraph>
+        </motion.div>
+
+        {/* Categories Carousel */}
+        <div className="pb-8">
           <Carousel>
             {categories.map((category, index) => (
               <CategoryItem key={index} {...category} />

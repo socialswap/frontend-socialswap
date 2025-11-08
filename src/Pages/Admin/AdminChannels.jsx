@@ -19,8 +19,10 @@ const AdminChannels = () => {
   });
 
   const categories = [
-    "Gaming", "Vlogs", "Music", "Tech", "Facts", "Entertainment",
-    "Anime", "Education", "Podcast", "News", "Commentary", "Reaction", "Other"
+    "Gaming", "Tech", "Finance", "Artificial intelligence",
+    "Business & Entrepreneurship", "Education", "Health & Fitness",
+    "Food", "Infotainment", "Vlogging", "Sports", "Commentary",
+    "Entertainment", "Music", "Motivation & Self-Improvement", "Other"
   ];
 
   useEffect(() => {

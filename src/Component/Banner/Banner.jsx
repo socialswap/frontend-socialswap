@@ -1,45 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-const banners = [
-  {
-    title: "Summer Sale!",
-    description: "Get 50% off on all channels this summer",
-    buttonText: "Shop Now",
-    buttonLink: "/channels",
-    img: '/IMG_9788.PNG'
-  },
-  {
-    title: "New Channels Added",
-    description: "Explore our latest additions to find your perfect match",
-    buttonText: "Explore More",
-    buttonLink: "/channels",
-    img: '/IMG_9787.PNG'
-  },
-  {
-    title: "Limited Time Offer",
-    description: "Buy one channel, get another 50% off",
-    buttonText: "Get Offer",
-    buttonLink: "/channels",
-    img: '/IMG_9786.PNG'
-  }
-];
+import axiosInstance, { api } from '../../API/api';
+import { Spin } from 'antd';
 
 const PromotionalBanner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState({});
-  const navigate = useNavigate()
+  const [banners, setBanners] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const navigate = useNavigate();
+
+  // Fetch banners from API
   useEffect(() => {
-    if (isHovered) return;
+    const fetchBanners = async () => {
+      try {
+        const response = await axiosInstance.get(`${api}/banners`);
+        setBanners(response.data.data);
+      } catch (error) {
+        console.error('Error fetching banners:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBanners();
+  }, []);
+
+  // Handle window resize for responsive images
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  useEffect(() => {
+    if (isHovered || banners.length === 0) return;
     
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % banners.length);
     }, 5000);
     
     return () => clearInterval(timer);
-  }, [isHovered]);
+  }, [isHovered, banners.length]);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % banners.length);
@@ -57,6 +64,18 @@ const PromotionalBanner = () => {
     setImagesLoaded(prev => ({ ...prev, [index]: true }));
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-96 bg-gray-100 rounded-lg">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (!banners || banners.length === 0) {
+    return null;
+  }
+
   return (
     <div 
       className="relative w-full h-96 overflow-hidden rounded-lg shadow-xl"
@@ -66,7 +85,7 @@ const PromotionalBanner = () => {
       <div className="relative w-full h-full">
         {banners.map((banner, index) => (
           <div
-            key={index}
+            key={banner._id || index}
             className={`absolute w-full h-full transition-all duration-500 ease-in-out ${
               !imagesLoaded[index] ? 'bg-gray-200' : ''
             }`}
@@ -77,7 +96,7 @@ const PromotionalBanner = () => {
           >
             <div className="relative w-full h-full">
               <img 
-                src={banner.img}
+                src={isMobile ? banner.mobileImageUrl : banner.desktopImageUrl}
                 alt={banner.title}
                 className="w-full h-full object-cover transition-opacity duration-300"
                 onLoad={() => handleImageLoad(index)}
@@ -85,14 +104,16 @@ const PromotionalBanner = () => {
               
               {/* Content Overlay */}
               <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent">
-                <div className="flex align-center justify-center absolute bottom-40 md:left-[47%] left-44 md:bottm-80">
-                  {/* <h2 className="text-4xl font-bold mb-4">{banner.title}</h2>
-                  <p className="text-lg mb-6">{banner.description}</p> */}
+                <div className="flex flex-col items-center justify-center h-full text-white px-4 md:px-12">
+                  <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4 text-center">{banner.title}</h2>
+                  {banner.description && (
+                    <p className="text-sm md:text-lg mb-4 md:mb-6 text-center max-w-2xl">{banner.description}</p>
+                  )}
                   <button 
-                    className="px-6 py-2 bg-white text-black rounded-full hover:bg-gray-200 transition-colors"
-                    onClick={() => navigate(`${banner.buttonLink}`)}
+                    className="px-6 py-2 md:px-8 md:py-3 bg-white text-black rounded-full hover:bg-gray-200 transition-colors font-semibold"
+                    onClick={() => navigate(banner.buttonLink || '/channels')}
                   >
-                    {banner.buttonText}
+                    {banner.buttonText || 'Shop Now'}
                   </button>
                 </div>
               </div>

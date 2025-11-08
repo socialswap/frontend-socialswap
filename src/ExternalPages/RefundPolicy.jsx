@@ -2,97 +2,59 @@ import React from 'react';
 
 const RefundAndReturnPolicy = () => {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-16 space-y-8"  style={{marginTop:'4rem'}}>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">
-        Refund and Return Policy
-      </h1>
+    <div className="max-w-4xl mx-auto p-8 mt-20">
+      <h1 className="text-4xl font-bold mb-6">Refund Policy</h1>
+      
+      <div className="space-y-6 text-gray-700 leading-relaxed">
+        <p className="text-justify">
+          By using SocialSwap.in and engaging in any transaction through our platform, you agree to this Refund Policy.
+        </p>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-gray-800">Overview</h2>
-        <div className="space-y-4 text-gray-600">
+        <p className="text-justify font-semibold text-red-600">
+          All payments made to SocialSwap are final and non-refundable under any circumstances once a transaction is completed.
+        </p>
+
+        <p className="text-justify">
+          SocialSwap is not responsible for and will not issue refunds to buyers if the purchased YouTube channel is deleted, hacked, demonetised, receives copyright strikes, community guideline strikes, or is affected by reused or ineligible content after transfer.
+        </p>
+
+        <p className="text-justify">
+          Similarly, SocialSwap will not make any payment or compensation to channel owners if a channel provided to us for sale is deleted, hacked, or receives strikes, policy violations, or reuse warnings while in or after our possession.
+        </p>
+
+        <p className="text-justify">
+          Once ownership or access is transferred, SocialSwap bears no liability for any future issues related to the channel's performance, safety, or compliance with YouTube's terms.
+        </p>
+
+        <p className="text-justify">
+          Both buyers and sellers understand and agree that it is their sole responsibility to protect their channels, adhere to YouTube policies, and secure their accounts from third-party attacks or recovery attempts by previous owners.
+        </p>
+
+        <p className="text-justify">
+          SocialSwap acts solely as a mediator and cannot reverse, cancel, or refund any completed transaction. By continuing to use our services, you acknowledge and accept this no-refund policy in full.
+        </p>
+
+        <p className="text-justify font-semibold">
+          All matters related to refunds or disputes shall be governed by the laws of India and fall under the exclusive jurisdiction of the courts in Pune, Maharashtra.
+        </p>
+
+        <section className="mt-8 pt-6 border-t">
+          <h2 className="text-2xl font-semibold mb-3">Contact Information</h2>
           <p>
-            We want you to be fully satisfied with your purchase. If you are not satisfied, we offer a straightforward process for returns and refunds.
+            If you have any questions about this Refund Policy, please contact us at:
+          </p>
+          <p className="mt-2">
+            <span className="font-semibold">Email: </span>
+            <a href="mailto:shubham@socialswap.in" className="text-blue-600 hover:text-blue-800 underline">
+              shubham@socialswap.in
+            </a>
           </p>
           <p>
-            Please review our policy below for detailed information on how to request a return or refund.
+            <span className="font-semibold">Phone: </span>
+            +91 9423523291
           </p>
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-gray-800">Return & Refund Timeline</h2>
-        <ul className="space-y-3 text-gray-600 list-none">
-          <li className="flex gap-2">
-            <span className="font-semibold">Return Period:</span>
-            You have <span className="font-semibold">30 days</span> from the date of purchase to initiate a return.
-          </li>
-          <li className="flex gap-2">
-            <span className="font-semibold">Refund Process:</span>
-            Refund requests will be processed within <span className="font-semibold">7 business days</span> after the return is approved.
-          </li>
-          <li className="flex gap-2">
-            <span className="font-semibold">Processing Time:</span>
-            Refunds to your original payment method may take up to <span className="font-semibold">10 business days</span> depending on your bank or payment provider.
-          </li>
-        </ul>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-gray-800">Return Eligibility</h2>
-        <p className="text-gray-600">In order for your return to be eligible, the following conditions must be met:</p>
-        <ul className="list-disc pl-6 space-y-2 text-gray-600">
-          <li>The product must be unused, in the original packaging, and in resellable condition.</li>
-          <li>Items marked as "Final Sale" or "Non-Returnable" cannot be returned or refunded.</li>
-          <li>Return requests must be made within 30 days of purchase.</li>
-          <li>Proof of purchase (order number or receipt) is required to process returns or refunds.</li>
-        </ul>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-gray-800">How to Request a Return or Refund</h2>
-        <p className="text-gray-600">To initiate a return or refund, please follow these steps:</p>
-        <ol className="list-decimal pl-6 space-y-2 text-gray-600">
-          <li>Contact our customer support team at <span className="font-semibold">support@socialswap.in</span> with your order details and the reason for the return.</li>
-          <li>Our team will review your request and provide return instructions if your return is eligible.</li>
-          <li>Once the item is received and inspected, we will notify you of the approval or rejection of your refund.</li>
-          <li>If your return is approved, your refund will be processed and applied to your original payment method.</li>
-        </ol>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-gray-800">Exceptions</h2>
-        <p className="text-gray-600">In the following cases, returns or refunds may not be accepted:</p>
-        <ul className="list-disc pl-6 space-y-2 text-gray-600">
-          <li>Products that have been used or altered from their original condition.</li>
-          <li>Items returned after the 30-day return window has passed.</li>
-          <li>Products that are not purchased directly from our website (e.g., third-party vendors or resellers).</li>
-        </ul>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-gray-800">Exchanges</h2>
-        <p className="text-gray-600">
-          We currently do not offer direct exchanges. If you would like to exchange a product, please follow the return process to receive a refund and then place a new order for the desired product.
-        </p>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-gray-800">Shipping Costs</h2>
-        <p className="text-gray-600">
-          Customers are responsible for return shipping costs unless the product is defective or an error was made in the order. In cases where the product is defective or incorrect, we will cover the return shipping costs.
-        </p>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-gray-800">Contact Us</h2>
-        <p className="text-gray-600">If you have any questions about this Refund and Return Policy, please contact us:</p>
-        <p className="text-gray-600">
-          <span className="font-semibold">Email: </span>
-          <a href="mailto:support@socialswap.in" className="text-blue-600 hover:text-blue-800 underline">
-            support@socialswap.in
-          </a>
-        </p>
-      </section>
+        </section>
+      </div>
     </div>
   );
 };
