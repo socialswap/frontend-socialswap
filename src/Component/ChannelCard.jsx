@@ -1,12 +1,65 @@
-import React, { useState } from "react";
-import { Tag, Tooltip, Badge } from "antd";
+import React, { useState, useEffect } from "react";
+import { Tag, Tooltip, Badge, message } from "antd";
 import { EyeOutlined, UserOutlined, DollarOutlined, YoutubeOutlined, CheckCircleFilled, FireOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import axiosInstance from "../API/api";
 
 const ChannelCard = ({ channel }) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
+  const [cartLoading, setCartLoading] = useState(false);
+
+  const channelId = channel?._id;
+
+  useEffect(() => {
+    const fetchCartStatus = async () => {
+      try {
+        const response = await axiosInstance.get('/cart');
+        const items = response?.data?.channels || [];
+        setIsInCart(items.some(item => item?._id === channelId));
+      } catch (error) {
+        console.error('Failed to check cart status', error);
+      }
+    };
+
+    if (localStorage.getItem('token') && channelId) {
+      fetchCartStatus();
+    } else {
+      setIsInCart(false);
+    }
+  }, [channelId]);
+
+  const handleAddToCart = async (event) => {
+    event.stopPropagation();
+
+    if (!localStorage.getItem('token')) {
+      message.info('Please login to add channels to your cart.');
+      navigate('/login');
+      return;
+    }
+
+    if (isInCart) {
+      navigate('/cart');
+      return;
+    }
+
+    try {
+      setCartLoading(true);
+      await axiosInstance.post('/cart/add', {
+        channelId,
+        quantity: 1,
+      });
+      setIsInCart(true);
+      message.success('Channel added to cart');
+    } catch (error) {
+      console.error('Failed to add channel to cart', error);
+      message.error('Unable to add channel to cart right now.');
+    } finally {
+      setCartLoading(false);
+    }
+  };
 
   if (!channel) return null;
 
@@ -14,8 +67,8 @@ const ChannelCard = ({ channel }) => {
     navigate(`/channel/${channel._id}`);
   };
 
-  const banner = channel.bannerUrl || channel.imageUrls?.[0];
-  const avatar = channel.avatar || channel.imageUrls?.[0];
+  const banner = channel.logoUrl || channel.bannerUrl || channel.imageUrls?.[0] || '/images/yt.png';
+  const avatar = channel.avatar || channel.logoUrl || channel.imageUrls?.[0];
 
   const hasDiscount = channel.discount && channel.discount > 0;
   const isPremium = channel.monetized && (channel.subscriberCount > 100000 || channel.mostDemanding);
@@ -231,6 +284,22 @@ const ChannelCard = ({ channel }) => {
             </motion.a>
           </Tooltip>
         </div>
+
+        <motion.button
+          whileHover={{ scale: isInCart ? 1 : 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          disabled={cartLoading}
+          onClick={handleAddToCart}
+          className={`mt-4 w-full text-center py-3 rounded-xl font-semibold text-white ${cartLoading ? 'opacity-80 cursor-not-allowed' : ''}`}
+          style={{
+            background: isInCart
+              ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+              : 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
+            boxShadow: '0 10px 20px rgba(248, 55, 88, 0.2)',
+          }}
+        >
+          {isInCart ? 'Go to Cart' : cartLoading ? 'Adding...' : 'Add to Cart'}
+        </motion.button>
 
         {/* Hot Deal Pulsing Badge */}
         {channel.mostDemanding && (

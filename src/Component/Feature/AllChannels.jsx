@@ -1,13 +1,66 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ExternalLink, DollarSign, TrendingUp } from "lucide-react";
+import { message } from "antd";
+import axiosInstance from "../../API/api";
 
 const ChannelCard = ({ channel }) => {
   const navigate = useNavigate();
+  const [isInCart, setIsInCart] = useState(false);
+  const [cartLoading, setCartLoading] = useState(false);
+  const channelId = channel?._id;
+  const heroImage = channel?.logoUrl || channel?.bannerUrl || channel?.imageUrls?.[0] || "/images/yt.png";
 
-  // 🛡️ Prevent crash if channel data isn't ready yet
+  useEffect(() => {
+    const fetchCartStatus = async () => {
+      try {
+        const response = await axiosInstance.get('/cart');
+        const items = response?.data?.channels || [];
+        setIsInCart(items.some(item => item?._id === channelId));
+      } catch (error) {
+        console.error('Failed to check cart status', error);
+      }
+    };
+
+    if (localStorage.getItem('token') && channelId) {
+      fetchCartStatus();
+    } else {
+      setIsInCart(false);
+    }
+  }, [channelId]);
+
   if (!channel) return null;
+
+  const handleAddToCart = async (event) => {
+    event.stopPropagation();
+
+    if (!localStorage.getItem('token')) {
+      message.info('Please login to add channels to your cart.');
+      navigate('/login');
+      return;
+    }
+
+    if (isInCart) {
+      navigate('/cart');
+      return;
+    }
+
+    try {
+      setCartLoading(true);
+      await axiosInstance.post('/cart/add', {
+        channelId,
+        quantity: 1,
+      });
+      setIsInCart(true);
+      message.success('Channel added to cart');
+    } catch (error) {
+      console.error('Failed to add channel to cart', error);
+      message.error('Unable to add channel to cart right now.');
+    } finally {
+      setCartLoading(false);
+    }
+  };
 
   const formatNumber = (num) => {
     if (!num && num !== 0) return "—";
@@ -53,7 +106,7 @@ const ChannelCard = ({ channel }) => {
     >
       <div className="relative group">
         <img
-          src={channel?.bannerUrl || "/images/yt.png"}
+          src={heroImage}
           alt={channel?.name || "YouTube Channel"}
           className="w-full h-48 object-contain"
         />
@@ -138,6 +191,21 @@ const ChannelCard = ({ channel }) => {
               {formatDate(channel?.createdAt)}
             </span>
           </div>
+          <motion.button
+            whileHover={{ scale: isInCart ? 1 : 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            disabled={cartLoading}
+            onClick={handleAddToCart}
+            className={`px-5 py-2 rounded-lg text-sm font-semibold text-white ${cartLoading ? 'opacity-80 cursor-not-allowed' : ''}`}
+            style={{
+              background: isInCart
+                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                : 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
+              boxShadow: '0 6px 16px rgba(248, 55, 88, 0.2)',
+            }}
+          >
+            {isInCart ? 'Go to Cart' : cartLoading ? 'Adding...' : 'Add to Cart'}
+          </motion.button>
         </div>
       </div>
     </motion.div>

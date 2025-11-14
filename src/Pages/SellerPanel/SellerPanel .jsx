@@ -42,6 +42,23 @@ const { Option } = Select;
 const { TextArea } = Input;
 
 const API_BASE_URL = api;
+const CATEGORY_OPTIONS = [
+  "Gaming",
+  "Tech",
+  "Finance",
+  "Artificial intelligence",
+  "Business & Entrepreneurship",
+  "Education",
+  "Health & Fitness",
+  "Food",
+  "Infotainment",
+  "Vlogging",
+  "Sports",
+  "Commentary",
+  "Entertainment",
+  "Music",
+  "Motivation & Self-Improvement",
+];
 
 const SellerPanel = () => {
   // States
@@ -63,6 +80,7 @@ const SellerPanel = () => {
   const initialValues = {
     name: '',
     description: '',
+    logoUrl: '',
     subscriberCount: undefined,
     viewCount: undefined,
     videoCount: undefined,
@@ -583,9 +601,6 @@ const getFieldsForStep = (step) => {
 const totalChannels = channels.length;
 const totalSold = soldChannels.length;
 const totalRevenue = soldChannels.reduce((sum, channel) => sum + (channel.soldPrice || 0), 0);
-const averagePrice = channels.length > 0 
-  ? channels.reduce((sum, channel) => sum + (channel.price || 0), 0) / channels.length 
-  : 0;
 
 // Render Stats Cards
 const renderStatsCards = () => (
@@ -634,8 +649,8 @@ const renderStep1 = () => (
       <h3 className="step-title">Basic Channel Information</h3>
       <p className="step-description">Enter the fundamental details about your channel</p>
     </div>
-    <Row gutter={16}>
-      <Col span={12}>
+    <Row gutter={[16, 16]}>
+      <Col xs={24} md={12}>
         <Form.Item 
           name="name" 
           label="Channel Name" 
@@ -644,7 +659,7 @@ const renderStep1 = () => (
           <Input placeholder="Enter channel name" />
         </Form.Item>
       </Col>
-      <Col span={12}>
+      <Col xs={24} md={12}>
         <Form.Item 
           name="price" 
           label="Channel Price (₹)" 
@@ -659,8 +674,8 @@ const renderStep1 = () => (
       </Col>
     </Row>
 
-    <Row gutter={16}>
-      <Col span={12}>
+    <Row gutter={[16, 16]}>
+      <Col xs={24} md={12}>
         <Form.Item 
           name="customUrl" 
           label="Custom URL" 
@@ -671,30 +686,33 @@ const renderStep1 = () => (
           <Input placeholder="Enter custom URL" />
         </Form.Item>
       </Col>
-      <Col span={12}>
+      <Col xs={24} md={12}>
         <Form.Item 
           name="category" 
           label="Category" 
           rules={[{ required: true, message: 'Please select category' }]}
         >
           <Select placeholder="Select category">
-            <Option value="Gaming">Gaming</Option>
-            <Option value="Tech">Tech</Option>
-            <Option value="Finance">Finance</Option>
-            <Option value="Artificial intelligence">Artificial intelligence</Option>
-            <Option value="Business & Entrepreneurship">Business & Entrepreneurship</Option>
-            <Option value="Education">Education</Option>
-            <Option value="Health & Fitness">Health & Fitness</Option>
-            <Option value="Food">Food</Option>
-            <Option value="Infotainment">Infotainment</Option>
-            <Option value="Vlogging">Vlogging</Option>
-            <Option value="Sports">Sports</Option>
-            <Option value="Commentary">Commentary</Option>
-            <Option value="Entertainment">Entertainment</Option>
-            <Option value="Music">Music</Option>
-            <Option value="Motivation & Self-Improvement">Motivation & Self-Improvement</Option>
-            <Option value="Other">Other</Option>
+            {CATEGORY_OPTIONS.map((option) => (
+              <Option key={option} value={option}>
+                {option}
+              </Option>
+            ))}
           </Select>
+        </Form.Item>
+      </Col>
+    </Row>
+
+    <Row gutter={[16, 16]}>
+      <Col xs={24} md={12}>
+        <Form.Item 
+          name="logoUrl" 
+          label="YouTube Logo URL" 
+          rules={[
+            { type: 'url', message: 'Please enter a valid URL (including https://)' }
+          ]}
+        >
+          <Input placeholder="https://example.com/logo.png" />
         </Form.Item>
       </Col>
     </Row>
@@ -813,7 +831,7 @@ const renderStep3 = () => (
       <p className="step-description">Provide accurate statistics about your channel's performance</p>
     </div>
     <Row gutter={16}>
-      <Col span={8}>
+      <Col xs={24} md={12} lg={8}>
         <Form.Item 
           name="subscriberCount" 
           label="Subscriber Count" 
@@ -827,7 +845,7 @@ const renderStep3 = () => (
           />
         </Form.Item>
       </Col>
-      <Col span={8}>
+      <Col xs={24} md={12} lg={8}>
         <Form.Item 
           name="viewCount" 
           label="Total View Count" 
@@ -841,7 +859,7 @@ const renderStep3 = () => (
           />
         </Form.Item>
       </Col>
-      <Col span={8}>
+      <Col xs={24} md={12} lg={8}>
         <Form.Item 
           name="videoCount" 
           label="Video Count" 
@@ -852,8 +870,8 @@ const renderStep3 = () => (
       </Col>
     </Row>
 
-    <Row gutter={16}>
-      <Col span={12}>
+    <Row gutter={[16, 16]}>
+      <Col xs={24} md={12}>
         <Form.Item 
           name="estimatedEarnings" 
           label="Estimated Monthly Earnings ($)" 
@@ -868,7 +886,7 @@ const renderStep3 = () => (
           />
         </Form.Item>
       </Col>
-      <Col span={12}>
+      <Col xs={24} md={12}>
         <Form.Item 
           name="channelType" 
           label="Channel Type" 
@@ -883,8 +901,8 @@ const renderStep3 = () => (
       </Col>
     </Row>
 
-    <Row gutter={16}>
-      <Col span={8}>
+    <Row gutter={[16, 16]}>
+      <Col xs={24} md={12} lg={8}>
         <Form.Item 
           name="averageViewsPerVideo" 
           label="Average Views Per Video" 
@@ -898,7 +916,7 @@ const renderStep3 = () => (
           />
         </Form.Item>
       </Col>
-      <Col span={8}>
+      <Col xs={24} md={12} lg={8}>
         <Form.Item 
           name="recentViews" 
           label="Recent Views (Last 28 Days)" 
@@ -912,7 +930,7 @@ const renderStep3 = () => (
           />
         </Form.Item>
       </Col>
-      <Col span={8}>
+      <Col xs={24} md={12} lg={8}>
         <Form.Item 
           name="watchTimeHours" 
           label="Watch Time (Hours)" 
@@ -933,8 +951,8 @@ const renderStep4 = () => (
       <h3 className="step-title">Additional Channel Details</h3>
       <p className="step-description">Complete your channel listing with final details and contact information</p>
     </div>
-    <Row gutter={16}>
-      <Col span={8}>
+    <Row gutter={[16, 16]}>
+      <Col xs={24} md={12} lg={8}>
         <Form.Item 
           name="joinedDate" 
           label="Joined Date" 
@@ -947,7 +965,7 @@ const renderStep4 = () => (
           />
         </Form.Item>
       </Col>
-      <Col span={8}>
+      <Col xs={24} md={12} lg={8}>
         <Form.Item 
           name="country" 
           label="Country" 
@@ -956,7 +974,7 @@ const renderStep4 = () => (
           <Input placeholder="Enter country" />
         </Form.Item>
       </Col>
-      <Col span={8}>
+      <Col xs={24} md={12} lg={8}>
         <Form.Item 
           name="my_language" 
           label="Language" 
@@ -967,8 +985,8 @@ const renderStep4 = () => (
       </Col>
     </Row>
 
-    <Row gutter={16}>
-      <Col span={12}>
+    <Row gutter={[16, 16]}>
+      <Col xs={24} md={12}>
         <Form.Item 
           name="copyrightStrike" 
           label="Copyright Strike" 
@@ -977,7 +995,7 @@ const renderStep4 = () => (
           <Input placeholder="e.g., 0 or None" />
         </Form.Item>
       </Col>
-      <Col span={12}>
+      <Col xs={24} md={12}>
         <Form.Item 
           name="communityStrike" 
           label="Community Strike" 
@@ -988,8 +1006,8 @@ const renderStep4 = () => (
       </Col>
     </Row>
     
-    <Row gutter={16}>
-      <Col span={12}>
+    <Row gutter={[16, 16]}>
+      <Col xs={24} md={12}>
         <Form.Item 
           name="userEmail" 
           label="Email Address" 
@@ -1001,7 +1019,7 @@ const renderStep4 = () => (
           <Input placeholder="Enter email address" />
         </Form.Item>
       </Col>
-      <Col span={12}>
+      <Col xs={24} md={12}>
         <Form.Item 
           name="contactNumber" 
           label="Contact Number" 
@@ -1015,8 +1033,8 @@ const renderStep4 = () => (
       </Col>
     </Row>
     
-    <Row gutter={16}>
-      <Col span={12}>
+    <Row gutter={[16, 16]}>
+      <Col xs={24} md={12}>
         <Form.Item 
           name="monetized" 
           label="Monetized" 
@@ -1026,7 +1044,7 @@ const renderStep4 = () => (
           <Switch />
         </Form.Item>
       </Col>
-      <Col span={12}>
+      <Col xs={24} md={12}>
         <Form.Item 
           name="organicGrowth" 
           label="Organic Growth" 
@@ -1101,17 +1119,7 @@ const renderAddChannelStepForm = (initialValues) => (
         Previous
       </Button>
       
-      <Button
-        onClick={() => {
-          const allValues = form.getFieldsValue();
-          console.log('=== DEBUG: All Form Values ===', allValues);
-          console.log('Images specifically:', allValues.images);
-          message.info('Check console for form values');
-        }}
-        style={{ margin: '0 10px' }}
-      >
-        Debug Form
-      </Button>
+
       
       {currentStep < 3 ? (
         <Button
@@ -1149,8 +1157,8 @@ const renderEditChannelForm = (initialValues) => (
     {/* Basic Information */}
     <div className="bg-gray-50 p-6 rounded-lg mb-6">
       <h3 className="text-lg font-medium mb-4">Basic Information</h3>
-      <Row gutter={16}>
-        <Col span={12}>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={12}>
           <Form.Item 
             name="name" 
             label="Channel Name" 
@@ -1159,7 +1167,7 @@ const renderEditChannelForm = (initialValues) => (
             <Input placeholder="Enter channel name" />
           </Form.Item>
         </Col>
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Form.Item 
             name="price" 
             label="Channel Price (₹)" 
@@ -1175,7 +1183,7 @@ const renderEditChannelForm = (initialValues) => (
       </Row>
 
       <Row gutter={16}>
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Form.Item 
             name="customUrl" 
             label="Custom URL" 
@@ -1186,30 +1194,33 @@ const renderEditChannelForm = (initialValues) => (
             <Input placeholder="Enter custom URL" />
           </Form.Item>
         </Col>
-        <Col span={12}>
+        <Col xs={24} md={12}>
+        <Form.Item 
+          name="category" 
+          label="Category" 
+          rules={[{ required: true, message: 'Please select category' }]}
+        >
+          <Select placeholder="Select category">
+            {CATEGORY_OPTIONS.map((option) => (
+              <Option key={option} value={option}>
+                {option}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+        </Col>
+      </Row>
+
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={12}>
           <Form.Item 
-            name="category" 
-            label="Category" 
-            rules={[{ required: true, message: 'Please select category' }]}
+            name="logoUrl" 
+            label="YouTube Logo URL" 
+            rules={[
+              { type: 'url', message: 'Please enter a valid URL (including https://)' }
+            ]}
           >
-            <Select placeholder="Select category">
-              <Option value="Gaming">Gaming</Option>
-              <Option value="Tech">Tech</Option>
-              <Option value="Finance">Finance</Option>
-              <Option value="Artificial intelligence">Artificial intelligence</Option>
-              <Option value="Business & Entrepreneurship">Business & Entrepreneurship</Option>
-              <Option value="Education">Education</Option>
-              <Option value="Health & Fitness">Health & Fitness</Option>
-              <Option value="Food">Food</Option>
-              <Option value="Infotainment">Infotainment</Option>
-              <Option value="Vlogging">Vlogging</Option>
-              <Option value="Sports">Sports</Option>
-              <Option value="Commentary">Commentary</Option>
-              <Option value="Entertainment">Entertainment</Option>
-              <Option value="Music">Music</Option>
-              <Option value="Motivation & Self-Improvement">Motivation & Self-Improvement</Option>
-              <Option value="Other">Other</Option>
-            </Select>
+            <Input placeholder="https://example.com/logo.png" />
           </Form.Item>
         </Col>
       </Row>
@@ -1232,7 +1243,7 @@ const renderEditChannelForm = (initialValues) => (
     <div className="bg-gray-50 p-6 rounded-lg mb-6">
       <h3 className="text-lg font-medium mb-4">Channel Statistics</h3>
       <Row gutter={16}>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item 
             name="subscriberCount" 
             label="Subscriber Count" 
@@ -1246,7 +1257,7 @@ const renderEditChannelForm = (initialValues) => (
             />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item 
             name="viewCount" 
             label="Total View Count" 
@@ -1260,7 +1271,7 @@ const renderEditChannelForm = (initialValues) => (
             />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item 
             name="videoCount" 
             label="Video Count" 
@@ -1272,7 +1283,7 @@ const renderEditChannelForm = (initialValues) => (
       </Row>
 
       <Row gutter={16}>
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Form.Item 
             name="estimatedEarnings" 
             label="Estimated Monthly Earnings ($)" 
@@ -1287,7 +1298,7 @@ const renderEditChannelForm = (initialValues) => (
             />
           </Form.Item>
         </Col>
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Form.Item 
             name="channelType" 
             label="Channel Type" 
@@ -1303,7 +1314,7 @@ const renderEditChannelForm = (initialValues) => (
       </Row>
 
       <Row gutter={16}>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item 
             name="averageViewsPerVideo" 
             label="Average Views Per Video" 
@@ -1317,7 +1328,7 @@ const renderEditChannelForm = (initialValues) => (
             />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item 
             name="recentViews" 
             label="Recent Views (Last 28 Days)" 
@@ -1331,7 +1342,7 @@ const renderEditChannelForm = (initialValues) => (
             />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item 
             name="watchTimeHours" 
             label="Watch Time (Hours)" 
@@ -1347,7 +1358,7 @@ const renderEditChannelForm = (initialValues) => (
     <div className="bg-gray-50 p-6 rounded-lg mb-6">
       <h3 className="text-lg font-medium mb-4">Channel Details</h3>
       <Row gutter={16}>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item 
             name="joinedDate" 
             label="Joined Date" 
@@ -1360,7 +1371,7 @@ const renderEditChannelForm = (initialValues) => (
             />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item 
             name="country" 
             label="Country" 
@@ -1369,7 +1380,7 @@ const renderEditChannelForm = (initialValues) => (
             <Input placeholder="Enter country" />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item 
             name="my_language" 
             label="Language" 
@@ -1381,7 +1392,7 @@ const renderEditChannelForm = (initialValues) => (
       </Row>
 
       <Row gutter={16}>
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Form.Item 
             name="copyrightStrike" 
             label="Copyright Strike" 
@@ -1393,7 +1404,7 @@ const renderEditChannelForm = (initialValues) => (
       </Row>
       
       <Row gutter={16}>
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Form.Item 
             name="userEmail" 
             label="Email Address" 
@@ -1405,7 +1416,7 @@ const renderEditChannelForm = (initialValues) => (
             <Input placeholder="Enter email address" />
           </Form.Item>
         </Col>
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Form.Item 
             name="contactNumber" 
             label="Contact Number" 
@@ -1420,7 +1431,7 @@ const renderEditChannelForm = (initialValues) => (
       </Row>
       
       <Row gutter={16}>
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Form.Item 
             name="monetized" 
             label="Monetized" 
@@ -1430,7 +1441,7 @@ const renderEditChannelForm = (initialValues) => (
             <Switch />
           </Form.Item>
         </Col>
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Form.Item 
             name="organicGrowth" 
             label="Organic Growth" 
@@ -1865,6 +1876,20 @@ return (
         border-color: #667eea;
       }
 
+      .custom-steps {
+        overflow-x: auto;
+        padding-bottom: 8px;
+      }
+
+      .custom-steps::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      .custom-steps::-webkit-scrollbar-thumb {
+        background: rgba(102, 126, 234, 0.4);
+        border-radius: 999px;
+      }
+
       .custom-steps .ant-steps-item-finish .ant-steps-item-icon {
         background: #52c41a;
         border-color: #52c41a;
@@ -1986,6 +2011,8 @@ return (
       .step-navigation {
         display: flex;
         justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
         margin-top: 40px;
         padding-top: 30px;
         border-top: 2px solid #f0f0f0;
@@ -2020,6 +2047,22 @@ return (
       .nav-button-success:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(82, 196, 26, 0.4);
+      }
+
+      @media (max-width: 640px) {
+        .step-navigation .nav-button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+
+      @media (min-width: 641px) {
+        .step-navigation {
+          flex-wrap: nowrap;
+        }
+        .step-navigation .nav-button {
+          width: auto;
+        }
       }
 
       /* Switch Styling */

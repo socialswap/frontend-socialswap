@@ -1,15 +1,68 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance, { api } from '../../API/api';
+import { message } from 'antd';
 import { FaCheckCircle, FaUsers, FaEye, FaChartLine, FaClock } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import Carousel from './Carousel';
 
 const API_BASE_URL = api;
 
-const ChannelCard = ({ channel }) => {
+export const ChannelCard = ({ channel }) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
+  const [cartLoading, setCartLoading] = useState(false);
+  const channelId = channel?._id;
+  const heroImage = channel?.logoUrl || channel?.bannerUrl || channel?.imageUrls?.[0] || '/images/yt.png';
+
+  useEffect(() => {
+    const fetchCartStatus = async () => {
+      try {
+        const response = await axiosInstance.get('/cart');
+        const cartChannels = response?.data?.channels || [];
+        setIsInCart(cartChannels.some(item => item?._id === channelId));
+      } catch (error) {
+        console.error('Failed to fetch cart status', error);
+      }
+    };
+
+    if (localStorage.getItem('token') && channelId) {
+      fetchCartStatus();
+    } else {
+      setIsInCart(false);
+    }
+  }, [channelId]);
+
+  const handleAddToCart = async (event) => {
+    event.stopPropagation();
+
+    if (!localStorage.getItem('token')) {
+      message.info('Please login to add channels to your cart.');
+      navigate('/login');
+      return;
+    }
+
+    if (isInCart) {
+      navigate('/cart');
+      return;
+    }
+
+    try {
+      setCartLoading(true);
+      await axiosInstance.post('/cart/add', {
+        channelId,
+        quantity: 1,
+      });
+      setIsInCart(true);
+      message.success('Channel added to cart');
+    } catch (error) {
+      console.error('Failed to add channel to cart', error);
+      message.error('Unable to add channel to cart right now.');
+    } finally {
+      setCartLoading(false);
+    }
+  };
 
   const discount = channel.originalPrice ? Math.round((1 - parseFloat(channel.price) / parseFloat(channel.originalPrice)) * 100) : 0;
 
@@ -26,6 +79,7 @@ const ChannelCard = ({ channel }) => {
         background: 'rgba(255, 255, 255, 0.9)',
         backdropFilter: 'blur(10px)',
         boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
+        minHeight: '540px',
       }}
       onClick={() => navigate(`/channel/${channel?._id}`)}
     >
@@ -42,7 +96,7 @@ const ChannelCard = ({ channel }) => {
       {/* Image Container with Overlay */}
       <div className="relative overflow-hidden">
         <motion.img
-          src={channel.bannerUrl ? channel.bannerUrl : '/images/yt.png'}
+          src={heroImage}
           alt={channel.name}
           className="w-full h-48 object-cover"
           whileHover={{ scale: 1.05 }}
@@ -180,6 +234,22 @@ const ChannelCard = ({ channel }) => {
             {channel.status === 'approved' ? 'Available' : channel.status}
           </motion.div>
         </div>
+
+        <motion.button
+          whileHover={{ scale: isInCart ? 1 : 1.03 }}
+          whileTap={{ scale: 0.98 }}
+          disabled={cartLoading}
+          onClick={handleAddToCart}
+          className={`mt-6 w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-white shadow-lg ${cartLoading ? 'opacity-80 cursor-not-allowed' : ''}`}
+          style={{
+            background: isInCart
+              ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+              : 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
+            boxShadow: '0 10px 20px rgba(248, 55, 88, 0.25)',
+          }}
+        >
+          {isInCart ? 'Go to Cart' : cartLoading ? 'Adding...' : 'Add to Cart'}
+        </motion.button>
 
         {/* Credibility Footer - Shows on Hover */}
         <motion.div

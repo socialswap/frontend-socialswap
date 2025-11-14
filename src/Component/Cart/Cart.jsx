@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Empty, message, Skeleton, Card, Button, Popconfirm, Modal } from 'antd';
+import { Typography, Empty, message, Skeleton, Button, Popconfirm } from 'antd';
 import { DeleteOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance, { api } from '../../API/api';
@@ -43,21 +43,67 @@ const CartPage = () => {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const navigate = useNavigate();
 
+  const formatCurrency = (value = 0) =>
+    `₹${Number(value || 0).toLocaleString('en-IN', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    })}`;
+
+
+  const enrichCartItems = async (items = []) => {
+    return Promise.all(
+      items.map(async (item) => {
+        const rawChannel = item?.channel ? { ...item.channel, ...item } : { ...item };
+        const channelId = rawChannel?._id || item?.channelId;
+
+        if (!channelId) return rawChannel;
+
+        const hasStats =
+          Number(rawChannel?.subscriberCount || 0) > 0 ||
+          Number(rawChannel?.viewCount || 0) > 0 ||
+          Number(rawChannel?.videoCount || 0) > 0;
+
+        if (hasStats) {
+          return {
+            ...rawChannel,
+            quantity: rawChannel?.quantity ?? item?.quantity ?? 1,
+          };
+        }
+
+        try {
+          const detailResponse = await axiosInstance.get(`/channels/${channelId}`);
+          const detail = detailResponse?.data || {};
+          return {
+            ...detail,
+            ...rawChannel,
+            _id: detail?._id || channelId,
+            quantity: rawChannel?.quantity ?? item?.quantity ?? 1,
+            price: rawChannel?.price ?? detail?.price,
+          };
+        } catch (err) {
+          console.error('Failed to enrich cart item', channelId, err);
+          return {
+            ...rawChannel,
+            quantity: rawChannel?.quantity ?? item?.quantity ?? 1,
+          };
+        }
+      })
+    );
+  };
 
   useEffect(() => {
     const fetchCartItems = async () => {
+      setLoading(true);
       try {
         const response = await axiosInstance.get('/cart');
-        console.log(response);
-        
-        setCartItems(response.data.channels);
-        setLoading(false);
+        const channels = response?.data?.channels || [];
+        const normalized = await enrichCartItems(channels);
+        setCartItems(normalized);
       } catch (error) {
         console.error('Error fetching cart:', error);
         message.error('Failed to load cart items.');
       } finally{
         setLoading(false);
-
       }
     };
     fetchCartItems();
@@ -91,7 +137,6 @@ const CartPage = () => {
     setPaymentLoading(true);
   
     try {
-      const user = decodeToken()
       // Create payment order with cart items
       const paymentResponse = await axiosInstance.post(`${api}/create-order`, { 
         amount: totalAmount,
@@ -142,73 +187,185 @@ const CartPage = () => {
 
   console.log(cartItems);
   
-  return (
-    <div style={{ maxWidth: '1200px', margin: '5rem auto', padding: '20px' }}>
-      <Title level={2} style={{ marginBottom: '24px', textAlign: 'center' }}>Your Shopping Cart</Title>
-      {cartItems.length === 0 ? (
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description={
-            <span>
-              Your cart is empty. <Link to="/buy">Continue shopping</Link>
-            </span>
-          }
+  const renderSkeleton = () => (
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {[1, 2, 3].map((s) => (
+        <Skeleton
+          key={s}
+          active
+          paragraph={{ rows: 4 }}
+          avatar={false}
+          style={{ padding: 24, borderRadius: 24, background: 'white' }}
         />
-      ) : (
-        <>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center' }}>
-            {cartItems.map(item => (
-              <Card
-                key={item._id}
-                onClick={() => navigate(`/channel/${item?._id}`)}
-                hoverable
-                style={{ width: 300, marginBottom: '16px' }}
-                cover={<img alt={item?.name} src={item?.bannerUrl || '/images/yt3.png'} style={{ height: 200, objectFit: 'cover' }} />}
-                actions={[
-                  <Popconfirm
-                    title={`Are you sure you want to remove ${item.name}?`}
-                    onConfirm={() => removeFromCart(item)}
-                    okText="Yes"
-                    cancelText="No"
-                  >
-                    <Button icon={<DeleteOutlined />} danger>Remove</Button>
-                  </Popconfirm>
-                ]}
-              >
-                <Card.Meta
-                  title={item?.name}
-                  description={
-                    <>
-                      <Text>Category: {item?.category}</Text>
-                      <br />
-                      <Text>Price: ₹{item?.price}</Text>
-                      <br />
-                      <Text>Subtotal: ₹{item?.price * (item?.quantity || 1)}</Text>
-                    </>
-                  }
-                />
-              </Card>
-            ))}
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 py-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <Title level={2} style={{ marginBottom: 0 }}>
+            Your Shopping Cart
+          </Title>
+          <Text type="secondary">
+            Review your shortlisted channels and proceed when you’re ready to secure the deal.
+          </Text>
+        </div>
+
+        {loading ? (
+          renderSkeleton()
+        ) : cartItems.length === 0 ? (
+          <div className="bg-white rounded-3xl shadow-xl border border-dashed border-gray-200 py-16">
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                <span>
+                  Your cart is empty. <Link to="/buy">Continue shopping</Link>
+                </span>
+              }
+            />
           </div>
-          <Card style={{ marginTop: '24px',width:'55%', textAlign: 'center', margin:'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <Title level={3}>Total Value:</Title>
-              <Title level={3}>₹{getTotalValue().toFixed(2)}</Title>
+        ) : (
+          <>
+            <div className="grid gap-6 md:grid-cols-2">
+              {cartItems.map((item) => (
+                <div
+                  key={item?._id}
+                  onClick={() => navigate(`/channel/${item?._id}`)}
+                  className="group relative rounded-3xl border border-gray-100 bg-white shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer"
+                >
+                  <div className="relative h-56 overflow-hidden">
+                    <img
+                      src={item?.logoUrl || item?.bannerUrl || item?.imageUrls?.[0] || '/images/yt3.png'}
+                      alt={item?.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute top-4 left-4">
+                      <span className="px-4 py-1 rounded-full text-xs font-semibold bg-white/90 text-gray-900 shadow">
+                        {item?.category || 'Channel'}
+                      </span>
+                    </div>
+                    <div className="absolute top-4 right-4 flex gap-2">
+                      <Popconfirm
+                        title={`Remove ${item?.name}?`}
+                        description="This channel will be removed from your cart."
+                        onConfirm={(e) => {
+                          e?.stopPropagation();
+                          removeFromCart(item);
+                        }}
+                        onCancel={(e) => e?.stopPropagation()}
+                        okText="Remove"
+                        cancelText="Keep"
+                      >
+                        <Button
+                          danger
+                          shape="circle"
+                          icon={<DeleteOutlined />}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </Popconfirm>
+                    </div>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <Title level={4} style={{ marginBottom: 4 }}>
+                        {item?.name}
+                      </Title>
+                      <Text type="secondary">{item?.channelType || 'YouTube Channel'}</Text>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div className="rounded-2xl bg-gray-50 p-3">
+                        <Text className="block text-xs uppercase text-gray-500">Subscribers</Text>
+                        <Text strong className="text-lg">
+                          {(item?.subscriberCount || 0).toLocaleString()}
+                        </Text>
+                      </div>
+                      <div className="rounded-2xl bg-gray-50 p-3">
+                        <Text className="block text-xs uppercase text-gray-500">Views</Text>
+                        <Text strong className="text-lg">
+                          {(item?.viewCount || 0).toLocaleString()}
+                        </Text>
+                      </div>
+                      <div className="rounded-2xl bg-gray-50 p-3">
+                        <Text className="block text-xs uppercase text-gray-500">Videos</Text>
+                        <Text strong className="text-lg">
+                          {(item?.videoCount || 0).toLocaleString()}
+                        </Text>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                      <div>
+                        <Text type="secondary" className="text-xs uppercase">
+                          Price
+                        </Text>
+                        <div className="text-2xl font-bold text-gray-900">
+                          {formatCurrency(item?.price)}
+                        </div>
+                        {item?.quantity > 1 && (
+                          <Text type="secondary" className="text-xs">
+                            Qty: {item?.quantity} • Subtotal {formatCurrency(item?.price * item?.quantity)}
+                          </Text>
+                        )}
+                      </div>
+                      <Button
+                        type="primary"
+                        size="large"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/channel/${item?._id}`);
+                        }}
+                        style={{
+                          borderRadius: 999,
+                          paddingInline: 24,
+                          background: 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
+                          border: 'none',
+                          boxShadow: '0 12px 24px rgba(248, 55, 88, 0.25)',
+                        }}
+                      >
+                        View Details
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-            <Button 
-              type="primary" 
-              icon={<ShoppingCartOutlined />} 
-              size="large" 
-              block 
-              onClick={initiatePayment}
-              loading={paymentLoading}
-              disabled={cartItems.length === 0}
-            >
-              Proceed to Checkout
-            </Button>
-          </Card>
-        </>
-      )}
+
+            <div className="mt-10 max-w-3xl mx-auto bg-white rounded-3xl shadow-2xl border border-gray-100 p-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <Text type="secondary" className="uppercase text-xs tracking-widest">
+                    Total cart value
+                  </Text>
+                  <div className="text-4xl font-bold text-gray-900">{formatCurrency(getTotalValue())}</div>
+                  <Text type="secondary">Secure checkout powered by PhonePe</Text>
+                </div>
+                <Button
+                  type="primary"
+                  icon={<ShoppingCartOutlined />}
+                  size="large"
+                  onClick={initiatePayment}
+                  loading={paymentLoading}
+                  disabled={cartItems.length === 0}
+                  style={{
+                    background: 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
+                    border: 'none',
+                    paddingInline: 32,
+                    borderRadius: 16,
+                    boxShadow: '0 20px 35px rgba(248, 55, 88, 0.25)',
+                  }}
+                >
+                  Proceed to Checkout
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };

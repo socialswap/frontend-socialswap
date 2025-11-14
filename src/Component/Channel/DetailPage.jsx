@@ -183,9 +183,9 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
               className="relative"
             >
               <div className={`w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-2xl flex items-center justify-center bg-gradient-to-br ${getAvatarGradient(channel.name)}`}>
-                {channel.avatar ? (
+                {channel.logoUrl || channel.avatar ? (
                   <img
-                    src={channel.avatar}
+                    src={channel.logoUrl || channel.avatar}
                     alt={channel.name}
                     className="w-full h-full object-cover"
                   />

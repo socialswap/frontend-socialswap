@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Form, Input, Button, Card, message } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,13 +7,6 @@ import axiosInstance, { api } from '../../API/api';
 const Signup = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState('buyer');
-
-  const handleCategoryChange = (category) => {
-    setSelectedCategory(category);
-    form.setFieldsValue({ role: category });
-  };
-
   const onFinish = async (values) => {
     try {
       const { confirmPassword, ...signupData } = values;
@@ -86,7 +79,7 @@ const Signup = () => {
             name="phone"
             rules={[
               { required: true, message: 'Please input your phone number!' },
-              { pattern: /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/, message: 'Please enter a valid phone number!' }
+              { pattern: /^(\+\d{1,2}\s?)?1?-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/, message: 'Please enter a valid phone number!' }
             ]}
           >
             <Input 

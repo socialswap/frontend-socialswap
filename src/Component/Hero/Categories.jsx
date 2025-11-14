@@ -21,8 +21,7 @@ const CATEGORIES = [
   "Commentary",
   "Entertainment",
   "Music",
-  "Motivation & Self-Improvement",
-  "Other"
+  "Motivation & Self-Improvement"
 ];
 
 const Categories = () => {

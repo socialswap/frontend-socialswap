@@ -220,7 +220,7 @@ const ChannelCard = ({ channel, updateCartStatus }) => {
           <div style={{ position: 'relative' }}>
             <StyledImage 
               alt={channel.name} 
-              src={channel.bannerUrl ? channel.bannerUrl : '/images/yt.png'} 
+              src={channel.logoUrl || channel.bannerUrl || channel.imageUrls?.[0] || '/images/yt.png'} 
             />
             {/* <PremiumTag>Premium</PremiumTag> */}
             {channel.monetized && (

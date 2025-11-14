@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Form, Input, Button, message, Divider } from 'antd';
 import { MailOutlined } from '@ant-design/icons';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axiosInstance, { api } from '../../API/api';
 import { useGoogleLogin } from '@react-oauth/google';
 import Particles from 'react-tsparticles';

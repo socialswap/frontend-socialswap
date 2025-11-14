@@ -12,6 +12,7 @@ import PromotionalBanner from '../../Component/Banner/Banner';
 import { Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import AllChannels from '../../Component/Feature/AllChannels';
+import TopChannelsCarousel from '../../Component/Feature/TopChannelsCarousel';
 
 const HomePage = () => {
     const navigate = useNavigate();
@@ -26,6 +27,7 @@ const HomePage = () => {
                     <VideoSection/>
                 </div>
                 <FeaturedListings />
+                <TopChannelsCarousel />
                 <AllChannels/>
                 <Testimonials />
                 <WhyChannelKart />

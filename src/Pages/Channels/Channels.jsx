@@ -8,6 +8,23 @@ import { FaGamepad, FaUsers, FaEye, FaDollarSign, FaMoneyBillWave, FaVideo } fro
 import { useLocation } from "react-router-dom";
 
 const { Option } = Select;
+const CATEGORY_OPTIONS = [
+  "Gaming",
+  "Tech",
+  "Finance",
+  "Artificial intelligence",
+  "Business & Entrepreneurship",
+  "Education",
+  "Health & Fitness",
+  "Food",
+  "Infotainment",
+  "Vlogging",
+  "Sports",
+  "Commentary",
+  "Entertainment",
+  "Music",
+  "Motivation & Self-Improvement"
+];
 
 const Channels = () => {
   const location = useLocation();
@@ -244,7 +261,12 @@ const Channels = () => {
     return count;
   };
 
-  const categories = [...new Set(channels.map(ch => ch.category))].filter(Boolean);
+  const categories = Array.from(
+    new Set([
+      ...CATEGORY_OPTIONS,
+      ...channels.map((ch) => ch.category).filter(Boolean),
+    ])
+  );
 
   // Group filtered channels by category
   const groupedChannels = filteredChannels.reduce((acc, channel) => {

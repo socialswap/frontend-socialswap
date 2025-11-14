@@ -14,8 +14,6 @@ import AdminDashboard from '../Pages/Admin/AdminDashboard';
 import AdminBanners from '../Pages/Admin/AdminBanners';
 import SellerPanel from '../Pages/SellerPanel/SellerPanel ';
 import UnauthorizedComponent from '../Component/UnAuthorized/UnAuthorized';
-import PurchaseSteps from '../Component/Steps/Steps/Steps';
-import SellChannelSteps from '../Component/Steps/Steps/SellChannel';
 import ChannelTransactionSteps from '../Component/Steps/Steps/ChannelSteps/ChannelSteps';
 import BlogSection from '../Pages/Blogs/Blogs';
 import UserProfile from '../Component/Profile/Profile';

@@ -10,6 +10,23 @@ const { Option } = Select;
 const { TextArea } = Input;
 
 const API_BASE_URL = api;
+const CATEGORY_OPTIONS = [
+  "Gaming",
+  "Tech",
+  "Finance",
+  "Artificial intelligence",
+  "Business & Entrepreneurship",
+  "Education",
+  "Health & Fitness",
+  "Food",
+  "Infotainment",
+  "Vlogging",
+  "Sports",
+  "Commentary",
+  "Entertainment",
+  "Music",
+  "Motivation & Self-Improvement"
+];
 
 const AdminPanel = () => {
   const [channels, setChannels] = useState([]);
@@ -170,22 +187,11 @@ const AdminPanel = () => {
       </Form.Item>
       <Form.Item name="category" label="Category" rules={[{ required: true }]}>
         <Select>
-          <Option value="Gaming">Gaming</Option>
-          <Option value="Tech">Tech</Option>
-          <Option value="Finance">Finance</Option>
-          <Option value="Artificial intelligence">Artificial intelligence</Option>
-          <Option value="Business & Entrepreneurship">Business & Entrepreneurship</Option>
-          <Option value="Education">Education</Option>
-          <Option value="Health & Fitness">Health & Fitness</Option>
-          <Option value="Food">Food</Option>
-          <Option value="Infotainment">Infotainment</Option>
-          <Option value="Vlogging">Vlogging</Option>
-          <Option value="Sports">Sports</Option>
-          <Option value="Commentary">Commentary</Option>
-          <Option value="Entertainment">Entertainment</Option>
-          <Option value="Music">Music</Option>
-          <Option value="Motivation & Self-Improvement">Motivation & Self-Improvement</Option>
-          <Option value="Other">Other</Option>
+          {CATEGORY_OPTIONS.map(option => (
+            <Option key={option} value={option}>
+              {option}
+            </Option>
+          ))}
         </Select>
       </Form.Item>
       <Form.Item name="joinedDate" label="Joined Date" rules={[{ required: true }]}>
