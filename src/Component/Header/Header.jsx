@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Drawer, Badge, Avatar, Dropdown, Menu } from 'antd';
-import { MenuOutlined, ShoppingCartOutlined, UserOutlined, HeartOutlined, SearchOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Drawer, Badge } from 'antd';
+import { MenuOutlined, ShoppingCartOutlined, SearchOutlined, LogoutOutlined } from '@ant-design/icons';
 import axiosInstance from '../../API/api';
-import { menuitem } from 'framer-motion/client';
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [visible, setVisible] = useState(false);
   const [cartCount, setCartCount] = useState(0);
-  const [wishlistCount, setWishlistCount] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState('');
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [cartPulse, setCartPulse] = useState(false);
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -29,7 +28,6 @@ const Header = () => {
       }
     }
     fetchCart();
-    setWishlistCount(3);
   }, [isLoggedIn, location?.pathname]);
 
   useEffect(() => {
@@ -42,13 +40,27 @@ const Header = () => {
       setIsLoggedIn(!!token);
     };
 
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 8);
+    };
+
     window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     checkLoginStatus();
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (cartCount > 0) {
+      setCartPulse(true);
+      const t = setTimeout(() => setCartPulse(false), 500);
+      return () => clearTimeout(t);
+    }
+  }, [cartCount]);
 
   const showDrawer = () => {
     setVisible(true);
@@ -79,7 +91,6 @@ const Header = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     setIsLoggedIn(false);
-    setUserRole('');
     setCartCount(0);
     navigate('/');
   };
@@ -95,106 +106,146 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 fixed top-0 w-[100vw] z-50">
-      <div className="container px-4">
-        <div className="flex items-center justify-between py-4 w-[100vw] pr-16">
-          <div className="flex items-center">
-            <img src="/images/logo.png" alt="" style={{ height: '2rem' }} />
-            <Link to="/" className="text-2xl font-bold text-">  SocialSwap</Link>
+    <header className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm' : 'bg-white/70 backdrop-blur border-b border-transparent'}`}>
+      <div className="max-w-screen-xl mx-auto px-4">
+        <div className="flex items-center justify-between py-3">
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2 group" aria-label="SocialSwap Home">
+              <img src="/images/logo.png" alt="SocialSwap logo" style={{ height: '2rem' }} className="transition-transform duration-300 group-hover:scale-105" />
+              <span className="text-xl md:text-2xl font-bold tracking-tight text-gray-900">SocialSwap</span>
+            </Link>
           </div>
 
-          <nav className="hidden md:flex space-x-6">
+          <nav className="hidden md:flex items-center gap-1">
             {menuItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`text-gray-700 hover:text-gray-900 ${isActiveRoute(item.path) ? 'font-semibold' : ''}`}
+                className={`relative px-3 py-2 rounded-md text-sm font-medium transition-colors
+                  ${isActiveRoute(item.path)
+                    ? 'text-gray-900 bg-gray-100'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
+                aria-current={isActiveRoute(item.path) ? 'page' : undefined}
               >
-                {item.label}
-                {item.hot && <span className="ml-1 bg-red-500 text-white text-xs px-1 rounded">HOT</span>}
+                <span className="relative after:absolute after:left-0 after:-bottom-0.5 after:h-0.5 after:w-0 after:bg-gray-900 after:transition-all after:duration-300 hover:after:w-full">
+                  {item.label}
+                </span>
+                {item.hot && <span className="ml-2 inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold bg-red-500 text-white ae">HOT</span>}
               </Link>
             ))}
           </nav>
 
-          <div className="flex items-center space-x-4">
-            {/* Only show search on desktop */}
-            <SearchOutlined className="hidden md:block text-gray-600 text-xl cursor-pointer" onClick={() => navigate('/channels')} />
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Search channels"
+              className="hidden md:inline-flex items-center justify-center h-9 w-9 rounded-full transition-transform duration-200 text-red-600 hover:text-red-700 drop-shadow-md hover:drop-shadow-lg hover:scale-110"
+              onClick={() => navigate('/channels')}
+            >
+              <SearchOutlined className="text-lg" />
+            </button>
 
-            {/* Only show heart/cart/profile icons on desktop */}
             {isLoggedIn ? (
               <>
-                <Badge count={cartCount} size="small" className="hidden md:block">
-                  <ShoppingCartOutlined className="text-gray-600 text-xl cursor-pointer" onClick={() => navigate('/cart')} />
+                <Badge count={cartCount} size="small" className={`hidden md:block ${cartPulse ? 'animate-bounce' : ''}`}>
+                  <button
+                    type="button"
+                    aria-label="Open cart"
+                    className="inline-flex items-center justify-center h-9 w-9 rounded-full transition-transform duration-200 text-red-600 hover:text-red-700 drop-shadow-md hover:drop-shadow-lg hover:scale-110"
+                    onClick={() => navigate('/cart')}
+                  >
+                    <ShoppingCartOutlined className="text-lg" />
+                  </button>
                 </Badge>
-                <div className="hidden md:block" key="profile" onClick={() => navigate('/profile')}>
-                  {/* <Avatar icon={<UserOutlined />} className="cursor-pointer bg-gray-200" /> */}
-                  <img src="/images/userImg.jpg" alt="" style={{height:'35px'}}/>
-                </div>
-                <div key="logout" className='cursor-pointer hidden md:block' onClick={handleLogout}>
-                  <LogoutOutlined />
-                </div>
+                <button
+                  type="button"
+                  className="hidden md:flex items-center"
+                  aria-label="Open profile"
+                  onClick={() => navigate('/profile')}
+                >
+                  <img src="/images/userImg.jpg" alt="User avatar" style={{height:'36px', width:'36px'}} className="rounded-full ring-1 ring-gray-200 transition-transform duration-300 hover:scale-105" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Logout"
+                  className="hidden md:inline-flex items-center justify-center h-9 w-9 rounded-full transition-transform duration-200 text-red-600 hover:text-red-700 drop-shadow-md hover:drop-shadow-lg hover:scale-110"
+                  onClick={handleLogout}
+                >
+                  <LogoutOutlined className="text-lg" />
+                </button>
               </>
             ) : (
-              <Link to="/login" className="text-gray-600 hover:text-gray-900 hidden md:block">
-                  <img src="/images/userImg.jpg" alt="" style={{height:'35px'}}/>
-                  </Link>
+              <Link
+                to="/login"
+                className="hidden md:inline-flex items-center h-9 px-5 rounded-full bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition shadow-sm hover:shadow"
+              >
+                Sign in
+              </Link>
             )}
 
-            {/* Always show hamburger menu on mobile */}
-        
-            {/* Profile and Cart options for mobile */}
             {isMobile && isLoggedIn && (
               <>
                 <Badge count={cartCount} size="small">
                   <ShoppingCartOutlined
-                    className="text-gray-600 text-xl cursor-pointer"
+                    className="text-red-600 text-2xl cursor-pointer transition-transform duration-200 drop-shadow-md hover:drop-shadow-lg hover:text-red-700 hover:scale-110"
                     onClick={() => navigate('/cart')}
                   />
                 </Badge>
-                <div onClick={() => navigate('/profile')}>
-                <img src="/images/userImg.jpg" alt="" style={{height:'35px'}}/>
-                </div>
+                <button type="button" onClick={() => navigate('/profile')} aria-label="Open profile">
+                  <img src="/images/userImg.jpg" alt="User avatar" style={{height:'35px', width:'35px'}} className="rounded-full ring-1 ring-gray-200" />
+                </button>
               </>
             )}
 
-            {/* Only show login for mobile if not logged in */}
             {isMobile && !isLoggedIn && (
-              <Link to="/login" className="text-gray-600 hover:text-gray-900">
-                  <img src="/images/userImg.jpg" alt="" style={{height:'35px'}}/>
-                  </Link>
+              <Link to="/login" aria-label="Sign in" className="text-gray-600 hover:text-gray-900">
+                <img src="/images/userImg.jpg" alt="User avatar" style={{height:'35px', width:'35px'}} className="rounded-full ring-1 ring-gray-200" />
+              </Link>
             )}
-                {isMobile && (
-              <MenuOutlined className="text-gray-600 text-xl cursor-pointer md:hidden" onClick={showDrawer} />
+            {isMobile && (
+              <button
+                type="button"
+                aria-label="Open menu"
+                className="inline-flex md:hidden items-center justify-center h-9 w-9 rounded-full transition-transform duration-200 text-red-600 hover:text-red-700 drop-shadow-md hover:drop-shadow-lg active:scale-95"
+                onClick={showDrawer}
+              >
+                <MenuOutlined className="text-lg" />
+              </button>
             )}
           </div>
         </div>
       </div>
 
       <Drawer
-        title="Menu"
+        title={
+          <div className="flex items-center gap-2">
+            <img src="/images/logo.png" alt="SocialSwap logo" style={{ height: '1.5rem' }} />
+            <span className="font-semibold">Menu</span>
+          </div>
+        }
         placement="right"
         onClose={onClose}
         open={visible}
         width={250}
       >
-        <nav className="flex flex-col space-y-4">
+        <nav className="flex flex-col space-y-2">
           {menuItems.map((item) => (
             <button
               key={item.path}
               onClick={() => handleNavigation(item.path)}
-              className={`text-left py-2 px-4 rounded w-full ${isActiveRoute(item.path)
+              className={`text-left py-2.5 px-4 rounded-md w-full transition-all ${isActiveRoute(item.path)
                   ? 'bg-gray-100 text-gray-900'
                   : 'hover:bg-gray-50 text-gray-600 hover:text-gray-900'
                 }`}
             >
               {item.label}
-              {item.hot && <span className="ml-1 bg-red-500 text-white text-xs px-1 rounded">HOT</span>}
+              {item.hot && <span className="ml-2 inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold bg-red-500 text-white">HOT</span>}
             </button>
           ))}
           {isLoggedIn && (
             <button
               onClick={handleLogout}
-              className="text-left py-2 px-4 hover:bg-gray-50 rounded w-full text-gray-600 hover:text-gray-900"
+              className="text-left py-2 px-4 hover:bg-gray-50 rounded-md w-full text-gray-600 hover:text-gray-900"
             >
               Logout
             </button>

@@ -173,7 +173,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
         transition={{ duration: 0.6 }}
         className="bg-white border-b border-gray-200 shadow-sm"
       >
-        <div className="max-w-[1600px] mx-auto px-8 py-12">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-8 py-8 md:py-12">
           {/* Channel Profile & Identity */}
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-8">
             {/* Large Avatar */}
@@ -182,7 +182,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
               transition={{ type: "spring", stiffness: 300 }}
               className="relative"
             >
-              <div className={`w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-2xl flex items-center justify-center bg-gradient-to-br ${getAvatarGradient(channel.name)}`}>
+              <div className={`w-28 h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white shadow-2xl flex items-center justify-center bg-gradient-to-br ${getAvatarGradient(channel.name)}`}>
                 {channel.logoUrl || channel.avatar ? (
                   <img
                     src={channel.logoUrl || channel.avatar}
@@ -190,7 +190,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-white text-6xl font-bold">
+                  <span className="text-white text-4xl md:text-6xl font-bold">
                     {channel.name?.charAt(0).toUpperCase() || 'C'}
                   </span>
                 )}
@@ -205,18 +205,18 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
             {/* Channel Info */}
             <div className="flex-1 text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
-                <h1 className="text-5xl font-bold text-gray-900">{channel.name}</h1>
+                <h1 className="text-3xl md:text-5xl font-bold text-gray-900 break-words">{channel.name}</h1>
                 {channel.verified && (
                   <CheckCircleFilled className="text-blue-500 text-3xl" />
                 )}
               </div>
 
-              <p className="text-2xl text-gray-600 mb-4">
+              <p className="text-lg md:text-2xl text-gray-600 mb-4">
                 {formatNumber(channel.subscriberCount)} Subscribers • {channel.videoCount} Videos
               </p>
 
               {/* YouTube Red Accent Line */}
-              <div className="w-32 h-1.5 bg-gradient-to-r from-red-500 via-red-600 to-red-500 rounded-full mx-auto md:mx-0 mb-6"></div>
+              <div className="w-24 md:w-32 h-1.5 bg-gradient-to-r from-red-500 via-red-600 to-red-500 rounded-full mx-auto md:mx-0 mb-6"></div>
 
               {/* Badges Row */}
               <div className="flex flex-wrap gap-2 justify-center md:justify-start">
@@ -261,7 +261,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
       </motion.div>
 
       {/* MAIN DASHBOARD CONTENT */}
-      <div className="max-w-[1600px] mx-auto px-8 py-8">
+      <div className="max-w-[1600px] mx-auto px-4 md:px-8 py-6 md:py-8">
         <div className="space-y-8">
             {/* 📊 ANALYTICS DASHBOARD SECTION */}
             <motion.div
@@ -515,7 +515,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                 </h3>
 
                 {/* Main Image Display */}
-                <div className="relative mb-6 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 shadow-lg" style={{ height: '450px' }}>
+                <div className="relative mb-6 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 shadow-lg" style={{ height: '300px', }}>
                   <Image
                     src={channel.imageUrls[currentImageIndex]}
                     alt={`Preview ${currentImageIndex + 1}`}
@@ -532,14 +532,14 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                 </div>
 
                 {/* Thumbnail Navigation */}
-                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                <div className="flex gap-3 overflow-x-auto pb-2">
                   {channel.imageUrls.map((img, index) => (
                     <motion.div
                       key={index}
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setCurrentImageIndex(index)}
-                      className={`flex-shrink-0 w-28 h-28 rounded-xl overflow-hidden cursor-pointer border-3 transition-all ${
+                      className={`flex-shrink-0 w-24 h-24 md:w-28 md:h-28 rounded-xl overflow-hidden cursor-pointer border-3 transition-all ${
                         currentImageIndex === index
                           ? 'border-blue-500 shadow-xl ring-2 ring-blue-200'
                           : 'border-gray-300 opacity-60 hover:opacity-100 hover:border-blue-300'
@@ -680,7 +680,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                       Asking Price
                     </p>
                     <div className="flex items-center justify-center gap-2 mb-3">
-                      <span className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      <span className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                         ₹{parseInt(channel.price || 0).toLocaleString()}
                       </span>
                     </div>
@@ -727,7 +727,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                       size="large"
                       icon={<WhatsAppOutlined />}
                       onClick={handleMakeOffer}
-                      className="w-full h-14 font-bold text-base"
+                      className="w-full h-12 sm:h-14 font-semibold sm:font-bold text-sm sm:text-base whitespace-normal break-words"
                       style={{
                         background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
                         border: 'none',
@@ -742,7 +742,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                       size="large"
                       icon={<ShoppingCartOutlined />}
                       onClick={handleAddToCart}
-                      className="w-full h-14 font-bold text-base"
+                      className="w-full h-12 sm:h-14 font-semibold sm:font-bold text-sm sm:text-base whitespace-normal break-words"
                       style={
                         !isInCart
                           ? {
@@ -766,7 +766,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                       icon={<ThunderboltOutlined />}
                       onClick={handleBuyNow}
                       loading={paymentLoading}
-                      className="w-full h-16 font-extrabold text-lg"
+                      className="w-full h-14 sm:h-16 font-bold sm:font-extrabold text-base sm:text-lg whitespace-normal break-words"
                       style={{
                         background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                         border: 'none',

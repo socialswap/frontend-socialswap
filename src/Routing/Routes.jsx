@@ -30,6 +30,8 @@ import PrivacyPolicy from '../ExternalPages/PrivacyPolicy';
 import TermsAndConditions from '../ExternalPages/TermsAndConditions';
 import RefundAndReturnPolicy from '../ExternalPages/RefundPolicy';
 import ShippingAndCancellationPolicy from '../ExternalPages/Cancellation';
+import AdminBlogs from '../Pages/Admin/AdminBlogs';
+import BlogDetail from '../Pages/Blogs/BlogDetail';
 
 const ProtectedRoute = ({ element, isAuthRequired = false }) => {
   const token = localStorage.getItem('token');
@@ -56,6 +58,7 @@ const Routes = () => {
     { path: '/channel/:id', element: <DetailPageWrapper /> },
     { path: '/how-to', element: <ChannelTransactionSteps /> },
     { path: '/blogs', element: <BlogSection /> },
+    { path: '/blogs/:id', element: <BlogDetail /> },
     { path: '/about', element: <AboutPage /> },
     { path: '/transactions', element: <TransactionsPanel /> },
 
@@ -82,6 +85,10 @@ const Routes = () => {
     {
       path: '/admin/banners',
       element: <ProtectedRoute element={<AdminBanners />} isAuthRequired={true} />
+    },
+    {
+      path: '/admin/blogs',
+      element: <ProtectedRoute element={<AdminBlogs />} isAuthRequired={true} />
     },
     { path: '/unauthorized', element: <UnauthorizedComponent /> },
     { 

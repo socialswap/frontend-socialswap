@@ -37,9 +37,9 @@ const PurchaseSteps = () => {
         <>
           You will see a sticker on the confirmation page with the message: "We are redirecting you to our official dealer for the channel transfer process." Click on the "Go" button in the sticker. This will redirect you to our business WhatsApp number.
           <br /><br />
-          <Button type="primary" icon={<WhatsAppOutlined />} style={{ backgroundColor: '#25D366', borderColor: '#25D366' }}>
+          <a href="https://wa.me/919423523291" target="_blank" style={{ backgroundColor: '#25D366', borderColor: '#25D366',color:'white', padding:'0.5rem', borderRadius:'0.5rem' }} rel="noopener noreferrer"  aria-label="Open WhatsApp to continue transfer">
             Go to WhatsApp
-          </Button>
+          </a>
         </>
       ),
       icon: <WhatsAppOutlined />
@@ -58,41 +58,101 @@ const PurchaseSteps = () => {
     }
   ];
 
-  const paymentMethods = ['UPI QR Code', 'PayPal', 'Binance', 'Credit/Debit Card'];
+  const paymentMethods = ['Razorpay'];
 
   return (
-    <Card style={{ maxWidth: 800 }} >
-      <Title level={2} style={{ color: 'rgb(248, 55, 88)', textAlign: 'center', marginBottom: 30 }}>
+    <Card  className="rounded-3xl bg-white/70 backdrop-blur border border-white/70 shadow-xl relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-24 -right-24 w-72 h-72 bg-rose-100/60 blur-3xl rounded-full" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-orange-100/60 blur-3xl rounded-full" />
+      </div>
+      <Title
+        level={2}
+        style={{
+          textAlign: 'center',
+          marginBottom: 22,
+          backgroundImage: 'linear-gradient(90deg, rgb(248,55,88), rgb(255,159,64))',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          color: 'transparent',
+          fontWeight: 800,
+          letterSpacing: -0.5
+        }}
+      >
         Welcome to our platform!
       </Title>
-      <Paragraph style={{ fontSize: 16, marginBottom: 30, textAlign: 'center' }}>
+      <Paragraph style={{ fontSize: 16, marginBottom: 24, textAlign: 'center', color: '#374151' }}>
         Follow these simple steps to buy a YouTube channel seamlessly.
       </Paragraph>
       <Steps
         direction="vertical"
         items={steps.map((step, index) => ({
-          title: <span style={{ color: '#1677ff', fontWeight: 'bold' }}>{step.title}</span>,
+          title: (
+            <span
+              style={{
+                fontWeight: 700,
+                backgroundImage: 'linear-gradient(90deg, #111827, #374151)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                color: 'transparent'
+              }}
+            >
+              {step.title}
+            </span>
+          ),
           description: (
             <div>
-              <Paragraph>{step.description}</Paragraph>
+              <Paragraph style={{ marginBottom: 8, color: '#4B5563' }}>{step.description}</Paragraph>
               {index === 3 && (
-                <ul style={{ paddingLeft: 20 }}>
+                <ul style={{ paddingLeft: 0, display: 'grid', gap: 8 }}>
                   {paymentMethods.map((method, i) => (
-                    <li key={i} style={{ color: 'rgb(22, 101, 52)' }}>{method}</li>
+                    <li
+                      key={i}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        width: 'fit-content',
+                        padding: '6px 10px',
+                        borderRadius: 12,
+                        backgroundColor: 'rgba(248,55,88,0.08)',
+                        color: 'rgb(248,55,88)',
+                        fontWeight: 600
+                      }}
+                    >
+                      {method}
+                    </li>
                   ))}
                 </ul>
               )}
             </div>
           ),
-          icon: React.cloneElement(step.icon, { style: { color: 'rgb(248, 55, 88)' } })
+          icon: React.cloneElement(step.icon, {
+            style: {
+              color: 'rgb(248, 55, 88)',
+              filter: 'drop-shadow(0 6px 14px rgba(248,55,88,0.35))',
+              transform: 'translateZ(0)'
+            }
+          })
         }))}
       />
-      <Paragraph style={{ marginTop: 20, textAlign: 'center', color: '#1677ff' }}>
+      <Paragraph style={{ marginTop: 20, textAlign: 'center', color: '#111827', fontWeight: 600 }}>
         Receive Further Assistance: Our team will review your message and assist you with the channel transfer process.
       </Paragraph>
-      <Paragraph style={{ marginTop: 10, textAlign: 'center' }}>
+      <Paragraph style={{ marginTop: 6, textAlign: 'center', color: '#4B5563' }}>
         Thank you for choosing our platform. If you have any questions or need further assistance, feel free to contact us!
       </Paragraph>
+      <div className="w-full flex items-center justify-center mt-4">
+        <a
+          href="https://wa.me/919423523291"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-white font-semibold bg-gradient-to-r from-emerald-500 to-green-500 shadow-lg hover:shadow-xl transition-transform hover:scale-[1.02]"
+          aria-label="Open WhatsApp to continue transfer"
+        >
+          <span className="inline-block h-2 w-2 rounded-full bg-white animate-pulse" />
+          Go to WhatsApp for Transfer
+        </a>
+      </div>
     </Card>
   );
 };

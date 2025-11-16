@@ -7,6 +7,7 @@ const Carousel = ({ children }) => {
   const [isScrolling, setIsScrolling] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const carouselRef = useRef(null);
   const x = useMotionValue(0);
   const dragControls = useDragControls();
@@ -15,21 +16,34 @@ const Carousel = ({ children }) => {
   const childCount = React.Children.count(children);
   const maxScroll = -(childCount - 4) * 288;
 
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkIsMobile = () => {
+      if (typeof window !== 'undefined') {
+        setIsMobile(window.innerWidth < 768);
+      }
+    };
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile, { passive: true });
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
   useEffect(() => {
     let interval;
     
-    if (!isPaused && !isDragging) {
+    // Reduce autoplay aggressiveness and disable on mobile for better UX
+    if (!isPaused && !isDragging && !isMobile) {
       interval = setInterval(() => {
         if (!isScrolling && currentIndex < childCount - 4) {
           setCurrentIndex(prev => prev + 1);
         } else if (!isScrolling) {
           setCurrentIndex(0);
         }
-      }, 1000);
+      }, 3000);
     }
 
     return () => clearInterval(interval);
-  }, [currentIndex, isScrolling, children, isPaused, isDragging, childCount]);
+  }, [currentIndex, isScrolling, children, isPaused, isDragging, childCount, isMobile]);
 
   const handleDragStart = (event, info) => {
     setIsDragging(true);
@@ -68,8 +82,49 @@ const Carousel = ({ children }) => {
     setIsPaused(!isPaused);
   };
 
+  // Native scroll for mobile to avoid vertical scroll being blocked by horizontal drag
+  if (isMobile) {
+    return (
+      <div
+        className="relative"
+        style={{
+          touchAction: 'pan-y',
+        }}
+      >
+        <div
+          className="flex gap-4 overflow-x-auto snap-x snap-mandatory px-1 hide-scrollbar"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehaviorX: 'contain',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
+        >
+          {/* hide scrollbar for WebKit */}
+          <style>{`
+            .hide-scrollbar::-webkit-scrollbar { display: none; }
+          `}</style>
+          {React.Children.map(children, (child, idx) => (
+            <div
+              key={idx}
+              className="snap-start"
+              style={{
+                minWidth: 288,
+                scrollSnapAlign: 'start',
+              }}
+            >
+              {child}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="relative group touch-pan-x" ref={carouselRef}>
+    <div className="relative group md:touch-pan-x" ref={carouselRef} style={{ touchAction: 'pan-y' }}>
       <button
         onClick={scrollLeft}
         className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all opacity-0 group-hover:opacity-100 hidden md:block"

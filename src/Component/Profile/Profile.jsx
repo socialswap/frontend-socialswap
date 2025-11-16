@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Avatar, Typography, Button, List, message, Spin, Modal, Form, Input } from 'antd';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Card, Button, List, message, Spin, Modal, Form, Input } from 'antd';
 import { 
   UserOutlined, 
   SettingOutlined, 
@@ -16,22 +16,30 @@ import axios from 'axios';
 import axiosInstance, { api } from '../../API/api';
 import { useNavigate } from 'react-router-dom';
 
-const { Text } = Typography;
-
 // Previous styled components remain the same...
 const StyledCard = styled(Card)`
   width: 100%;
-  max-width: 400px;
+  max-width: 480px;
   margin: 4rem auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  border-radius: 16px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.65)) padding-box,
+              linear-gradient(120deg, #7c3aed, #06b6d4, #f43f5e) border-box;
+  border: 1px solid transparent;
+  box-shadow: 0 20px 40px rgba(17, 12, 46, 0.08);
+  backdrop-filter: blur(10px);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 24px 48px rgba(17, 12, 46, 0.12);
+  }
 `;
 
 const ProfileHeader = styled.div`
   text-align: center;
-  padding: 1.5rem 0;
+  padding: 1.75rem 0 1.25rem;
   position: relative;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px dashed rgba(0,0,0,0.06);
   margin-bottom: 1rem;
 
   .back-button {
@@ -42,54 +50,93 @@ const ProfileHeader = styled.div`
     background: none;
     padding: 8px;
     cursor: pointer;
+    color: #6b7280;
+    border-radius: 12px;
+    transition: background 180ms ease, transform 180ms ease, color 180ms ease;
+  }
+  .back-button:hover {
+    background: rgba(124, 58, 237, 0.08);
+    color: #7c3aed;
+    transform: translateX(-1px);
   }
 
   .header-text {
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: .3px;
+    background: linear-gradient(120deg, #7c3aed, #06b6d4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   .avatar-container {
-    margin: 1rem 0;
+    margin: 1rem 0 0.75rem;
+  }
+  .avatar-container img {
+    height: 88px;
+    width: 88px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.9);
+    box-shadow: 0 10px 24px rgba(17, 12, 46, 0.12), 0 0 0 6px rgba(124, 58, 237, 0.08);
+    object-fit: cover;
   }
 
   .username {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0.5rem 0 0.25rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0.6rem 0 0.15rem;
+    color: #0f172a;
+    letter-spacing: 0.2px;
   }
 
   .user-handle {
-    color: #666;
+    color: #64748b;
     margin: 0;
+    font-size: 0.9rem;
   }
 `;
 
 const EditButton = styled(Button)`
-  background-color: #000;
-  color: white;
-  border-radius: 20px;
+  background-image: linear-gradient(120deg, #7c3aed, #06b6d4);
+  color: #fff;
+  border-radius: 999px;
   border: none;
-  padding: 4px 16px;
-  margin-top: 0.5rem;
-  
+  padding: 6px 18px;
+  margin-top: 0.75rem;
+  box-shadow: 0 10px 20px rgba(124, 58, 237, 0.18);
+  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+  font-weight: 600;
+
   &:hover {
-    background-color: #333;
-    color: white;
+    filter: brightness(1.03);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(124, 58, 237, 0.22);
   }
 `;
 
 const StyledList = styled(List)`
   .ant-list-item {
-    padding: 12px 24px;
+    padding: 14px 18px;
     cursor: pointer;
+    border-radius: 14px;
+    margin: 6px 8px;
+    border: 1px solid rgba(124, 58, 237, 0.08);
+    background: rgba(255,255,255,0.6);
+    transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
     
     &:hover {
-      background-color: #f9f9f9;
+      background-color: rgba(124, 58, 237, 0.04);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(17, 12, 46, 0.06);
+      border-color: rgba(124, 58, 237, 0.18);
     }
 
     .ant-list-item-meta-title {
       margin: 0;
+      font-weight: 600;
+      color: #0f172a;
     }
   }
 `;
@@ -103,16 +150,13 @@ const UserProfile = () => {
   const [profileForm] = Form.useForm();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchUserProfile();
-  }, []);
 
   const getAuthHeader = () => {
     const token = localStorage.getItem('token');
     return { 'x-auth-token': token };
   };
 
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = useCallback(async () => {
     try {
       const response = await axios.get(`${api}/profile`, {
         headers: getAuthHeader()
@@ -124,7 +168,11 @@ const UserProfile = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [profileForm]);
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, [fetchUserProfile]);
 
   const handleProfileEdit = async (values) => {
     try {

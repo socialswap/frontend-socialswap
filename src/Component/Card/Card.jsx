@@ -21,6 +21,46 @@ import axiosInstance, { api, url } from '../../API/api';
 const { Text } = Typography;
 const MotionCard = motion(Card);
 
+// Tries to resolve the best primary image for the channel.
+// Priority:
+// 1) Analytics-uploaded images (various possible shapes)
+// 2) thumbnails arrays with possible {url} shape
+// 3) existing fields: imageUrls[0], bannerUrl, logoUrl
+// 4) fallback placeholder
+const resolvePrimaryImage = (channel) => {
+  if (!channel) return '/images/yt.png';
+  
+  const analytics = channel.analytics || channel.Analytics || channel.stats || {};
+  
+  const candidates = [];
+  
+  // Common analytics shapes
+  if (Array.isArray(analytics.uploadedImages)) candidates.push(...analytics.uploadedImages);
+  if (Array.isArray(analytics.images)) candidates.push(...analytics.images);
+  if (Array.isArray(analytics.thumbnails)) candidates.push(...analytics.thumbnails);
+  if (analytics.thumbnail) candidates.push(analytics.thumbnail);
+  
+  // Other potential shapes on channel
+  if (Array.isArray(channel.thumbnails)) candidates.push(...channel.thumbnails);
+  if (channel.thumbnail) candidates.push(channel.thumbnail);
+  
+  // Normalize candidates to pure URLs (handle objects like { url: '...' })
+  const normalized = candidates
+    .map((item) => (typeof item === 'string' ? item : item?.url))
+    .filter(Boolean);
+  
+  const firstAnalyticsUrl = normalized[0];
+  if (firstAnalyticsUrl) return firstAnalyticsUrl;
+  
+  // Existing logic fallback order
+  return (
+    channel.logoUrl ||
+    channel.bannerUrl ||
+    (Array.isArray(channel.imageUrls) ? channel.imageUrls[0] : null) ||
+    '/images/yt.png'
+  );
+};
+
 const StyledCard = styled(MotionCard)`
   width: 99%;
   margin: auto;
@@ -220,7 +260,7 @@ const ChannelCard = ({ channel, updateCartStatus }) => {
           <div style={{ position: 'relative' }}>
             <StyledImage 
               alt={channel.name} 
-              src={channel.logoUrl || channel.bannerUrl || channel.imageUrls?.[0] || '/images/yt.png'} 
+              src={resolvePrimaryImage(channel)} 
             />
             {/* <PremiumTag>Premium</PremiumTag> */}
             {channel.monetized && (
