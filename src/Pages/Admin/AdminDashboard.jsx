@@ -160,10 +160,10 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="p-6 mt-20">
-      <div className="flex justify-between items-center mb-6">
+    <div className="mt-20 px-3 pb-8 md:px-6">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
         <Title level={2} style={{ margin: 0 }}>Admin Dashboard</Title>
-        <Space>
+        <Space wrap className="justify-start md:justify-end">
           <Tooltip title="Refresh">
             <Button icon={<ReloadOutlined />} onClick={fetchUsers} loading={loading}>
               Refresh
@@ -221,7 +221,7 @@ const AdminDashboard = () => {
         </Col>
       </Row>
 
-      <Card bordered>
+      <Card bordered className="mb-6">
         <Row gutter={[12, 12]} align="middle" className="mb-4">
           <Col xs={24} md={12}>
             <Input
@@ -247,21 +247,25 @@ const AdminDashboard = () => {
           </Col>
         </Row>
 
-        <Table
-          columns={columns}
-          dataSource={filteredUsers}
-          rowKey="_id"
-          loading={loading}
-          bordered
-          size="middle"
-          locale={{ emptyText: <Empty description="No users found" /> }}
-          pagination={{
-            showSizeChanger: true,
-            pageSizeOptions: ['10', '20', '50', '100'],
-            defaultPageSize: 10,
-            showTotal: (total) => `Total ${total} users`,
-          }}
-        />
+        <div className="-mx-2 md:mx-0 overflow-x-auto">
+          <div className="min-w-[640px] md:min-w-0 px-2 md:px-0">
+            <Table
+              columns={columns}
+              dataSource={filteredUsers}
+              rowKey="_id"
+              loading={loading}
+              bordered
+              size="middle"
+              locale={{ emptyText: <Empty description="No users found" /> }}
+              pagination={{
+                showSizeChanger: true,
+                pageSizeOptions: ['10', '20', '50', '100'],
+                defaultPageSize: 10,
+                showTotal: (total) => `Total ${total} users`,
+              }}
+            />
+          </div>
+        </div>
       </Card>
 
       <Modal
