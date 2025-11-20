@@ -668,7 +668,10 @@ const AboutPage = () => {
         </StyledButton>
       </div>
     </CTASection>
-
+    <HelpWidget onClick={() => navigate('/contact')}>
+      <span style={{ width: 10, height: 10, borderRadius: 999, background: primaryColor, display: 'inline-block', boxShadow: '0 0 0 6px rgba(255,0,0,0.08)' }} />
+      Have questions? Chat with us
+    </HelpWidget>
     </PageContainer>
   );
 };

@@ -145,7 +145,9 @@ const Carousel = ({ children }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
+  const [startY, setStartY] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  const [isHorizontalDrag, setIsHorizontalDrag] = useState(false);
   const containerRef = useRef(null);
   const autoScrollRef = useRef(null);
 
@@ -158,7 +160,9 @@ const Carousel = ({ children }) => {
   const handleTouchStart = (e) => {
     setIsDragging(true);
     setStartX(e.touches[0].pageX - containerRef.current.offsetLeft);
+    setStartY(e.touches[0].pageY - containerRef.current.offsetTop);
     setScrollLeft(containerRef.current.scrollLeft);
+    setIsHorizontalDrag(false);
   };
 
   const handleMouseMove = (e) => {
@@ -171,13 +175,40 @@ const Carousel = ({ children }) => {
 
   const handleTouchMove = (e) => {
     if (!isDragging) return;
-    const x = e.touches[0].pageX - containerRef.current.offsetLeft;
-    const walk = (x - startX) * 2;
-    containerRef.current.scrollLeft = scrollLeft - walk;
+    
+    const touch = e.touches[0];
+    const currentX = touch.pageX - containerRef.current.offsetLeft;
+    const currentY = touch.pageY - containerRef.current.offsetTop;
+    const deltaX = Math.abs(currentX - startX);
+    const deltaY = Math.abs(currentY - startY);
+    
+    // Determine if this is a horizontal or vertical gesture
+    // Only treat as horizontal if horizontal movement is significantly greater
+    if (!isHorizontalDrag) {
+      if (deltaX > deltaY && deltaX > 15) {
+        setIsHorizontalDrag(true);
+      } else if (deltaY > deltaX && deltaY > 15) {
+        // It's a vertical scroll, stop handling and let it pass through
+        setIsDragging(false);
+        return;
+      } else {
+        // Not enough movement yet, wait for more
+        return;
+      }
+    }
+    
+    // Only prevent default and scroll horizontally if it's confirmed as a horizontal drag
+    if (isHorizontalDrag) {
+      e.preventDefault();
+      e.stopPropagation();
+      const walk = (currentX - startX) * 2;
+      containerRef.current.scrollLeft = scrollLeft - walk;
+    }
   };
 
   const handleDragEnd = () => {
     setIsDragging(false);
+    setIsHorizontalDrag(false);
   };
 
   const scroll = (direction) => {
@@ -211,6 +242,21 @@ const Carousel = ({ children }) => {
       }
     };
   }, [isPaused, autoScroll]);
+
+  // Inject CSS to hide webkit scrollbar
+  useEffect(() => {
+    const styleId = 'carousel-scrollbar-hide';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        .carousel-container::-webkit-scrollbar {
+          display: none;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
 
   const togglePause = () => {
     setIsPaused(!isPaused);
@@ -263,11 +309,13 @@ const Carousel = ({ children }) => {
       </AnimatePresence>
       <div
         ref={containerRef}
-        className="flex overflow-x-hidden scroll-smooth touch-pan-x pt-[6rem]"
+        className="flex overflow-x-auto scroll-smooth pt-[6rem] carousel-container"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
-          cursor: isDragging ? 'grabbing' : 'grab'
+          cursor: isDragging ? 'grabbing' : 'grab',
+          WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-y pinch-zoom',
         }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}

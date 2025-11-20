@@ -5,22 +5,11 @@ import {
   DollarOutlined,
   ThunderboltOutlined,
   BulbOutlined,
-  RobotOutlined,
-  EyeOutlined
+  RobotOutlined
 } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import PurchaseSteps from '../Steps';
 import SellChannelSteps from '../SellChannel';
-
-// Default fallback steps (used for Sell or general)
-const defaultSteps = [
-  { key: 'browse', title: 'Browse Channels', desc: 'Discover verified, high-quality listings' },
-  { key: 'cart', title: 'Add to Cart', desc: 'Save shortlisted channels securely' },
-  { key: 'checkout', title: 'Checkout', desc: 'Review details and proceed' },
-  { key: 'payment', title: 'Payment', desc: 'Complete payment via secure gateway' },
-  { key: 'access', title: 'Access Details', desc: 'Receive credentials and guide' },
-  { key: 'transfer', title: 'Transfer', desc: 'Safe ownership handover' },
-];
 
 const springy = { type: 'spring', stiffness: 400, damping: 28, mass: 0.9 };
 const fadeSlide = {
@@ -378,7 +367,7 @@ const ChannelTransactionSteps = () => {
     {
       key: 'payment',
       title: 'Choose Payment Method',
-      desc: 'Pay securely via UPI QR, PayPal, Binance, or Card.',
+      desc: 'Pay securely via Razorpay ',
       details: 'We offer UPI QR Code, PayPal, Binance, and Credit/Debit Card options for Indian and international customers.'
     },
     {
@@ -407,7 +396,46 @@ const ChannelTransactionSteps = () => {
     }
   ]), []);
 
-  const currentSteps = transactionType === 'buy' ? buySteps : defaultSteps;
+  const sellSteps = useMemo(() => ([
+    {
+      key: 'submit',
+      title: 'Submit the Form',
+      desc: 'Click "Submit" to send your completed form to us.',
+      details: 'Fill out all required information about your YouTube channel and click the "Submit" button to send your completed form to us.'
+    },
+    {
+      key: 'receive',
+      title: 'Receive Auto-Generated Message',
+      desc: 'Get an auto-generated message with your channel ID.',
+      details: 'After submitting the form, you will receive an auto-generated message that reads: "Hey team SocialSwap, I have submitted my channel with the channel ID _________. Guide me further to sell my channel."'
+    },
+    {
+      key: 'copy',
+      title: 'Copy the Auto-Generated Message',
+      desc: 'Copy the message text for your reference.',
+      details: 'Copy the text of the auto-generated message for your reference. You will need to paste it in the next step.'
+    },
+    {
+      key: 'proceed',
+      title: 'Proceed to Our Channel Dealers',
+      desc: 'Click "Continue" to redirect to channel dealers page.',
+      details: 'Click the "Continue" button, which will redirect you to our official channel dealers page on WhatsApp.'
+    },
+    {
+      key: 'paste',
+      title: 'Paste the Auto-Generated Message',
+      desc: 'Paste the copied message on the dealers page.',
+      details: 'On the official channel dealers page, paste the auto-generated message you copied earlier.'
+    },
+    {
+      key: 'complete',
+      title: "We'll Take It From Here",
+      desc: 'Our team handles the rest of the process.',
+      details: "Once you've pasted the message, our team will handle the rest of the process manually and guide you through the next steps."
+    }
+  ]), []);
+
+  const currentSteps = transactionType === 'buy' ? buySteps : sellSteps;
 
   const helperText = useMemo(() => {
     if (mode === 'list') return 'Tip: Tap any step to proceed.';

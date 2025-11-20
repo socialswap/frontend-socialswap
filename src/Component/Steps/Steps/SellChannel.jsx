@@ -45,7 +45,9 @@ const SellChannelSteps = () => {
             style={{
               backgroundImage: 'linear-gradient(90deg, rgb(248,55,88), rgb(255,159,64))',
               border: 'none',
-              boxShadow: '0 12px 30px rgba(248,55,88,0.25)'
+              boxShadow: '0 12px 30px rgba(248,55,88,0.25)',
+              padding:'0.5rem',
+              borderRadius:'8px'
             }}
           >
             Continue to Channel Dealers
