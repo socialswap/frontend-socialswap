@@ -32,14 +32,11 @@ const TopChannelsCarousel = () => {
 
   return (
     <section
-      className="relative py-16 px-4 sm:px-6 lg:px-8 overflow-hidden"
-      style={{
-        background: 'linear-gradient(180deg, #ffffff 0%, #fdf3f5 50%, #ffffff 100%)',
-      }}
+      className="relative py-16 px-4 sm:px-6 lg:px-8 overflow-hidden bg-bg-secondary text-text-primary transition-all duration-300"
     >
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-16 -right-10 w-72 h-72 bg-rose-100/60 blur-3xl rounded-full" />
-        <div className="absolute -bottom-10 -left-10 w-72 h-72 bg-indigo-100/50 blur-3xl rounded-full" />
+        <div className="absolute -top-16 -right-10 w-72 h-72 bg-purple-primary/10 blur-3xl rounded-full" />
+        <div className="absolute -bottom-10 -left-10 w-72 h-72 bg-accent-pink/10 blur-3xl rounded-full" />
       </div>
 
       <div className="relative z-10 mx-auto">
@@ -53,17 +50,17 @@ const TopChannelsCarousel = () => {
           <motion.span
             className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase mb-4"
             style={{
-              background: 'rgba(248, 55, 88, 0.1)',
-              color: '#F83758',
-              border: '1px solid rgba(248, 55, 88, 0.2)',
+              background: 'rgba(124, 58, 237, 0.1)',
+              color: 'var(--purple-primary)',
+              border: '1px solid rgba(124, 58, 237, 0.2)',
             }}
           >
             Curated Selection
           </motion.span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
+          <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-3">
             Explore 20 Handpicked Channels
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="text-text-secondary max-w-2xl mx-auto">
             Fresh inventory updated daily — discover vetted channels ready for acquisition, presented in the same immersive carousel experience as our Most Demanding list.
           </p>
         </motion.div>
@@ -80,10 +77,7 @@ const TopChannelsCarousel = () => {
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="animate-pulse rounded-2xl min-w-[300px] h-96"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.8))',
-                  }}
+                  className="animate-pulse rounded-2xl min-w-[300px] h-96 bg-bg-card border border-border-color/20"
                 />
               ))}
             </motion.div>
@@ -93,7 +87,7 @@ const TopChannelsCarousel = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-center py-12 text-red-500 font-medium"
+              className="text-center py-12 text-error font-medium"
             >
               {error}
             </motion.div>
@@ -117,7 +111,7 @@ const TopChannelsCarousel = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-center text-gray-500 py-12"
+              className="text-center text-text-secondary py-12"
             >
               No channels are available right now. Please check back shortly.
             </motion.div>
@@ -129,4 +123,3 @@ const TopChannelsCarousel = () => {
 };
 
 export default TopChannelsCarousel;
-

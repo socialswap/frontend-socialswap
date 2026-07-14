@@ -19,8 +19,8 @@ import { useNavigate } from 'react-router-dom';
 // Previous styled components remain the same...
 const StyledCard = styled(Card)`
   width: 100%;
-  max-width: 480px;
-  margin: 4rem auto;
+  max-width: 100%;
+  margin: 0;
   border-radius: 20px;
   background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.65)) padding-box,
               linear-gradient(120deg, #7c3aed, #06b6d4, #f43f5e) border-box;
@@ -216,26 +216,6 @@ const UserProfile = () => {
   };
   const menuItems = [
     {
-      title: 'Seller Panel',
-      icon: <DashboardOutlined /> ,
-      onClick: () => navigate('/seller-dashboard')
-    },
-    {
-      title: 'My Channels',
-      icon: <SettingOutlined />,
-      onClick: () => navigate('/my-channels')
-    },
-    {
-      title: 'My Orders',
-      icon: <ShoppingOutlined />,
-      onClick: () => navigate('/orders')
-    },
-    {
-      title: 'Transactions',
-      icon: <TransactionOutlined />,
-      onClick: () => navigate('/transactions')
-    },
-    {
       title: 'Change Password',
       icon: <LockOutlined />,
       onClick: () => setIsPasswordModalVisible(true)
@@ -244,14 +224,6 @@ const UserProfile = () => {
       title: 'Help & Support',
       icon: <QuestionCircleOutlined />,
       onClick: () => handleMakeOffer()
-    },
-    {
-      title: 'Log out',
-      icon: <LogoutOutlined />,
-      onClick: () => {
-        localStorage.removeItem('token');
-        navigate('/login');
-      }
     }
   ];
 
@@ -267,9 +239,6 @@ const UserProfile = () => {
     <>
       <StyledCard bordered={false}>
         <ProfileHeader>
-          <button className="back-button" onClick={() => navigate(-1)}>
-            <ArrowLeftOutlined />
-          </button>
           <span className="header-text">Profile</span>
           <div className="avatar-container m-auto flex align-center justify-center">
             <img src="/images/userImg.jpg" alt="" style={{height:'82px'}}/>

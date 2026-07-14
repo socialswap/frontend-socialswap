@@ -6,6 +6,7 @@ import axios from "axios";
 import ChannelCard from "../../Component/ChannelCard.jsx";
 import { FaGamepad, FaUsers, FaEye, FaDollarSign, FaMoneyBillWave, FaVideo } from "react-icons/fa";
 import { useLocation } from "react-router-dom";
+import SEOHead from "../../Component/SEO/SEOHead";
 
 const { Option } = Select;
 const CATEGORY_OPTIONS = [
@@ -43,6 +44,8 @@ const Channels = () => {
   const [sortBy, setSortBy] = useState("popularity");
   const [loading, setLoading] = useState(true);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(12);
+  const loadMoreRef = React.useRef(null);
 
   // Read category from URL on mount
   useEffect(() => {
@@ -61,20 +64,25 @@ const Channels = () => {
   useEffect(() => {
     const fetchAllChannels = async () => {
       try {
-        let allChannels = [];
-        let currentPage = 1;
-        let totalPages = 1;
+        const firstPage = await axios.get(
+          `${process.env.REACT_APP_API_BASE_URL}/channels?limit=100&page=1`
+        );
+        
+        const data = firstPage.data;
+        let allChannels = [...(data.channels || [])];
+        const totalPages = data.totalPages || 1;
 
-        // Fetch channels page by page (max 100 per page due to backend limit)
-        while (currentPage <= totalPages) {
-          const response = await axios.get(
-            `${process.env.REACT_APP_API_BASE_URL}/channels?limit=100&page=${currentPage}`
-          );
-          
-          const data = response.data;
-          allChannels = [...allChannels, ...(data.channels || [])];
-          totalPages = data.totalPages || 1;
-          currentPage++;
+        if (totalPages > 1) {
+          const promises = [];
+          for (let i = 2; i <= totalPages; i++) {
+            promises.push(
+              axios.get(`${process.env.REACT_APP_API_BASE_URL}/channels?limit=100&page=${i}`)
+            );
+          }
+          const results = await Promise.all(promises);
+          results.forEach(res => {
+            allChannels = [...allChannels, ...(res.data.channels || [])];
+          });
         }
 
         setChannels(allChannels);
@@ -202,11 +210,27 @@ const Channels = () => {
     }
 
     setFilteredChannels(filtered);
+    setVisibleCount(12);
   }, [channels, filters, searchTerm, sortBy]);
 
   useEffect(() => {
     applyFilters();
   }, [applyFilters]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + 12, filteredChannels.length));
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+    return () => observer.disconnect();
+  }, [filteredChannels.length]);
 
   const handleInputChange = (filterName, value) => {
     setFilters((prev) => ({
@@ -268,17 +292,7 @@ const Channels = () => {
     ])
   );
 
-  // Group filtered channels by category
-  const groupedChannels = filteredChannels.reduce((acc, channel) => {
-    const category = channel.category || 'Other';
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push(channel);
-    return acc;
-  }, {});
-
-  // Get category icons
+  // Removed category grouping logic to support flat infinite scroll
   const getCategoryIcon = (category) => {
     const icons = {
       'Gaming': '🎮',
@@ -302,9 +316,19 @@ const Channels = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white mt-[4rem]">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 mt-[4rem] transition-colors duration-200">
+      <SEOHead
+        title="Browse YouTube Channels for Sale in India"
+        description="Explore verified YouTube channels for sale. Filter by category, subscribers, earnings. Buy monetized channels in Gaming, Tech, Finance, Education & more."
+        keywords="youtube channels for sale, buy youtube channel india, monetized channel for sale, gaming channel for sale, tech channel for sale"
+        canonicalUrl="https://www.socialswap.in/channels"
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Browse Channels' },
+        ]}
+      />
       {/* Sticky Quick Search Bar */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+      <div className="sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-3 flex-wrap">
             <div className="flex-1 min-w-[200px]">
@@ -312,7 +336,7 @@ const Channels = () => {
                 placeholder="Search channels..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                prefix={<SearchOutlined className="text-gray-400" />}
+                prefix={<SearchOutlined className="text-gray-400 dark:text-gray-500" />}
                 size="large"
                 allowClear
               />
@@ -356,13 +380,13 @@ const Channels = () => {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
-          className="bg-white border-b border-gray-200 shadow-inner"
+          className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-inner"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Category Filter */}
               <div>
-                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                   <FaGamepad className="text-blue-500" />
                   Category
                 </h4>
@@ -375,7 +399,7 @@ const Channels = () => {
             <Row>
                     {categories.map((cat) => (
                       <Col span={24} key={cat} className="mb-2">
-                        <Checkbox value={cat}>{cat}</Checkbox>
+                        <Checkbox value={cat} className="dark:text-gray-300">{cat}</Checkbox>
               </Col>
                     ))}
             </Row>
@@ -384,7 +408,7 @@ const Channels = () => {
 
         {/* Subscribers Range Filter */}
               <div>
-                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                   <FaUsers className="text-purple-500" />
                   Subscribers Range
                 </h4>
@@ -400,7 +424,7 @@ const Channels = () => {
 
         {/* Views Range Filter */}
               <div>
-                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                   <FaEye className="text-green-500" />
                   Views Range
                 </h4>
@@ -415,7 +439,7 @@ const Channels = () => {
 
               {/* Estimated Earnings Filter */}
               <div>
-                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                   <FaDollarSign className="text-yellow-500" />
                   Est. Monthly Earnings
                 </h4>
@@ -430,7 +454,7 @@ const Channels = () => {
 
               {/* Price Range Filter */}
               <div>
-                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                   <FaMoneyBillWave className="text-green-600" />
                   Price Range
                 </h4>
@@ -443,7 +467,7 @@ const Channels = () => {
 
               {/* Monetization Filter */}
               <div>
-                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                   <FaDollarSign className="text-emerald-500" />
                   Monetization Status
                 </h4>
@@ -455,10 +479,10 @@ const Channels = () => {
                 >
                   <Row>
                     <Col span={24} className="mb-2">
-                      <Checkbox value="monetized">Monetized Channels</Checkbox>
+                      <Checkbox value="monetized" className="dark:text-gray-300">Monetized Channels</Checkbox>
                     </Col>
                     <Col span={24} className="mb-2">
-                      <Checkbox value="non-monetized">Non-Monetized Channels</Checkbox>
+                      <Checkbox value="non-monetized" className="dark:text-gray-300">Non-Monetized Channels</Checkbox>
                     </Col>
                   </Row>
                 </Checkbox.Group>
@@ -466,7 +490,7 @@ const Channels = () => {
 
               {/* Channel Type Filter */}
               <div>
-                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
                   <FaVideo className="text-red-500" />
                   Channel Type
                 </h4>
@@ -478,10 +502,10 @@ const Channels = () => {
                 >
                   <Row>
                     <Col span={24} className="mb-2">
-                      <Checkbox value="shorts">Shorts Channels</Checkbox>
+                      <Checkbox value="shorts" className="dark:text-gray-300">Shorts Channels</Checkbox>
                     </Col>
                     <Col span={24} className="mb-2">
-                      <Checkbox value="long-form">Long Form Channels</Checkbox>
+                      <Checkbox value="long-form" className="dark:text-gray-300">Long Form Channels</Checkbox>
                     </Col>
                   </Row>
                 </Checkbox.Group>
@@ -494,10 +518,10 @@ const Channels = () => {
       {/* Results Summary */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex items-center justify-between mb-6">
-          <p className="text-gray-600">
-            Showing <span className="font-bold text-gray-900">{filteredChannels.length}</span> channels
+          <p className="text-gray-600 dark:text-gray-400">
+            Showing <span className="font-bold text-gray-900 dark:text-gray-100">{filteredChannels.length}</span> channels
             {sortBy && (
-              <span className="text-sm text-gray-500 ml-2">
+              <span className="text-sm text-gray-500 dark:text-gray-500 ml-2">
                 • Sorted by {sortBy === 'price-low' ? 'Price: Low to High' : 
                            sortBy === 'price-high' ? 'Price: High to Low' : 
                            sortBy.charAt(0).toUpperCase() + sortBy.slice(1)}
@@ -506,68 +530,44 @@ const Channels = () => {
           </p>
       </div>
 
-        {/* Channel Cards - Grouped by Category */}
+        {/* Channel Cards Grid */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="animate-pulse bg-white rounded-2xl p-4 h-96"
-                style={{
-                  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
-                }}
+                className="animate-pulse bg-white dark:bg-gray-800 rounded-2xl p-4 h-96 shadow-sm border border-transparent dark:border-gray-700"
               />
             ))}
           </div>
         ) : filteredChannels.length > 0 ? (
-          <div className="space-y-12">
-            {Object.entries(groupedChannels).map(([category, categoryChannels], index) => (
-              <motion.div
-                key={category}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                {/* Category Header */}
-                <div className="flex items-center gap-3 mb-6">
-                  <div 
-                    className="flex items-center gap-3 px-6 py-3 rounded-2xl"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(248, 55, 88, 0.1) 0%, rgba(255, 107, 107, 0.05) 100%)',
-                      border: '2px solid rgba(248, 55, 88, 0.2)',
-                    }}
+          <div className="space-y-8">
+            <motion.div
+              layout
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
+              <AnimatePresence>
+                {filteredChannels.slice(0, visibleCount).map((channel) => (
+                  <motion.div
+                    key={channel._id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.3 }}
                   >
-                    <span className="text-3xl">{getCategoryIcon(category)}</span>
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-900">{category}</h2>
-                      <p className="text-sm text-gray-600">{categoryChannels.length} channels</p>
-                    </div>
-                  </div>
-                  <div className="flex-1 h-px bg-gradient-to-r from-gray-300 to-transparent"></div>
-                </div>
+                    <ChannelCard channel={channel} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
 
-                {/* Category Channels Grid */}
-                <motion.div
-                  layout
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                >
-                  <AnimatePresence>
-                    {categoryChannels.map((channel) => (
-                      <motion.div
-                        key={channel._id}
-                        layout
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <ChannelCard channel={channel} />
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </motion.div>
-              </motion.div>
-            ))}
+            {/* Infinite Scroll Target */}
+            {visibleCount < filteredChannels.length && (
+              <div ref={loadMoreRef} className="py-8 flex justify-center items-center w-full">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-purple-500"></div>
+              </div>
+            )}
           </div>
         ) : (
           <motion.div
@@ -576,8 +576,8 @@ const Channels = () => {
             className="text-center py-20"
           >
             <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">No channels found</h3>
-            <p className="text-gray-600 mb-6">Try adjusting your filters or search term</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">No channels found</h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">Try adjusting your filters or search term</p>
             <Button type="primary" onClick={resetFilters} size="large">
               Clear All Filters
             </Button>

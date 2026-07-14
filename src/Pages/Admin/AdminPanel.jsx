@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../API/api';
 import { Tabs, Form, Input, InputNumber, Select, Button, Table, message, DatePicker, Switch, Modal, Popconfirm } from 'antd';
 import { PlusOutlined, DollarOutlined, UserOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import moment from 'moment';
@@ -43,7 +43,7 @@ const AdminPanel = () => {
   const fetchChannels = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_BASE_URL}/channels`);
+      const response = await axiosInstance.get(`${API_BASE_URL}/channels`);
       const allChannels = response.data;
       setChannels(allChannels.filter(channel => channel.status !== 'Sold'));
       setSoldChannels(allChannels.filter(channel => channel.status === 'Sold'));
@@ -55,7 +55,7 @@ const AdminPanel = () => {
 
   const addChannel = async (values) => {
     try {
-      await axios.post(`${API_BASE_URL}/channels`, {
+      await axiosInstance.post(`${API_BASE_URL}/channels`, {
         ...values,
         joinedDate: values.joinedDate.format('YYYY-MM-DD'),
         status: 'Available'
@@ -70,7 +70,7 @@ const AdminPanel = () => {
 
   const editChannel = async (values) => {
     try {
-      await axios.patch(`${API_BASE_URL}/channels/${editingChannel._id}`, {
+      await axiosInstance.patch(`${API_BASE_URL}/channels/${editingChannel._id}`, {
         ...values,
         joinedDate: values.joinedDate.format('YYYY-MM-DD')
       });
@@ -85,7 +85,7 @@ const AdminPanel = () => {
 
   const deleteChannel = async (id) => {
     try {
-      await axios.delete(`${API_BASE_URL}/channels/${id}`);
+      await axiosInstance.delete(`${API_BASE_URL}/channels/${id}`);
       message.success('Channel deleted successfully');
       fetchChannels();
     } catch (error) {

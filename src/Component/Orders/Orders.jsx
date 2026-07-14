@@ -157,7 +157,7 @@ const Orders = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4 flex items-center justify-center">
+      <div className="w-full p-4 flex items-center justify-center">
         <RefreshCcw className="w-8 h-8 text-blue-500 animate-spin" />
       </div>
     );
@@ -165,8 +165,8 @@ const Orders = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-4xl mx-auto">
+      <div className="w-full p-4">
+        <div className="w-full">
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <h3 className="text-red-800 font-medium">Error</h3>
             <p className="text-red-600">{error}</p>
@@ -177,8 +177,8 @@ const Orders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="w-full p-4">
+      <div className="w-full">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">YouTube Channels</h1>
         
         {channels.length === 0 ? (

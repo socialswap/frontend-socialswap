@@ -95,7 +95,7 @@ const FeatureCard = ({ icon, title, description, index }) => {
         borderColor: "rgba(239, 68, 68, 0.45)",
         transition: { type: "spring", stiffness: 320 }
       }}
-      className="group relative rounded-3xl bg-white/95 backdrop-blur-lg border border-slate-200 p-8 shadow-[0_14px_50px_-28px_rgba(15,23,42,0.65)] hover:shadow-[0_28px_90px_-30px_rgba(239,68,68,0.45)] transition-all duration-500 cursor-pointer overflow-hidden"
+      className="group relative rounded-3xl bg-white/95 dark:bg-bg-card/90 backdrop-blur-lg border border-slate-200 dark:border-border-dark/40 p-8 shadow-[0_14px_50px_-28px_rgba(15,23,42,0.65)] dark:shadow-[0_14px_50px_-28px_rgba(0,0,0,0.8)] hover:shadow-[0_28px_90px_-30px_rgba(239,68,68,0.45)] transition-all duration-500 cursor-pointer overflow-hidden"
     >
       <div className="glow-trail" />
       <div className="card-play" aria-hidden="true">
@@ -103,11 +103,11 @@ const FeatureCard = ({ icon, title, description, index }) => {
           <polygon points="45,35 85,60 45,85" fill="currentColor" />
         </svg>
       </div>
-      <div className="absolute inset-0 bg-gradient-to-br from-rose-100/40 via-red-50/40 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-br from-rose-100/40 via-red-50/40 to-white dark:from-purple-900/10 dark:via-bg-card/10 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
       <div className="relative z-10">
         <motion.div
-          className={`neon-ring w-16 h-16 mx-auto mb-6 relative flex items-center justify-center text-slate-700 group-hover:text-red-500 transition-colors duration-300 ${isVerifiedCard ? "verify-ring" : ""}`}
+          className={`neon-ring w-16 h-16 mx-auto mb-6 relative flex items-center justify-center text-slate-700 dark:text-text-secondary group-hover:text-red-500 transition-colors duration-300 ${isVerifiedCard ? "verify-ring" : ""}`}
           whileHover={{ rotate: 360 }}
           transition={{ duration: 0.6 }}
         >
@@ -122,12 +122,12 @@ const FeatureCard = ({ icon, title, description, index }) => {
           </div>
         </motion.div>
 
-        <h3 className="text-xl font-semibold text-center mb-3 text-slate-900">
+        <h3 className="text-xl font-semibold text-center mb-3 text-slate-900 dark:text-text-primary">
           {title}
         </h3>
         <div className="mx-auto mb-4 h-0.5 w-12 rounded-full bg-gradient-to-r from-red-500 via-rose-500 to-red-400 opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
 
-        <p className="text-slate-600 text-center leading-relaxed text-sm">
+        <p className="text-slate-600 dark:text-text-secondary text-center leading-relaxed text-sm">
           {description}
         </p>
       </div>
@@ -196,12 +196,12 @@ const WhySocialSwap = () => {
   ];
 
   return (
-    <div className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-100 text-slate-900">
+    <div className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-100 dark:from-bg-primary dark:via-bg-secondary dark:to-bg-primary text-slate-900 dark:text-text-primary transition-all duration-300">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <ParticleBackground />
-        <div className="absolute top-10 left-1/4 w-72 h-72 bg-rose-200/40 rounded-full mix-blend-soft-light blur-3xl animate-blob" />
-        <div className="absolute -top-12 right-10 w-80 h-80 bg-red-100/50 rounded-full mix-blend-soft-light blur-3xl animate-blob animation-delay-2000" />
-        <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-rose-100/45 rounded-full mix-blend-soft-light blur-[90px] animate-blob animation-delay-4000" />
+        <div className="absolute top-10 left-1/4 w-72 h-72 bg-rose-200/40 rounded-full mix-blend-soft-light blur-3xl animate-blob opacity-40 dark:opacity-10" />
+        <div className="absolute -top-12 right-10 w-80 h-80 bg-red-100/50 rounded-full mix-blend-soft-light blur-3xl animate-blob animation-delay-2000 opacity-40 dark:opacity-10" />
+        <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-rose-100/45 rounded-full mix-blend-soft-light blur-[90px] animate-blob animation-delay-4000 opacity-40 dark:opacity-10" />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -221,11 +221,11 @@ const WhySocialSwap = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-6 text-slate-600 max-w-2xl mx-auto"
+            className="mt-6 text-slate-600 dark:text-text-secondary max-w-2xl mx-auto"
           >
             The safest way to buy and sell verified YouTube channels — powered by trust and technology.
           </motion.p>
-          <p className="mt-3 text-slate-500 max-w-xl mx-auto">
+          <p className="mt-3 text-slate-500 dark:text-text-muted max-w-xl mx-auto">
             Join thousands of creators who rely on our vetted marketplace for transparent valuations, secure escrow, and white-glove deal support.
           </p>
         </motion.div>

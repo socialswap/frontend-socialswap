@@ -6,7 +6,6 @@ import axiosInstance, { api } from '../../API/api';
 import { useGoogleLogin } from '@react-oauth/google';
 import Particles from 'react-tsparticles';
 import { loadSlim } from 'tsparticles-slim';
-import './Login.css';
 
 const Login = () => {
   const [form] = Form.useForm();
@@ -256,23 +255,24 @@ const Login = () => {
   };
 
   return (
-    <div className="futuristic-login-container">
+    <div className="futuristic-login-container min-h-screen flex justify-center items-center bg-gradient-to-br from-[#f5f5f5] via-[#ffffff] to-[#fafafa] dark:bg-gradient-to-br dark:from-[#070312] dark:via-[#110824] dark:to-[#0D071C] dark:text-white relative overflow-hidden p-5 font-sans">
       <Particles
         id="tsparticles"
         init={particlesInit}
         options={particlesConfig}
-        className="particles-background"
+        className="absolute top-0 left-0 w-full h-full z-0"
       />
       
       {/* Floating Gradient Orbs */}
-      <div className="floating-orb floating-orb-1"></div>
-      <div className="floating-orb floating-orb-2"></div>
-      <div className="floating-orb floating-orb-3"></div>
+      <div className="absolute rounded-full pointer-events-none z-[1] filter blur-[40px] opacity-20 w-[300px] h-[300px] bg-gradient-to-br from-[rgba(255,255,255,0.4)] to-[rgba(255,255,255,0.2)] dark:bg-gradient-to-br dark:from-[rgba(124,58,237,0.45)] dark:to-[rgba(124,58,237,0.1)] top-[20%] right-[10%] animate-orb-float-1"></div>
+      <div className="absolute rounded-full pointer-events-none z-[1] filter blur-[40px] opacity-20 w-[250px] h-[250px] bg-gradient-to-br from-[rgba(255,255,255,0.35)] to-[rgba(255,255,255,0.15)] dark:bg-gradient-to-br dark:from-[rgba(217,70,239,0.35)] dark:to-[rgba(217,70,239,0.05)] bottom-[20%] left-[10%] animate-orb-float-2"></div>
+      <div className="absolute rounded-full pointer-events-none z-[1] filter blur-[40px] opacity-20 w-[200px] h-[200px] bg-gradient-to-br from-[rgba(255,255,255,0.3)] to-[rgba(255,255,255,0.1)] dark:bg-gradient-to-br dark:from-[rgba(59,130,246,0.3)] dark:to-[rgba(59,130,246,0.05)] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-orb-float-3"></div>
 
-      <div className="glow-border-card">
+      <div className="relative w-full max-w-[450px] bg-[rgba(255,255,255,0.95)] dark:bg-[rgba(24,17,46,0.95)] backdrop-blur-[20px] rounded-[24px] p-10 sm:p-[50px_40px] z-10 border-2 border-[rgba(0,0,0,0.1)] dark:border-[rgba(124,58,237,0.3)] shadow-[0_0_40px_rgba(255,255,255,0.4),0_0_80px_rgba(255,255,255,0.2),0_8px_32px_rgba(0,0,0,0.08),inset_0_0_40px_rgba(255,255,255,0.3)] dark:shadow-[0_0_40px_rgba(124,58,237,0.25),0_0_80px_rgba(124,58,237,0.15),0_8px_32px_rgba(0,0,0,0.45)] animate-card-border-glow">
+        <div className="absolute inset-[-2px] bg-gradient-to-r from-[rgba(255,255,255,0.8)] via-[rgba(0,0,0,0.05)] to-[rgba(255,255,255,0.8)] dark:bg-gradient-to-r dark:from-[rgba(124,58,237,0.8)] dark:via-[rgba(217,70,239,0.4)] dark:to-[rgba(59,130,246,0.8)] bg-[length:300%_300%] rounded-[24px] z-[-1] opacity-60 animate-gradient-shift" />
         <div className="text-center mb-8">
-          <h1 className="futuristic-title">WELCOME BACK</h1>
-          <p className="futuristic-subtitle">Sign in to your account to continue</p>
+          <h1 className="font-sans font-bold text-center text-black dark:text-white text-4xl mb-[10px] tracking-[2px] drop-shadow-[0_2px_8px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_10px_rgba(124,58,237,0.4)] animate-text-glow">WELCOME BACK</h1>
+          <p className="font-sans text-center text-black/60 dark:text-[#C9C4DD] text-[0.95rem] mb-[40px] tracking-[1px]">Sign in to your account to continue</p>
         </div>
 
         {/* Email OTP Login Form */}
@@ -293,7 +293,7 @@ const Login = () => {
             <Input 
               prefix={<MailOutlined />} 
               placeholder="you@example.com"
-              className="futuristic-input"
+              className="!bg-[rgba(255,255,255,0.9)] dark:!bg-[rgba(13,7,28,0.95)] !border-2 !border-[rgba(0,0,0,0.15)] dark:!border-[rgba(124,58,237,0.35)] hover:!border-[rgba(0,0,0,0.3)] dark:hover:!border-[#8B5CF6] focus:!border-[rgba(0,0,0,0.5)] dark:focus:!border-[#8B5CF6] !rounded-[12px] !text-black dark:!text-white !p-[14px_16px] !text-[15px] transition-all duration-300 font-sans hover:shadow-[0_0_15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_0_15px_rgba(124,58,237,0.25)] focus:shadow-[0_0_20px_rgba(0,0,0,0.15)] dark:focus:shadow-[0_0_20px_rgba(124,58,237,0.25)] hover:!bg-white dark:hover:!bg-[rgba(24,17,46,1)] focus:!bg-white dark:focus:!bg-[rgba(24,17,46,1)]"
               disabled={otpSent}
             />
           </Form.Item>
@@ -303,7 +303,7 @@ const Login = () => {
                 type="primary" 
                 htmlType="submit" 
                 loading={loading}
-                className="pulsating-glow-button"
+                className="pulsating-glow-button w-full h-[50px] !bg-black dark:!bg-gradient-to-r dark:from-[#7C3AED] dark:to-[#A855F7] !border-none !rounded-[12px] font-sans font-semibold text-[16px] tracking-[1.5px] !text-white cursor-pointer relative overflow-hidden transition-all duration-300 animate-pulsate-glow hover:!bg-black/90 dark:hover:!bg-gradient-to-r dark:hover:from-[#8B5CF6] dark:hover:to-[#B87CF8] hover:-translate-y-[2px] active:translate-y-0 before:content-[''] before:absolute before:top-0 before:left-[-100%] before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-[rgba(255,255,255,0.3)] before:to-transparent hover:before:left-full before:transition-[left] before:duration-500 shadow-[0_0_20px_rgba(0,0,0,0.3),0_0_40px_rgba(0,0,0,0.2),inset_0_0_20px_rgba(255,255,255,0.1)] dark:shadow-[0_0_20px_rgba(124,58,237,0.4),0_0_40px_rgba(124,58,237,0.2),inset_0_0_20px_rgba(255,255,255,0.15)] hover:shadow-[0_0_30px_rgba(0,0,0,0.4),0_0_60px_rgba(0,0,0,0.25),inset_0_0_30px_rgba(255,255,255,0.15)] dark:hover:shadow-[0_0_30px_rgba(124,58,237,0.5),0_0_60px_rgba(124,58,237,0.3),inset_0_0_30px_rgba(255,255,255,0.2)]"
               >
                 SEND OTP
               </Button>
@@ -323,7 +323,7 @@ const Login = () => {
                 <Input 
                   placeholder="Enter 6-digit OTP"
                   maxLength={6}
-                  className="futuristic-input text-center text-2xl tracking-widest"
+                  className="!bg-[rgba(255,255,255,0.9)] dark:!bg-[rgba(13,7,28,0.95)] !border-2 !border-[rgba(0,0,0,0.15)] dark:!border-[rgba(124,58,237,0.35)] hover:!border-[rgba(0,0,0,0.3)] dark:hover:!border-[#8B5CF6] focus:!border-[rgba(0,0,0,0.5)] dark:focus:!border-[#8B5CF6] !rounded-[12px] !text-black dark:!text-white !p-[14px_16px] !text-[15px] transition-all duration-300 font-sans hover:shadow-[0_0_15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_0_15px_rgba(124,58,237,0.25)] focus:shadow-[0_0_20px_rgba(0,0,0,0.15)] dark:focus:shadow-[0_0_20px_rgba(124,58,237,0.25)] hover:!bg-white dark:hover:!bg-[rgba(24,17,46,1)] focus:!bg-white dark:focus:!bg-[rgba(24,17,46,1)] text-center text-2xl tracking-widest"
                 />
               </Form.Item>
               <Form.Item>
@@ -331,7 +331,7 @@ const Login = () => {
                   type="primary" 
                   htmlType="submit" 
                   loading={loading}
-                  className="pulsating-glow-button"
+                  className="pulsating-glow-button w-full h-[50px] !bg-black dark:!bg-gradient-to-r dark:from-[#7C3AED] dark:to-[#A855F7] !border-none !rounded-[12px] font-sans font-semibold text-[16px] tracking-[1.5px] !text-white cursor-pointer relative overflow-hidden transition-all duration-300 animate-pulsate-glow hover:!bg-black/90 dark:hover:!bg-gradient-to-r dark:hover:from-[#8B5CF6] dark:hover:to-[#B87CF8] hover:-translate-y-[2px] active:translate-y-0 before:content-[''] before:absolute before:top-0 before:left-[-100%] before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-[rgba(255,255,255,0.3)] before:to-transparent hover:before:left-full before:transition-[left] before:duration-500 shadow-[0_0_20px_rgba(0,0,0,0.3),0_0_40px_rgba(0,0,0,0.2),inset_0_0_20px_rgba(255,255,255,0.1)] dark:shadow-[0_0_20px_rgba(124,58,237,0.4),0_0_40px_rgba(124,58,237,0.2),inset_0_0_20px_rgba(255,255,255,0.15)] hover:shadow-[0_0_30px_rgba(0,0,0,0.4),0_0_60px_rgba(0,0,0,0.25),inset_0_0_30px_rgba(255,255,255,0.15)] dark:hover:shadow-[0_0_30px_rgba(124,58,237,0.5),0_0_60px_rgba(124,58,237,0.3),inset_0_0_30px_rgba(255,255,255,0.2)]"
                 >
                   VERIFY OTP
                 </Button>
@@ -340,7 +340,7 @@ const Login = () => {
                 <Button 
                   type="link" 
                   onClick={handleChangeEmail}
-                  className="futuristic-link w-full"
+                  className="w-full font-sans font-medium text-black dark:text-[#D946EF] hover:text-black/70 dark:hover:text-[#E879F9] transition-all duration-300 text-center hover:drop-shadow-[0_1px_3px_rgba(0,0,0,0.2)]"
                 >
                   Change Email
                 </Button>
@@ -351,13 +351,13 @@ const Login = () => {
         
         {isGoogleOAuthEnabled && (
           <>
-            <Divider className="futuristic-divider">
-              <span className="futuristic-divider-inner-text">Or continue with</span>
+            <Divider className="!border-[rgba(0,0,0,0.1)] dark:!border-[rgba(124,58,237,0.2)] !my-[30px]">
+              <span className="text-[rgba(0,0,0,0.5)] dark:text-[#9C96B8] font-sans text-[14px]">Or continue with</span>
             </Divider>
             
             <Button 
               onClick={handleGoogleLogin}
-              className="futuristic-google-button"
+              className="w-full h-[50px] !bg-[rgba(255,255,255,0.9)] dark:!bg-[rgba(24,17,46,0.95)] !border-2 !border-[rgba(0,0,0,0.15)] dark:!border-[rgba(124,58,237,0.35)] !rounded-[12px] font-sans font-medium !text-[#1a1a2e] dark:!text-[#C9C4DD] transition-all duration-300 flex items-center justify-center gap-3 hover:!border-[rgba(0,0,0,0.3)] dark:hover:!border-[#8B5CF6] hover:!bg-white dark:hover:!bg-[rgba(13,7,28,1)] hover:shadow-[0_0_20px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_0_20px_rgba(124,58,237,0.2)] hover:-translate-y-[2px]"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path

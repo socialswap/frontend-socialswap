@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../API/api';
 import {
   Table,
   Button,
@@ -19,12 +19,17 @@ import {
   Statistic,
   Empty,
   Typography,
+  Tabs,
 } from 'antd';
 import { PictureOutlined, ReloadOutlined, UserOutlined, TeamOutlined, SafetyCertificateOutlined, SearchOutlined, DeleteOutlined, EyeOutlined, FileTextOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../API/api';
 import AdminChannels from './AdminChannels';
 import AdminTransactions from './AdminTransactions';
+import AdminChat from './AdminChat';
+import AdminBanners from './AdminBanners';
+import AdminBlogs from './AdminBlogs';
+import AdminDeals from './AdminDeals';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -46,7 +51,7 @@ const AdminDashboard = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${api}/users`);
+      const response = await axiosInstance.get(`${api}/users`);
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -57,25 +62,31 @@ const AdminDashboard = () => {
 
   const handleViewDetails = (user) => {
     setSelectedUser(user);
-    form.setFieldsValue(user);
+    form.setFieldsValue({
+      ...user,
+      status: user.status || 'active'
+    });
     setModalVisible(true);
   };
 
-  const handleUpdateRole = async (values) => {
+  const handleUpdateUser = async (values) => {
     try {
-      await axios.put(`${api}/users/${selectedUser._id}/role`, { role: values.role });
-      message.success('User role updated successfully');
+      await axiosInstance.put(`${api}/users/${selectedUser._id}/admin-update`, {
+        role: values.role,
+        status: values.status
+      });
+      message.success('User updated successfully');
       setModalVisible(false);
       fetchUsers();
     } catch (error) {
-      console.error('Error updating user role:', error);
-      message.error('Failed to update user role');
+      console.error('Error updating user:', error);
+      message.error('Failed to update user');
     }
   };
 
   const handleDeleteUser = async (userId) => {
     try {
-      await axios.delete(`${api}/users/${userId}`);
+      await axiosInstance.delete(`${api}/users/${userId}`);
       message.success('User deleted successfully');
       fetchUsers();
     } catch (error) {
@@ -136,6 +147,26 @@ const AdminDashboard = () => {
         ),
     },
     {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      filters: [
+        { text: 'Active', value: 'active' },
+        { text: 'Suspended', value: 'suspended' },
+        { text: 'Disabled', value: 'disabled' },
+        { text: 'Deleted', value: 'deleted' },
+      ],
+      onFilter: (value, record) => (record.status || 'active') === value,
+      render: (status) => {
+        const currentStatus = status || 'active';
+        let color = 'green';
+        if (currentStatus === 'suspended') color = 'orange';
+        else if (currentStatus === 'disabled') color = 'red';
+        else if (currentStatus === 'deleted') color = 'gray';
+        return <Tag color={color}>{currentStatus.toUpperCase()}</Tag>;
+      }
+    },
+    {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
@@ -159,35 +190,8 @@ const AdminDashboard = () => {
     },
   ];
 
-  return (
-    <div className="mt-20 px-3 pb-8 md:px-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
-        <Title level={2} style={{ margin: 0 }}>Admin Dashboard</Title>
-        <Space wrap className="justify-start md:justify-end">
-          <Tooltip title="Refresh">
-            <Button icon={<ReloadOutlined />} onClick={fetchUsers} loading={loading}>
-              Refresh
-            </Button>
-          </Tooltip>
-          <Button
-            type="primary"
-            icon={<PictureOutlined />}
-            onClick={() => navigate('/admin/banners')}
-            size="large"
-          >
-            Manage Banners
-          </Button>
-          <Button
-            type="default"
-            icon={<FileTextOutlined />}
-            onClick={() => navigate('/admin/blogs')}
-            size="large"
-          >
-            Manage Blogs
-          </Button>
-        </Space>
-      </div>
-
+  const usersTabContent = (
+    <>
       <Row gutter={[16, 16]} className="mb-6">
         <Col xs={24} sm={12} md={8}>
           <Card bordered hoverable>
@@ -267,6 +271,67 @@ const AdminDashboard = () => {
           </div>
         </div>
       </Card>
+    </>
+  );
+
+  const tabItems = [
+    {
+      key: 'users',
+      label: 'Users',
+      children: usersTabContent,
+    },
+    {
+      key: 'channels',
+      label: 'Channels',
+      children: <AdminChannels />,
+    },
+    {
+      key: 'transactions',
+      label: 'Transactions',
+      children: <AdminTransactions />,
+    },
+    {
+      key: 'chats',
+      label: 'Chats & Deals',
+      children: <AdminChat isEmbedded={true} />,
+    },
+    {
+      key: 'deals_management',
+      label: 'Escrow Deals',
+      children: <AdminDeals />,
+    },
+    {
+      key: 'banners',
+      label: 'Poster Management',
+      children: <AdminBanners isEmbedded={true} />,
+    },
+    {
+      key: 'blogs',
+      label: 'Blog Management',
+      children: <AdminBlogs isEmbedded={true} />,
+    },
+  ];
+
+  return (
+    <div className="mt-20 px-3 pb-8 md:px-6">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
+        <Title level={2} style={{ margin: 0 }}>Admin Dashboard</Title>
+        <Space wrap className="justify-start md:justify-end">
+          <Tooltip title="Refresh">
+            <Button icon={<ReloadOutlined />} onClick={fetchUsers} loading={loading}>
+              Refresh
+            </Button>
+          </Tooltip>
+        </Space>
+      </div>
+
+      <Tabs 
+        defaultActiveKey="users" 
+        items={tabItems} 
+        destroyInactiveTabPane={true}
+        size="large"
+        className="admin-dashboard-tabs"
+      />
 
       <Modal
         title="User Details"
@@ -284,7 +349,7 @@ const AdminDashboard = () => {
             <Text type="secondary">{selectedUser?.email || '-'}</Text>
           </div>
         </Space>
-        <Form layout="vertical" form={form} onFinish={handleUpdateRole}>
+        <Form layout="vertical" form={form} onFinish={handleUpdateUser}>
           <Form.Item name="name" label="Name">
             <Input disabled />
           </Form.Item>
@@ -301,23 +366,28 @@ const AdminDashboard = () => {
               <Option value="admin">Admin</Option>
             </Select>
           </Form.Item>
+          <Form.Item
+            name="status"
+            label="Status"
+            rules={[{ required: true, message: 'Please select a status' }]}
+          >
+            <Select>
+              <Option value="active">Active</Option>
+              <Option value="suspended">Suspended</Option>
+              <Option value="disabled">Disabled</Option>
+              <Option value="deleted">Deleted</Option>
+            </Select>
+          </Form.Item>
           <Form.Item>
             <Space>
               <Button onClick={() => setModalVisible(false)}>Cancel</Button>
               <Button type="primary" htmlType="submit">
-                Update Role
+                Update User
               </Button>
             </Space>
           </Form.Item>
         </Form>
       </Modal>
-
-      <div className="mt-8">
-        <AdminChannels />
-      </div>
-      <div className="mt-8">
-        <AdminTransactions />
-      </div>
     </div>
   );
 };

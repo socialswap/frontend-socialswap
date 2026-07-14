@@ -80,7 +80,7 @@ const ChannelCard = ({ channel }) => {
       onHoverEnd={() => setIsHovered(false)}
       whileHover={{ y: -8 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="relative rounded-2xl overflow-hidden bg-white cursor-pointer group"
+      className="relative rounded-2xl overflow-hidden bg-white dark:bg-gray-800 cursor-pointer group border border-transparent dark:border-gray-700"
       style={{
         boxShadow: isHovered 
           ? '0 20px 40px rgba(37, 99, 235, 0.15), 0 0 0 2px rgba(37, 99, 235, 0.1)' 
@@ -173,7 +173,7 @@ const ChannelCard = ({ channel }) => {
             <img
               src={avatar}
               alt="avatar"
-              className="w-12 h-12 rounded-full border-2 border-gray-200 object-cover"
+              className="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-700 object-cover"
             />
             {channel.monetized && (
               <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1">
@@ -183,7 +183,7 @@ const ChannelCard = ({ channel }) => {
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-gray-800">
+              <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
                 {channel.my_language || "English"} • {channel.country?.trim() || "Global"}
               </p>
             </div>
@@ -198,50 +198,47 @@ const ChannelCard = ({ channel }) => {
 
         {/* Stats Grid with Icons */}
         <div 
-          className="grid grid-cols-3 gap-2 mb-4 p-3 rounded-xl"
-          style={{
-            background: 'linear-gradient(135deg, rgba(249, 250, 251, 0.9) 0%, rgba(243, 244, 246, 0.9) 100%)',
-          }}
+          className="grid grid-cols-3 gap-2 mb-4 p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50"
         >
           <Tooltip title="Total Subscribers">
             <div className="text-center">
               <UserOutlined className="text-blue-500 text-base mb-1" />
-              <p className="text-sm font-bold text-gray-900">
+              <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
                 {(channel.subscriberCount || 0) >= 1000 
                   ? `${(channel.subscriberCount / 1000).toFixed(1)}K` 
                   : channel.subscriberCount || 0}
               </p>
-              <p className="text-[10px] text-gray-500 font-medium">Subscribers</p>
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Subscribers</p>
             </div>
           </Tooltip>
           <Tooltip title="Total Views">
-            <div className="text-center border-l border-r border-gray-300">
+            <div className="text-center border-l border-r border-gray-300 dark:border-gray-600">
               <EyeOutlined className="text-green-500 text-base mb-1" />
-              <p className="text-sm font-bold text-gray-900">
+              <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
                 {(channel.viewCount || 0) >= 1000000 
                   ? `${(channel.viewCount / 1000000).toFixed(1)}M` 
                   : (channel.viewCount || 0) >= 1000 
                   ? `${(channel.viewCount / 1000).toFixed(1)}K` 
                   : channel.viewCount || 0}
               </p>
-              <p className="text-[10px] text-gray-500 font-medium">Views</p>
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Views</p>
             </div>
           </Tooltip>
           <Tooltip title="Videos Published">
             <div className="text-center">
               <VideoCameraOutlined className="text-purple-500 text-base mb-1" />
-              <p className="text-sm font-bold text-gray-900">
+              <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
                 {channel.videoCount || 0}
               </p>
-              <p className="text-[10px] text-gray-500 font-medium">Videos</p>
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">Videos</p>
             </div>
           </Tooltip>
         </div>
 
         {/* Info Strip with Credibility */}
-        <div className="flex items-center justify-between text-xs text-gray-600 mb-4 pb-3 border-b border-gray-100">
+        <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-4 pb-3 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-1">
-            <span className="text-gray-500">Est. Earnings:</span>
+            <span className="text-gray-500 dark:text-gray-400">Est. Earnings:</span>
             <span className="font-bold text-green-600">
               ₹{(channel.estimatedEarnings || 0).toLocaleString()}/mo
             </span>
@@ -257,9 +254,9 @@ const ChannelCard = ({ channel }) => {
         {/* Price Section with CTA */}
         <div className="flex justify-between items-center">
           <div>
-            <p className="text-xs text-gray-500 font-medium mb-0.5">Asking Price</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-0.5">Asking Price</p>
             <div className="flex items-baseline gap-2">
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 ₹{parseInt(channel.price || 0).toLocaleString()}
               </p>
               {hasDiscount && (
@@ -285,21 +282,44 @@ const ChannelCard = ({ channel }) => {
           </Tooltip>
         </div>
 
-        <motion.button
-          whileHover={{ scale: isInCart ? 1 : 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          disabled={cartLoading}
-          onClick={handleAddToCart}
-          className={`mt-4 w-full text-center py-3 rounded-xl font-semibold text-white ${cartLoading ? 'opacity-80 cursor-not-allowed' : ''}`}
-          style={{
-            background: isInCart
-              ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-              : 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
-            boxShadow: '0 10px 20px rgba(248, 55, 88, 0.2)',
-          }}
-        >
-          {isInCart ? 'Go to Cart' : cartLoading ? 'Adding...' : 'Add to Cart'}
-        </motion.button>
+        <div className="flex gap-3 mt-4">
+          <motion.button
+            whileHover={{ scale: isInCart ? 1 : 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            disabled={cartLoading}
+            onClick={handleAddToCart}
+            className={`flex-1 text-center py-2.5 rounded-xl font-semibold text-white text-sm ${cartLoading ? 'opacity-80 cursor-not-allowed' : ''}`}
+            style={{
+              background: isInCart
+                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                : 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
+              boxShadow: '0 8px 16px rgba(248, 55, 88, 0.2)',
+            }}
+          >
+            {isInCart ? 'In Cart' : cartLoading ? 'Adding...' : 'Add to Cart'}
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!localStorage.getItem('token')) {
+                message.info('Please login to request an Escrow Deal.');
+                navigate('/login');
+                return;
+              }
+              navigate('/chat', { state: { requestDeal: channel } });
+            }}
+            className="flex-1 text-center py-2.5 rounded-xl font-semibold text-white text-sm"
+            style={{
+              background: 'linear-gradient(135deg, #7C3AED 0%, #9333EA 100%)',
+              boxShadow: '0 8px 16px rgba(124, 58, 237, 0.2)',
+            }}
+          >
+            Request Deal
+          </motion.button>
+        </div>
 
         {/* Hot Deal Pulsing Badge */}
         {channel.mostDemanding && (

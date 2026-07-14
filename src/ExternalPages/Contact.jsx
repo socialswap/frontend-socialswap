@@ -1,21 +1,21 @@
 import React from 'react';
-import './contact.css'
+
 const ContactUs = () => {
   return (
-    <div className="contact-us mt-16" style={{marginTop:'4rem'}}>
-      <h1>Contact Us</h1>
+    <div className="max-w-[800px] mx-auto p-5 font-sans mt-16" style={{ marginTop: '4rem' }}>
+      <h1 className="text-center text-[#333] dark:text-white text-3xl font-bold mb-6">Contact Us</h1>
 
       {/* Contact Information Section */}
-      <section>
-        <h2>Get in Touch</h2>
-        <p>
+      <section className="mb-5">
+        <h2 className="text-2xl font-semibold mb-3">Get in Touch</h2>
+        <p className="text-[16px] leading-[1.6] mb-4">
           Have any questions or need assistance? Feel free to reach out to us via email.
         </p>
-        <p>
+        <p className="text-[16px] leading-[1.6] mb-4">
           <strong>Email:</strong>{' '}
-          <a href="mailto:contact@socialswap.in">contact@socialswap.in</a>
+          <a href="mailto:contact@socialswap.in" className="text-[#007bff] no-underline hover:underline">contact@socialswap.in</a>
         </p>
-        <p>
+        <p className="text-[16px] leading-[1.6] mb-4">
           Or give us a call at <strong>+91 8010803291</strong>.
         </p>
       </section>

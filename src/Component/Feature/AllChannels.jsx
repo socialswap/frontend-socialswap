@@ -89,7 +89,6 @@ const ChannelCard = ({ channel }) => {
     }
   };
 
-  // 🧮 Safe discount calculation
   const discount = channel?.originalPrice
     ? Math.round(
         (1 - parseFloat(channel?.price || 0) / parseFloat(channel?.originalPrice || 1)) *
@@ -102,22 +101,22 @@ const ChannelCard = ({ channel }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
+      className="bg-bg-card border border-border-color/20 text-text-primary rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
     >
-      <div className="relative group">
+      <div className="relative group bg-bg-secondary/40">
         <img
           src={heroImage}
           alt={channel?.name || "YouTube Channel"}
-          className="w-full h-48 object-contain"
+          className="w-full h-48 object-contain p-4"
         />
 
-        <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+        <div className="absolute inset-0 bg-bg-secondary/75 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
           <button
             onClick={(e) => {
               e.stopPropagation();
               if (channel?.customUrl) window.open(channel.customUrl, "_blank");
             }}
-            className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-700 transition-colors"
+            className="bg-purple-primary text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-hover transition-colors"
           >
             <ExternalLink size={16} />
             View on YouTube
@@ -126,13 +125,13 @@ const ChannelCard = ({ channel }) => {
 
         <div className="absolute top-2 left-2 flex flex-wrap gap-2">
           {channel?.monetized && (
-            <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+            <span className="bg-success text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
               <DollarSign size={12} />
               Monetized
             </span>
           )}
           {channel?.mostDemanding && (
-            <span className="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+            <span className="bg-purple-secondary text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
               <TrendingUp size={12} />
               Trending
             </span>
@@ -140,7 +139,7 @@ const ChannelCard = ({ channel }) => {
         </div>
 
         {discount > 0 && (
-          <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+          <span className="absolute top-2 right-2 bg-accent-pink text-white text-xs font-bold px-2 py-1 rounded">
             -{discount}%
           </span>
         )}
@@ -150,44 +149,44 @@ const ChannelCard = ({ channel }) => {
         className="p-4 cursor-pointer"
         onClick={() => navigate(`/channel/${channel?._id}`)}
       >
-        <h3 className="text-xl font-bold mb-2 truncate">
+        <h3 className="text-xl font-bold mb-2 truncate text-text-primary">
           {channel?.name || "Unnamed Channel"}
         </h3>
 
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="flex flex-col">
-            <span className="text-gray-500 text-sm">Subscribers</span>
-            <span className="text-lg font-semibold">
+            <span className="text-text-secondary text-sm">Subscribers</span>
+            <span className="text-lg font-semibold text-text-primary">
               {formatNumber(channel?.subscriberCount)}
             </span>
           </div>
 
           <div className="flex flex-col">
-            <span className="text-gray-500 text-sm">Total Views</span>
-            <span className="text-lg font-semibold">
+            <span className="text-text-secondary text-sm">Total Views</span>
+            <span className="text-lg font-semibold text-text-primary">
               {formatNumber(channel?.viewCount)}
             </span>
           </div>
 
           <div className="flex flex-col">
-            <span className="text-gray-500 text-sm">Recent Views</span>
-            <span className="text-lg font-semibold">
+            <span className="text-text-secondary text-sm">Recent Views</span>
+            <span className="text-lg font-semibold text-text-primary">
               {formatNumber(channel?.recentViews)}
             </span>
           </div>
 
           <div className="flex flex-col">
-            <span className="text-gray-500 text-sm">Videos</span>
-            <span className="text-lg font-semibold">
+            <span className="text-text-secondary text-sm">Videos</span>
+            <span className="text-lg font-semibold text-text-primary">
               {formatNumber(channel?.videoCount)}
             </span>
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+        <div className="flex items-center justify-between pt-4 border-t border-border-color/20">
           <div className="flex flex-col">
-            <span className="text-gray-500 text-sm">Lifetime</span>
-            <span className="text-lg font-semibold">
+            <span className="text-text-secondary text-sm">Lifetime</span>
+            <span className="text-lg font-semibold text-text-primary">
               {formatDate(channel?.createdAt)}
             </span>
           </div>
@@ -199,9 +198,11 @@ const ChannelCard = ({ channel }) => {
             className={`px-5 py-2 rounded-lg text-sm font-semibold text-white ${cartLoading ? 'opacity-80 cursor-not-allowed' : ''}`}
             style={{
               background: isInCart
-                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                : 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
-              boxShadow: '0 6px 16px rgba(248, 55, 88, 0.2)',
+                ? 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)'
+                : 'var(--btn-gradient)',
+              boxShadow: isInCart
+                ? '0 6px 16px rgba(34, 197, 94, 0.2)'
+                : 'var(--purple-glow)',
             }}
           >
             {isInCart ? 'Go to Cart' : cartLoading ? 'Adding...' : 'Add to Cart'}

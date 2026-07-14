@@ -108,16 +108,16 @@ const testimonials = [
 
 const badgeThemes = {
   seller: {
-    background: "rgba(229, 9, 20, 0.12)",
-    color: "#E50914"
+    background: "rgba(124, 58, 237, 0.15)",
+    color: "#7C3AED"
   },
   buyer: {
-    background: "rgba(0, 224, 255, 0.12)",
-    color: "#00B8FF"
+    background: "rgba(217, 70, 239, 0.15)",
+    color: "#D946EF"
   },
   community: {
-    background: "rgba(255, 193, 7, 0.16)",
-    color: "#FFB703"
+    background: "rgba(59, 130, 246, 0.15)",
+    color: "#3B82F6"
   }
 };
 
@@ -126,8 +126,12 @@ const TestimonialCard = ({ name, date, content, rating, youtubeUrl, badge, trust
 
   return (
     <Card 
-      className="testimonial-card mx-2 h-full bg-white/90 transition-transform duration-300"
+      className="testimonial-card mx-2 h-full transition-transform duration-300"
       bordered={false}
+      style={{
+        background: 'var(--bg-card)',
+        borderColor: 'var(--border)',
+      }}
     >
       <div className="energy-line" />
       <div className="card-glow" />
@@ -135,7 +139,7 @@ const TestimonialCard = ({ name, date, content, rating, youtubeUrl, badge, trust
         <div className="flex items-start justify-between mb-4 gap-4">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-3 flex-wrap">
-              <Title level={4} className="!mb-0 !text-gray-900">{name}</Title>
+              <Title level={4} className="!mb-0 !text-text-primary">{name}</Title>
               {badge && (
                 <span
                   className="badge-chip"
@@ -150,14 +154,14 @@ const TestimonialCard = ({ name, date, content, rating, youtubeUrl, badge, trust
                 </span>
               )}
             </div>
-            <Text className="text-xs uppercase tracking-wider text-gray-400">{date}</Text>
+            <Text className="text-xs uppercase tracking-wider text-text-muted">{date}</Text>
           </div>
           <div className="flex flex-col items-end gap-2">
             <a 
               href={youtubeUrl} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="youtube-orb"
+              className="youtube-orb animate--pulse"
             >
               <span className="youtube-pulse" />
               <YoutubeFilled className="text-xl text-white relative z-10" />
@@ -169,13 +173,13 @@ const TestimonialCard = ({ name, date, content, rating, youtubeUrl, badge, trust
             </div>
           </div>
         </div>
-        <Text className="text-gray-700 leading-relaxed block mb-4">
+        <Text className="text-text-secondary leading-relaxed block mb-4">
           {content}
         </Text>
-        <div className="flex items-center justify-between text-sm text-gray-500">
+        <div className="flex items-center justify-between text-sm text-text-secondary">
           <span className="trust-meter">
             Trust Score
-            <strong className="ml-2 text-gray-900">{trustScore.toFixed(1)}/10</strong>
+            <strong className="ml-2 text-text-primary">{trustScore.toFixed(1)}/10</strong>
           </span>
           <span className="card-accent-label">Verified</span>
         </div>
@@ -209,16 +213,16 @@ const Testimonials = () => {
   };
 
   return (
-    <div className="w-full py-20 testimonials-section">
+    <div className="w-full py-20 testimonials-section bg-bg-primary text-text-primary transition-all duration-300">
       <div className="container mx-auto px-4">
-        <Title level={2} className="text-center mb-12 gradient-heading">
+        <Title level={2} className="text-center mb-12 gradient-heading text-text-primary">
           <span>What Our Users Say</span>
         </Title>
         <div className="relative testimonials-carousel">
           <style jsx>{`
             .testimonials-section {
               position: relative;
-              background: linear-gradient(135deg, #ffffff 0%, #f7fbff 100%);
+              background: var(--bg-primary);
               overflow: hidden;
             }
 
@@ -226,7 +230,7 @@ const Testimonials = () => {
               content: "";
               position: absolute;
               inset: 0;
-              background-image: radial-gradient(circle at center, rgba(0, 224, 255, 0.08) 0%, transparent 60%), linear-gradient(120deg, rgba(229, 9, 20, 0.06) 0%, rgba(0, 224, 255, 0.04) 100%);
+              background-image: radial-gradient(circle at center, var(--glow-blue) 0%, transparent 60%);
               z-index: 0;
             }
 
@@ -234,11 +238,11 @@ const Testimonials = () => {
               content: "";
               position: absolute;
               inset: 0;
-              opacity: 0.15;
+              opacity: 0.05;
               background-size: 80px 80px;
               background-image:
-                linear-gradient(transparent 79px, rgba(148, 163, 184, 0.25) 80px),
-                linear-gradient(90deg, transparent 79px, rgba(148, 163, 184, 0.25) 80px);
+                linear-gradient(transparent 79px, var(--border) 80px),
+                linear-gradient(90deg, transparent 79px, var(--border) 80px);
               z-index: 0;
             }
 
@@ -248,7 +252,7 @@ const Testimonials = () => {
             }
 
             .gradient-heading span {
-              background: linear-gradient(90deg, #E50914 0%, #FF6B00 50%, #00E0FF 100%);
+              background: var(--btn-gradient);
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
               display: inline-block;
@@ -262,8 +266,8 @@ const Testimonials = () => {
               margin: 12px auto 0;
               width: 140px;
               border-radius: 999px;
-              background: linear-gradient(90deg, rgba(229, 9, 20, 0.7) 0%, rgba(0, 224, 255, 0.7) 100%);
-              box-shadow: 0 0 15px rgba(229, 9, 20, 0.35);
+              background: var(--btn-gradient);
+              box-shadow: var(--purple-glow);
             }
 
             .testimonial-card {
@@ -271,8 +275,8 @@ const Testimonials = () => {
               border-radius: 22px;
               overflow: hidden;
               backdrop-filter: blur(6px);
-              border: 1px solid rgba(255, 255, 255, 0.4);
-              box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+              border: 1px solid var(--border);
+              box-shadow: var(--shadow-card);
               transform-origin: center;
             }
 
@@ -282,7 +286,7 @@ const Testimonials = () => {
               inset: 1px;
               border-radius: 20px;
               border: 1px solid transparent;
-              background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.7));
+              background: var(--bg-card);
               z-index: 0;
             }
 
@@ -303,8 +307,8 @@ const Testimonials = () => {
               top: 16%;
               bottom: 16%;
               width: 4px;
-              background: linear-gradient(180deg, #E50914 0%, #00E0FF 100%);
-              box-shadow: 0 0 15px rgba(0, 224, 255, 0.4);
+              background: var(--btn-gradient);
+              box-shadow: var(--purple-glow);
               border-radius: 999px;
               overflow: hidden;
             }
@@ -313,14 +317,14 @@ const Testimonials = () => {
               content: "";
               position: absolute;
               inset: -60% 0;
-              background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.7) 50%, transparent 100%);
+              background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
               animation: flow 2.5s linear infinite;
             }
 
             .card-glow {
               position: absolute;
               inset: -15% -25%;
-              background: radial-gradient(circle at 10% 10%, rgba(229, 9, 20, 0.2), transparent 60%), radial-gradient(circle at 90% 90%, rgba(0, 224, 255, 0.2), transparent 60%);
+              background: radial-gradient(circle at 10% 10%, var(--glow-hero) 0%, transparent 60%), radial-gradient(circle at 90% 90%, var(--glow-pink) 0%, transparent 60%);
               opacity: 0;
               transition: opacity 0.4s ease;
               pointer-events: none;
@@ -334,8 +338,8 @@ const Testimonials = () => {
               display: grid;
               place-items: center;
               border-radius: 50%;
-              background: linear-gradient(135deg, #E50914, #FF4D4D);
-              box-shadow: 0 12px 30px rgba(229, 9, 20, 0.35);
+              background: var(--btn-gradient);
+              box-shadow: var(--purple-glow);
               transition: transform 0.3s ease, box-shadow 0.3s ease;
             }
 
@@ -344,13 +348,13 @@ const Testimonials = () => {
               position: absolute;
               inset: -8px;
               border-radius: 50%;
-              border: 2px solid rgba(229, 9, 20, 0.3);
+              border: 2px solid var(--purple-primary);
               animation: pulse 2.6s infinite ease-out;
             }
 
             .youtube-orb:hover {
               transform: translateY(-2px);
-              box-shadow: 0 18px 36px rgba(229, 9, 20, 0.45);
+              box-shadow: var(--purple-glow);
             }
 
             .star-row {
@@ -368,7 +372,7 @@ const Testimonials = () => {
 
             .testimonial-card:hover {
               transform: translateY(-12px) scale(1.02);
-              box-shadow: 0 26px 55px rgba(15, 23, 42, 0.16);
+              box-shadow: var(--shadow-card);
             }
 
             .testimonial-card:hover .card-glow {
@@ -386,7 +390,7 @@ const Testimonials = () => {
               font-size: 0.75rem;
               letter-spacing: 0.18em;
               text-transform: uppercase;
-              color: rgba(15, 23, 42, 0.45);
+              color: var(--text-muted);
             }
 
             .testimonials-carousel .slick-list {
@@ -410,27 +414,28 @@ const Testimonials = () => {
             }
 
             .testimonials-carousel .slick-dots li button {
-              background: #D1D5DB;
+              background: var(--border);
             }
             .testimonials-carousel .slick-dots li.slick-active button {
-              background: #4B5563;
+              background: var(--purple-primary);
             }
             .testimonials-carousel .slick-prev,
             .testimonials-carousel .slick-next {
               width: 44px;
               height: 44px;
               border-radius: 50%;
-              background: rgba(255, 255, 255, 0.9);
+              background: var(--bg-card);
+              border: 1px solid var(--border);
               font-size: 24px;
-              color: #4B5563;
-              box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+              color: var(--text-primary);
+              box-shadow: var(--shadow-card);
               transition: transform 0.3s ease, box-shadow 0.3s ease;
             }
 
             .testimonials-carousel .slick-prev:hover,
             .testimonials-carousel .slick-next:hover {
               transform: translateY(-2px);
-              box-shadow: 0 16px 38px rgba(15, 23, 42, 0.16);
+              box-shadow: var(--purple-glow);
             }
             .testimonials-carousel .slick-track {
               display: flex !important;
@@ -475,12 +480,6 @@ const Testimonials = () => {
               }
               100% {
                 transform: scale(1);
-              }
-            }
-
-            @media (max-width: 1024px) {
-              .testimonials-carousel .slick-list {
-                padding-bottom: 60px;
               }
             }
 

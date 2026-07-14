@@ -74,11 +74,8 @@ export const ChannelCard = ({ channel }) => {
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       whileHover={{ y: -8 }}
-      className="relative rounded-2xl overflow-hidden cursor-pointer min-w-[300px] mx-3 group"
+      className="relative rounded-2xl overflow-hidden cursor-pointer min-w-[300px] mx-3 group border border-border-color bg-bg-card text-text-primary backdrop-blur-md shadow-card-shadow transition-all duration-300"
       style={{
-        background: 'rgba(255, 255, 255, 0.9)',
-        backdropFilter: 'blur(10px)',
-        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
         minHeight: '540px',
       }}
       onClick={() => navigate(`/channel/${channel?._id}`)}
@@ -87,7 +84,7 @@ export const ChannelCard = ({ channel }) => {
       <motion.div
         className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         style={{
-          background: 'radial-gradient(circle at center, rgba(248, 55, 88, 0.08) 0%, transparent 70%)',
+          background: 'radial-gradient(circle at center, var(--glow-hero) 0%, transparent 70%)',
           filter: 'blur(20px)',
           transform: 'scale(1.1)',
         }}
@@ -141,9 +138,9 @@ export const ChannelCard = ({ channel }) => {
               animate={{ scale: 1 }}
               className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold"
               style={{
-                background: 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
+                background: 'var(--btn-gradient)',
                 color: 'white',
-                boxShadow: '0 4px 12px rgba(248, 55, 88, 0.4)',
+                boxShadow: 'var(--purple-glow)',
               }}
             >
               🔥 -{discount}%
@@ -155,46 +152,46 @@ export const ChannelCard = ({ channel }) => {
       {/* Card Content */}
       <div className="p-5">
         {/* Channel Name */}
-        <h3 className="text-lg font-bold mb-3 text-gray-900 truncate group-hover:text-[#F83758] transition-colors">
+        <h3 className="text-lg font-bold mb-3 text-text-primary truncate group-hover:text-purple-secondary transition-colors">
           {channel.name}
         </h3>
 
         {/* Channel Category & Type Badge */}
         <div className="flex items-center gap-2 mb-3">
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-primary/10 text-purple-primary">
             {channel.category}
           </span>
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-50 text-purple-600">
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-secondary/10 text-purple-secondary">
             {channel.channelType}
           </span>
         </div>
 
         {/* Info Strip */}
-        <div className="grid grid-cols-3 gap-3 mb-4 pb-4 border-b border-gray-100">
+        <div className="grid grid-cols-3 gap-3 mb-4 pb-4 border-b border-border-color/20">
           <div className="flex flex-col items-start">
-            <div className="flex items-center gap-1 text-xs text-gray-500 mb-1">
-              <FaUsers className="text-blue-500" />
+            <div className="flex items-center gap-1 text-xs text-text-secondary mb-1">
+              <FaUsers className="text-purple-primary" />
               <span>Subs</span>
             </div>
-            <span className="font-bold text-sm text-gray-900">
+            <span className="font-bold text-sm text-text-primary">
               {channel?.subscriberCount?.toLocaleString()}
             </span>
           </div>
           <div className="flex flex-col items-start">
-            <div className="flex items-center gap-1 text-xs text-gray-500 mb-1">
-              <FaEye className="text-purple-500" />
+            <div className="flex items-center gap-1 text-xs text-text-secondary mb-1">
+              <FaEye className="text-purple-secondary" />
               <span>Views</span>
             </div>
-            <span className="font-bold text-sm text-gray-900">
+            <span className="font-bold text-sm text-text-primary">
               {(channel?.viewCount / 1000).toFixed(0)}K
             </span>
           </div>
           <div className="flex flex-col items-start">
-            <div className="flex items-center gap-1 text-xs text-gray-500 mb-1">
-              <FaClock className="text-green-500" />
+            <div className="flex items-center gap-1 text-xs text-text-secondary mb-1">
+              <FaClock className="text-accent-pink" />
               <span>Videos</span>
             </div>
-            <span className="font-bold text-sm text-gray-900">
+            <span className="font-bold text-sm text-text-primary">
               {channel?.videoCount}
             </span>
           </div>
@@ -204,11 +201,11 @@ export const ChannelCard = ({ channel }) => {
         <div className="flex items-center justify-between">
           <div>
             {channel.originalPrice && parseFloat(channel.originalPrice) > parseFloat(channel.price) && (
-              <p className="text-sm text-gray-400 line-through mb-1">
+              <p className="text-sm text-text-muted line-through mb-1">
                 ₹{parseFloat(channel.originalPrice).toLocaleString()}
               </p>
             )}
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-text-primary">
               ₹{parseFloat(channel.price ?? 0).toLocaleString()}
             </p>
           </div>
@@ -219,12 +216,12 @@ export const ChannelCard = ({ channel }) => {
             className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium"
             style={{
               background: channel.status === 'approved' 
-                ? 'rgba(16, 185, 129, 0.1)' 
+                ? 'rgba(34, 197, 94, 0.15)' 
                 : channel.status === 'Sold' 
-                ? 'rgba(239, 68, 68, 0.1)'
-                : 'rgba(59, 130, 246, 0.1)',
+                ? 'rgba(239, 68, 68, 0.15)'
+                : 'rgba(59, 130, 246, 0.15)',
               color: channel.status === 'approved' 
-                ? '#10b981' 
+                ? '#22c55e' 
                 : channel.status === 'Sold' 
                 ? '#ef4444'
                 : '#3b82f6',
@@ -243,9 +240,11 @@ export const ChannelCard = ({ channel }) => {
           className={`mt-6 w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-white shadow-lg ${cartLoading ? 'opacity-80 cursor-not-allowed' : ''}`}
           style={{
             background: isInCart
-              ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-              : 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
-            boxShadow: '0 10px 20px rgba(248, 55, 88, 0.25)',
+              ? 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)'
+              : 'var(--btn-gradient)',
+            boxShadow: isInCart
+              ? '0 10px 20px rgba(34, 197, 94, 0.25)'
+              : 'var(--purple-glow)',
           }}
         >
           {isInCart ? 'Go to Cart' : cartLoading ? 'Adding...' : 'Add to Cart'}
@@ -255,11 +254,11 @@ export const ChannelCard = ({ channel }) => {
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: isHovered ? 1 : 0, height: isHovered ? 'auto' : 0 }}
-          className="mt-4 pt-4 border-t border-gray-100 space-y-2"
+          className="mt-4 pt-4 border-t border-border-color/20 space-y-2"
         >
           <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-500">Avg Views/Video</span>
-            <span className="font-semibold text-gray-900">
+            <span className="text-text-secondary">Avg Views/Video</span>
+            <span className="font-semibold text-text-primary">
               {channel?.averageViewsPerVideo?.toLocaleString()}
             </span>
           </div>
@@ -271,8 +270,8 @@ export const ChannelCard = ({ channel }) => {
           )}
           {channel.recentViews > 0 && (
             <div className="flex items-center justify-between text-xs">
-              <span className="text-gray-500">Recent Views</span>
-              <span className="font-semibold text-gray-900">
+              <span className="text-text-secondary">Recent Views</span>
+              <span className="font-semibold text-text-primary">
                 {(channel.recentViews / 1000).toFixed(0)}K
               </span>
             </div>
@@ -284,7 +283,7 @@ export const ChannelCard = ({ channel }) => {
       <motion.div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none"
         style={{
-          background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)',
+          background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent)',
         }}
         animate={{
           x: isHovered ? [-300, 300] : 0,
@@ -297,7 +296,6 @@ export const ChannelCard = ({ channel }) => {
     </motion.div>
   );
 };
-
 
 const FeaturedListings = () => {
   const [featuredChannels, setFeaturedChannels] = useState([]);
@@ -313,8 +311,6 @@ const FeaturedListings = () => {
     const fetchFeaturedChannels = async () => {
       try {
         const response = await axiosInstance.get(`${API_BASE_URL}/channels/demanding`);
-        console.log(response);
-        
         setFeaturedChannels(response?.data);
         setFilteredChannels(response?.data);
         setLoading(false);
@@ -327,7 +323,6 @@ const FeaturedListings = () => {
     fetchFeaturedChannels();
   }, []);
 
-  // Filter channels when activeFilter changes
   useEffect(() => {
     if (activeFilter === 'All') {
       setFilteredChannels(featuredChannels);
@@ -345,16 +340,13 @@ const FeaturedListings = () => {
 
   return (
     <section 
-      className="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
-      style={{
-        background: 'linear-gradient(180deg, #fafbff 0%, #f9fafb 50%, #ffffff 100%)',
-      }}
+      className="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-bg-primary text-text-primary transition-all duration-300"
     >
       {/* Background Orbs */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-gradient-to-br from-blue-100/40 to-transparent rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-gradient-to-br from-red-100/40 to-transparent rounded-full blur-3xl" />
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-gradient-to-br from-purple-primary/10 to-transparent rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-gradient-to-br from-accent-pink/10 to-transparent rounded-full blur-3xl" />
 
-      <div className=" mx-auto relative z-10">
+      <div className="mx-auto relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -366,24 +358,16 @@ const FeaturedListings = () => {
           {/* Badge */}
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="inline-block mb-4 px-6 py-2 rounded-full"
-            style={{
-              background: 'rgba(255, 255, 255, 0.8)',
-              backdropFilter: 'blur(10px)',
-              boxShadow: '0 4px 24px rgba(248, 55, 88, 0.1)',
-              border: '1px solid rgba(248, 55, 88, 0.1)',
-            }}
+            className="inline-block mb-4 px-6 py-2 rounded-full bg-bg-card/80 border border-border-color/30 backdrop-blur-md"
           >
-            <span className="text-sm font-semibold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+            <span className="text-sm font-semibold bg-gradient-to-r from-purple-primary to-accent-pink bg-clip-text text-transparent">
               🔥 Trending Now
             </span>
           </motion.div>
 
           {/* Title */}
-          <h2 className="text-4xl font-bold mb-3">
-            <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-              Most Demanding Channels
-            </span>
+          <h2 className="text-4xl font-bold mb-3 text-text-primary">
+            Most Demanding Channels
           </h2>
           
           {/* Accent Line */}
@@ -394,11 +378,11 @@ const FeaturedListings = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="h-1 mx-auto mb-4 rounded-full"
             style={{
-              background: 'linear-gradient(90deg, #F83758, #ff6b6b, #ff9f40)',
+              background: 'var(--btn-gradient)',
             }}
           />
 
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          <p className="text-text-secondary text-lg max-w-2xl mx-auto">
             Unmatched channels—superior performance and customer satisfaction in one.
           </p>
         </motion.div>
@@ -425,18 +409,17 @@ const FeaturedListings = () => {
                 className={`px-6 py-2.5 rounded-full font-medium text-sm transition-all duration-300 flex items-center gap-2 ${
                   activeFilter === filter
                     ? 'text-white shadow-lg'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-text-secondary hover:text-text-primary'
                 }`}
                 style={
                   activeFilter === filter
                     ? {
-                        background: 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
-                        boxShadow: '0 4px 16px rgba(248, 55, 88, 0.3)',
+                        background: 'var(--btn-gradient)',
+                        boxShadow: 'var(--purple-glow)',
                       }
                     : {
-                        background: 'rgba(255, 255, 255, 0.8)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(0, 0, 0, 0.06)',
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border)',
                       }
                 }
               >
@@ -445,8 +428,8 @@ const FeaturedListings = () => {
                   <span 
                     className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
                       activeFilter === filter 
-                        ? 'bg-white/20' 
-                        : 'bg-gray-200 text-gray-700'
+                        ? 'bg-white/25 text-white' 
+                        : 'bg-bg-secondary text-text-secondary'
                     }`}
                   >
                     {count}
@@ -470,10 +453,7 @@ const FeaturedListings = () => {
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="animate-pulse rounded-2xl min-w-[300px] h-96"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.8))',
-                  }}
+                  className="animate-pulse rounded-2xl min-w-[300px] h-96 bg-bg-card border border-border-color/20"
                 />
               ))}
             </motion.div>
@@ -483,7 +463,7 @@ const FeaturedListings = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-center py-12 text-red-500 font-medium"
+              className="text-center py-12 text-error font-medium"
             >
               {error}
             </motion.div>
@@ -507,19 +487,19 @@ const FeaturedListings = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-center text-gray-500 py-12"
+              className="text-center py-12"
             >
               <div className="inline-flex flex-col items-center gap-4">
                 <div className="text-6xl">🔍</div>
-                <p className="text-lg font-medium text-gray-700">No channels found in "{activeFilter}"</p>
-                <p className="text-sm text-gray-500">Try selecting a different category</p>
+                <p className="text-lg font-medium text-text-primary">No channels found in "{activeFilter}"</p>
+                <p className="text-sm text-text-muted">Try selecting a different category</p>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setActiveFilter('All')}
                   className="mt-4 px-6 py-2 rounded-full font-medium text-sm text-white"
                   style={{
-                    background: 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
+                    background: 'var(--btn-gradient)',
                   }}
                 >
                   View All Channels
@@ -543,8 +523,8 @@ const FeaturedListings = () => {
             onClick={handleViewAllClick}
             className="px-8 py-4 rounded-full font-semibold text-white shadow-lg"
             style={{
-              background: 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
-              boxShadow: '0 8px 24px rgba(248, 55, 88, 0.3)',
+              background: 'var(--btn-gradient)',
+              boxShadow: 'var(--purple-glow)',
             }}
           >
             View All Channels →
