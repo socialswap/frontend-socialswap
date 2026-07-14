@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, message } from 'antd';
+import { Modal, message, Form, Select, InputNumber } from 'antd';
 import io from 'socket.io-client';
 import axiosInstance, { api } from '../../API/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+
+const { Option } = Select;
 
 const SOCKET_URL = process.env.REACT_APP_API_URL || 'http://localhost:8090';
 
@@ -27,7 +29,27 @@ const AdminChat = ({ isEmbedded = false }) => {
   
   const [socket, setSocket] = useState(null);
   const [dealDetails, setDealDetails] = useState({ channelId: '', price: '', buyerId: '' });
-  const [rightPaneTab, setRightPaneTab] = useState('deals'); // 'deals' or 'create'
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [form] = Form.useForm();
+  const selectedSellerId = Form.useWatch('sellerId', form);
+  
+  useEffect(() => {
+    const fetchSellerChannels = async () => {
+      if (!selectedSellerId) {
+        setChannels([]);
+        return;
+      }
+      try {
+        const response = await axiosInstance.get(`${api}/admin/users/${selectedSellerId}/channels`);
+        if (response.data?.success) {
+          setChannels(response.data.channels || []);
+        }
+      } catch (error) {
+        console.error('Error fetching seller channels:', error);
+      }
+    };
+    fetchSellerChannels();
+  }, [selectedSellerId]);
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -45,13 +67,16 @@ const AdminChat = ({ isEmbedded = false }) => {
 
   useEffect(() => {
     if (location.state?.prefillDeal) {
-      setRightPaneTab('create');
+      setCreateModalVisible(true);
       const ch = location.state.prefillDeal;
-      setDealDetails(prev => ({ ...prev, channelId: ch._id, price: ch.price }));
-      setSearchChannelTerm(ch.name);
+      form.setFieldsValue({
+        sellerId: ch.seller?._id || ch.seller,
+        channelId: ch._id,
+        dealPrice: ch.price
+      });
       window.history.replaceState({}, document.title);
     }
-  }, [location.state]);
+  }, [location.state, form]);
 
   useEffect(() => {
     fetchThreads();
@@ -98,16 +123,7 @@ const AdminChat = ({ isEmbedded = false }) => {
   };
 
   const fetchAvailableChannels = async () => {
-    try {
-      const res = await axiosInstance.get(`${api}/channels`);
-      if (res.data && res.data.data) {
-        setChannels(res.data.data);
-      } else if (Array.isArray(res.data)) {
-        setChannels(res.data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
+    // Only fetch globally if needed elsewhere, but we fetch by seller now
   };
 
   const fetchUsers = async () => {
@@ -169,26 +185,37 @@ const AdminChat = ({ isEmbedded = false }) => {
     }
   };
 
-  const handleCreateDeal = async () => {
+  const handleChannelChange = (channelId) => {
+    const channel = channels.find(c => c._id === channelId);
+    if (channel) {
+      form.setFieldsValue({ dealPrice: channel.price });
+    }
+  };
+
+  const handleCreateDealSubmit = async (values) => {
     try {
       const res = await axiosInstance.post(`${api}/admin/deals`, {
-        channelId: dealDetails.channelId,
-        dealPrice: dealDetails.price,
-        buyerId: dealDetails.buyerId || activeThread?.user?._id,
-        threadId: activeThread?._id
+        channelId: values.channelId,
+        buyerId: values.buyerId,
+        dealPrice: values.dealPrice
       });
 
       if (res.data.success) {
-        setRightPaneTab('deals');
-        setDealDetails({ channelId: '', price: '', buyerId: '' });
-        setSearchChannelTerm('');
-        setSearchUserTerm('');
+        message.success('Escrow Deal created and dispatched successfully!');
+        setCreateModalVisible(false);
+        form.resetFields();
         fetchDeals(); // Refresh deals
       }
     } catch (err) {
-      console.error(err);
-      alert('Failed to create deal. Please check Channel ID.');
+      console.error('Error creating deal:', err);
+      message.error(err.response?.data?.message || 'Failed to create deal');
     }
+  };
+
+  const openCreateModal = () => {
+    form.resetFields();
+    setChannels([]);
+    setCreateModalVisible(true);
   };
 
   const handlePaymentOverride = async (dealId, paymentStatus) => {
@@ -375,24 +402,15 @@ const AdminChat = ({ isEmbedded = false }) => {
               <span className="font-semibold text-white">Escrow Deals</span>
             </div>
             
-            <div className="flex space-x-2 bg-white/20 p-1 rounded-lg">
+            <div className="flex space-x-2">
               <button 
-                onClick={() => setRightPaneTab('deals')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${rightPaneTab === 'deals' ? 'bg-white text-[#7C3AED]' : 'text-white hover:bg-white/10'}`}
+                onClick={openCreateModal}
+                className="px-4 py-1.5 text-xs font-bold rounded-md bg-white text-[#7C3AED] hover:bg-gray-100 transition-colors shadow-sm"
               >
-                ALL DEALS
-              </button>
-              <button 
-                onClick={() => setRightPaneTab('create')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${rightPaneTab === 'create' ? 'bg-white text-[#7C3AED]' : 'text-white hover:bg-white/10'}`}
-              >
-                ISSUE NEW
+                + Create New Deal
               </button>
             </div>
           </div>
-
-          {rightPaneTab === 'deals' ? (
-            <>
               {/* Search Bar */}
               <div className="p-4 border-b border-gray-100 dark:border-purple-900/30 bg-white dark:bg-[#18112e]">
                 <div className="relative">
@@ -453,137 +471,6 @@ const AdminChat = ({ isEmbedded = false }) => {
               ))
             )}
           </div>
-          </>
-          ) : (
-            <div className="flex-1 flex flex-col p-4 sm:p-8 bg-gray-50/50 dark:bg-transparent overflow-y-auto">
-              <div className="max-w-md mx-auto w-full bg-white dark:bg-[#231542] rounded-2xl shadow-sm border border-gray-200 dark:border-purple-900/30 p-6 sm:p-8 mt-4 sm:mt-10 mb-6">
-                <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-6 shrink-0">
-                  <svg className="w-8 h-8 text-[#7C3AED] dark:text-[#A855F7]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                </div>
-                
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-2">Issue New Escrow Deal</h2>
-                <p className="text-gray-500 dark:text-gray-400 text-sm text-center mb-8">
-                  Create a secure escrow transaction. The deal card will be automatically dispatched to both the buyer and seller.
-                </p>
-
-                {!activeThread && !dealDetails.buyerId ? (
-                  <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-xl text-sm font-medium border border-red-100 dark:border-red-900/30 flex items-start mb-4">
-                    <svg className="w-5 h-5 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span>Please search for a Buyer or select an active chat on the left to designate the Buyer before issuing a deal.</span>
-                  </div>
-                ) : null}
-
-                <div className="space-y-5">
-                  <div className="relative">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Select Buyer (User)</label>
-                    <input 
-                      type="text" 
-                      placeholder={activeThread && !dealDetails.buyerId ? `Using active chat: ${activeThread.user?.name}` : "Search for buyer by name or email..."}
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-[#18112e] border border-gray-200 dark:border-purple-900/50 rounded-xl focus:ring-2 focus:ring-purple-400 dark:focus:ring-purple-600 outline-none text-gray-800 dark:text-white transition-all"
-                      value={searchUserTerm}
-                      onChange={e => {
-                        setSearchUserTerm(e.target.value);
-                        setShowUserDropdown(true);
-                        if(dealDetails.buyerId) setDealDetails({...dealDetails, buyerId: ''});
-                      }}
-                      onFocus={() => setShowUserDropdown(true)}
-                    />
-                    {showUserDropdown && searchUserTerm && (
-                      <div className="absolute z-20 w-full mt-1 bg-white dark:bg-[#231542] border border-gray-200 dark:border-purple-900/40 rounded-xl shadow-lg max-h-48 overflow-y-auto">
-                        {users
-                          .filter(u => 
-                            u.name?.toLowerCase().includes(searchUserTerm.toLowerCase()) || 
-                            u.email?.toLowerCase().includes(searchUserTerm.toLowerCase())
-                          )
-                          .map(u => (
-                            <div 
-                              key={u._id}
-                              className="px-4 py-3 hover:bg-purple-50 dark:hover:bg-purple-900/30 cursor-pointer text-sm text-gray-800 dark:text-gray-200 border-b border-gray-50 dark:border-purple-900/20 last:border-0"
-                              onClick={() => {
-                                setDealDetails({ ...dealDetails, buyerId: u._id });
-                                setSearchUserTerm(u.name);
-                                setShowUserDropdown(false);
-                              }}
-                            >
-                              <span className="font-semibold">{u.name}</span> <span className="text-gray-400 text-xs ml-1">({u.email})</span>
-                            </div>
-                          ))}
-                        {users.filter(u => u.name?.toLowerCase().includes(searchUserTerm.toLowerCase()) || u.email?.toLowerCase().includes(searchUserTerm.toLowerCase())).length === 0 && (
-                          <div className="px-4 py-3 text-sm text-gray-500">No users found</div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="relative">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Select Channel</label>
-                    <input 
-                      type="text" 
-                      placeholder="Search for channel by name..." 
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-[#18112e] border border-gray-200 dark:border-purple-900/50 rounded-xl focus:ring-2 focus:ring-purple-400 dark:focus:ring-purple-600 outline-none text-gray-800 dark:text-white transition-all"
-                      value={searchChannelTerm}
-                      onChange={e => {
-                        setSearchChannelTerm(e.target.value);
-                        setShowChannelDropdown(true);
-                        if(dealDetails.channelId) setDealDetails({...dealDetails, channelId: ''});
-                      }}
-                      onFocus={() => setShowChannelDropdown(true)}
-                    />
-                    {showChannelDropdown && searchChannelTerm && (
-                      <div className="absolute z-20 w-full mt-1 bg-white dark:bg-[#231542] border border-gray-200 dark:border-purple-900/40 rounded-xl shadow-lg max-h-48 overflow-y-auto">
-                        {channels
-                          .filter(c => c.name.toLowerCase().includes(searchChannelTerm.toLowerCase()))
-                          .map(c => (
-                            <div 
-                              key={c._id}
-                              className="px-4 py-3 hover:bg-purple-50 dark:hover:bg-purple-900/30 cursor-pointer text-sm text-gray-800 dark:text-gray-200 border-b border-gray-50 dark:border-purple-900/20 last:border-0"
-                              onClick={() => {
-                                setDealDetails({ ...dealDetails, channelId: c._id });
-                                setSearchChannelTerm(c.name);
-                                setShowChannelDropdown(false);
-                              }}
-                            >
-                              <span className="font-semibold">{c.name}</span> <span className="text-gray-400 text-xs ml-1">(${c.price})</span>
-                            </div>
-                          ))}
-                        {channels.filter(c => c.name.toLowerCase().includes(searchChannelTerm.toLowerCase())).length === 0 && (
-                          <div className="px-4 py-3 text-sm text-gray-500">No channels found</div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Custom Deal Price ($)</label>
-                    <input 
-                      type="number" 
-                      placeholder="0.00" 
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-[#18112e] border border-gray-200 dark:border-purple-900/50 rounded-xl focus:ring-2 focus:ring-purple-400 dark:focus:ring-purple-600 outline-none text-gray-800 dark:text-white transition-all"
-                      value={dealDetails.price}
-                      onChange={e => setDealDetails({...dealDetails, price: e.target.value})}
-                    />
-                  </div>
-
-                  <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-xl border border-purple-100 dark:border-purple-900/40">
-                    <p className="text-xs text-purple-800 dark:text-purple-300">
-                      <span className="font-bold">Buyer:</span> {dealDetails.buyerId ? searchUserTerm : activeThread?.user?.name || 'Please select a buyer'}
-                    </p>
-                    <p className="text-xs text-purple-800 dark:text-purple-300 mt-1">
-                      <span className="font-bold">Seller:</span> Will be inferred from Channel ID
-                    </p>
-                  </div>
-
-                  <button 
-                    onClick={handleCreateDeal}
-                    disabled={!dealDetails.channelId || !dealDetails.price || (!dealDetails.buyerId && !activeThread)}
-                    className="w-full bg-gradient-to-r from-[#7C3AED] to-[#9333EA] hover:from-[#6D28D9] hover:to-[#7E22CE] disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 rounded-xl font-bold transition shadow-md shadow-purple-500/20 text-sm mt-2"
-                  >
-                    Dispatch Deal Securely
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
         
       </div>
@@ -631,6 +518,111 @@ const AdminChat = ({ isEmbedded = false }) => {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Create Deal Modal */}
+      <Modal
+        title={
+          <div className="font-bold text-lg text-gray-900 dark:text-white">Create New Escrow Deal</div>
+        }
+        open={createModalVisible}
+        onCancel={() => setCreateModalVisible(false)}
+        footer={null}
+        destroyOnClose
+        className="dark:bg-gray-800"
+      >
+        <Form 
+          form={form} 
+          layout="vertical" 
+          onFinish={handleCreateDealSubmit}
+          className="mt-4"
+        >
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-100 dark:border-blue-800/40 mb-4">
+            <p className="text-sm text-blue-800 dark:text-blue-300">
+              This wizard will dispatch a deal card to both the Buyer's and Seller's chat threads.
+            </p>
+          </div>
+
+          <Form.Item 
+            name="sellerId" 
+            label={<span className="text-gray-700 dark:text-gray-300 font-semibold">1. Select Seller</span>}
+            rules={[{ required: true, message: 'Please select a seller' }]}
+          >
+            <Select 
+              showSearch
+              placeholder="Search and select seller..."
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
+              options={users.map(u => ({ value: u._id, label: `${u.name} (${u.email})` }))}
+              onChange={() => {
+                form.setFieldsValue({ channelId: undefined, dealPrice: undefined });
+              }}
+              className="w-full"
+            />
+          </Form.Item>
+
+          <Form.Item 
+            name="channelId" 
+            label={<span className="text-gray-700 dark:text-gray-300 font-semibold">2. Select Channel</span>}
+            rules={[{ required: true, message: 'Please select a channel' }]}
+            tooltip="Only channels owned by the selected Seller are shown."
+          >
+            <Select 
+              showSearch
+              placeholder="Search and select channel..."
+              disabled={!selectedSellerId}
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
+              options={channels.map(c => ({ value: c._id, label: `${c.name} - $${c.price}` }))}
+              onChange={handleChannelChange}
+              className="w-full"
+            />
+          </Form.Item>
+
+          <Form.Item 
+            name="buyerId" 
+            label={<span className="text-gray-700 dark:text-gray-300 font-semibold">3. Select Buyer</span>}
+            rules={[{ required: true, message: 'Please select a buyer' }]}
+          >
+            <Select 
+              showSearch
+              placeholder="Search and select buyer..."
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
+              options={users.filter(u => u._id !== selectedSellerId).map(u => ({ value: u._id, label: `${u.name} (${u.email})` }))}
+              className="w-full"
+            />
+          </Form.Item>
+
+          <Form.Item 
+            name="dealPrice" 
+            label={<span className="text-gray-700 dark:text-gray-300 font-semibold">4. Negotiated Deal Price ($)</span>}
+            rules={[{ required: true, message: 'Please enter the deal price' }]}
+          >
+            <InputNumber 
+              className="w-full"
+              placeholder="0.00"
+              prefix="$"
+              min={0}
+              size="large"
+            />
+          </Form.Item>
+
+          <Form.Item className="mb-0 mt-6">
+            <button 
+              type="submit" 
+              className="w-full bg-gradient-to-r from-[#7C3AED] to-[#9333EA] hover:from-[#6D28D9] hover:to-[#7E22CE] text-white py-3.5 rounded-xl font-bold transition shadow-md shadow-purple-500/20 text-sm"
+            >
+              Dispatch Escrow Deal
+            </button>
+          </Form.Item>
+        </Form>
       </Modal>
 
     </div>
