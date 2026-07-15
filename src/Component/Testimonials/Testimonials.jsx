@@ -127,7 +127,7 @@ const TestimonialCard = ({ name, date, content, rating, youtubeUrl, badge, trust
   return (
     <Card 
       className="testimonial-card mx-2 h-full transition-transform duration-300"
-      bordered={false}
+      variant="borderless"
       style={{
         background: 'var(--bg-card)',
         borderColor: 'var(--border)',
@@ -219,7 +219,7 @@ const Testimonials = () => {
           <span>What Our Users Say</span>
         </Title>
         <div className="relative testimonials-carousel">
-          <style jsx>{`
+          <style>{`
             .testimonials-section {
               position: relative;
               background: var(--bg-primary);

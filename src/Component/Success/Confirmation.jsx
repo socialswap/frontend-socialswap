@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CheckCircle, XCircle, RotateCw, AlertCircle } from 'lucide-react';
 import { api } from '../../API/api';
 import { notification } from 'antd';
@@ -112,7 +112,7 @@ const PaymentConfirmation = () => {
   const [status, setStatus] = useState(PaymentStatus.LOADING);
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [error, setError] = useState('');
-  const [retryCount, setRetryCount] = useState(0);
+  const retryCountRef = useRef(0);
 
   useEffect(() => {
     let pollingInterval;
@@ -160,9 +160,9 @@ const PaymentConfirmation = () => {
           throw new Error(data.message || 'Payment verification failed');
         }
       } catch (err) {
-        setRetryCount(prev => prev + 1);
+        retryCountRef.current += 1;
         
-        if (retryCount >= MAX_RETRIES) {
+        if (retryCountRef.current >= MAX_RETRIES) {
           clearInterval(pollingInterval);
           setStatus(PaymentStatus.ERROR);
           setError(err.message);
@@ -180,7 +180,7 @@ const PaymentConfirmation = () => {
         clearTimeout(redirectTimeout);
       }
     };
-  }, [retryCount]);
+  }, []);
 
   const currentStatus = statusConfigs[status];
   const Icon = currentStatus.icon;

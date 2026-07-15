@@ -138,16 +138,16 @@ const AdminTransactions = () => {
         <Card title="PhonePe Response" className="w-full">
           <Descriptions bordered column={{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }}>
             <Descriptions.Item label="Merchant ID">
-              {transaction.phonepeResponse.data.merchantId}
+              {transaction.phonepeResponse?.data?.merchantId || transaction.phonepeResponse?.statusResponse?.merchantId || transaction.phonepeResponse?.merchantId || 'N/A'}
             </Descriptions.Item>
             <Descriptions.Item label="Transaction ID">
-              {transaction.phonepeResponse.data.transactionId}
+              {transaction.phonepeResponse?.data?.transactionId || transaction.phonepeResponse?.statusResponse?.transactionId || transaction.phonepeResponse?.transactionId || 'N/A'}
             </Descriptions.Item>
             <Descriptions.Item label="State">
-              {transaction.phonepeResponse.data.state}
+              {transaction.phonepeResponse?.data?.state || transaction.phonepeResponse?.statusResponse?.state || 'N/A'}
             </Descriptions.Item>
             <Descriptions.Item label="Response Code">
-              {transaction.phonepeResponse.data.responseCode}
+              {transaction.phonepeResponse?.data?.responseCode || transaction.phonepeResponse?.statusResponse?.responseCode || 'N/A'}
             </Descriptions.Item>
           </Descriptions>
 
@@ -155,16 +155,16 @@ const AdminTransactions = () => {
             <h4 className="text-lg font-medium mb-4">Payment Instrument</h4>
             <Descriptions bordered column={{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }}>
               <Descriptions.Item label="Type">
-                {transaction.phonepeResponse.data.paymentInstrument.type}
+                {transaction.phonepeResponse?.data?.paymentInstrument?.type || transaction.phonepeResponse?.statusResponse?.paymentInstrument?.type || 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="UTR">
-                {transaction.phonepeResponse.data.paymentInstrument.utr}
+                {transaction.phonepeResponse?.data?.paymentInstrument?.utr || transaction.phonepeResponse?.statusResponse?.paymentInstrument?.utr || 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="UPI Transaction ID">
-                {transaction.phonepeResponse.data.paymentInstrument.upiTransactionId}
+                {transaction.phonepeResponse?.data?.paymentInstrument?.upiTransactionId || transaction.phonepeResponse?.statusResponse?.paymentInstrument?.upiTransactionId || 'N/A'}
               </Descriptions.Item>
               <Descriptions.Item label="Account Type">
-                {transaction.phonepeResponse.data.paymentInstrument.accountType}
+                {transaction.phonepeResponse?.data?.paymentInstrument?.accountType || transaction.phonepeResponse?.statusResponse?.paymentInstrument?.accountType || 'N/A'}
               </Descriptions.Item>
             </Descriptions>
           </div>

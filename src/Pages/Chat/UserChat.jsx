@@ -4,6 +4,7 @@ import io from 'socket.io-client';
 import axiosInstance, { api } from '../../API/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import EmojiPicker from 'emoji-picker-react';
 
 const SOCKET_URL = process.env.REACT_APP_API_URL || 'http://localhost:8090';
 
@@ -12,6 +13,7 @@ const UserChat = () => {
   const [messages, setMessages] = useState([]);
   const [deals, setDeals] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [replyingTo, setReplyingTo] = useState(null);
   const [searchDeal, setSearchDeal] = useState('');
   const [selectedDeal, setSelectedDeal] = useState(null);
   const [isDealModalVisible, setIsDealModalVisible] = useState(false);
@@ -32,6 +34,21 @@ const UserChat = () => {
   const location = useLocation();
   const [requestProcessed, setRequestProcessed] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const [activeMenuId, setActiveMenuId] = useState(null);
+  const [activeEmojiId, setActiveEmojiId] = useState(null);
+  const [showFullPickerId, setShowFullPickerId] = useState(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.msg-action-btn') && !e.target.closest('.msg-popup')) {
+        setActiveMenuId(null);
+        setActiveEmojiId(null);
+        setShowFullPickerId(null);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (userRole === 'admin') {
@@ -54,8 +71,15 @@ const UserChat = () => {
       socket.on('receive_message', (msg) => {
         setMessages((prev) => [...prev, msg]);
       });
+
+      socket.on('message_updated', (updatedMsg) => {
+        setMessages((prev) => prev.map(m => m._id === updatedMsg._id ? updatedMsg : m));
+      });
       
-      return () => socket.off('receive_message');
+      return () => {
+        socket.off('receive_message');
+        socket.off('message_updated');
+      };
     }
   }, [socket, thread]);
 
@@ -86,7 +110,7 @@ const UserChat = () => {
       const res = await axiosInstance.get(`${api}/chat`);
       if (res.data.success) {
         setThread(res.data.thread);
-        setMessages(res.data.thread.messages);
+        setMessages(res.data.messages);
       }
     } catch (err) {
       console.error(err);
@@ -110,11 +134,13 @@ const UserChat = () => {
     const msgData = {
       threadId: thread._id,
       sender: currentUserId,
-      text: newMessage
+      text: newMessage,
+      replyTo: replyingTo?._id || null
     };
     
     socket.emit('send_message', msgData);
     setNewMessage('');
+    setReplyingTo(null);
   };
 
   const handleImageUpload = async (e) => {
@@ -147,8 +173,7 @@ const UserChat = () => {
       const res = await axiosInstance.patch(`${api}/deals/${dealId}/status`, { status });
       if (res.data.success) {
         if (status === 'accepted') {
-          const channelId = res.data.deal.channel;
-          navigate(`/payment-gateway/${channelId}`, { state: { dealId, price: res.data.deal.price }});
+          handleDealPayment(res.data.deal);
         } else {
           fetchThread();
           fetchDeals();
@@ -205,7 +230,7 @@ const UserChat = () => {
           </div>
 
           {/* Chat Interface */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-5 bg-gray-50/50 dark:bg-transparent">
+          <div className="flex-1 overflow-y-auto p-5 pt-16 pb-32 space-y-5 bg-gray-50/50 dark:bg-transparent relative">
             {!messages.length && (
               <div className="h-full flex flex-col items-center justify-center text-center px-4">
                 <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mb-3">
@@ -219,18 +244,34 @@ const UserChat = () => {
             {messages.map((msg, idx) => {
               const isMe = msg.sender?._id === currentUserId || msg.sender === currentUserId;
               return (
-                <div key={idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'} group`}>
-                  <div className={`max-w-[85%] rounded-2xl p-4 shadow-sm ${
+                <div key={idx} id={`msg-${msg._id}`} className={`flex ${isMe ? 'justify-end' : 'justify-start'} group/msg relative mb-5`}>
+                  <div className={`max-w-[85%] rounded-2xl px-4 py-3 pb-2 shadow-sm relative ${
                     isMe 
                     ? 'bg-gradient-to-r from-[#7C3AED] to-[#9333EA] text-white rounded-br-sm' 
                     : 'bg-white dark:bg-[#231542] border border-gray-100 dark:border-purple-900/20 text-gray-800 dark:text-gray-200 rounded-bl-sm'
                   }`}>
-                    {msg.imageUrl && (
-                      <img src={msg.imageUrl} alt="Attachment" className="rounded-lg mb-2 w-full object-cover max-h-64 cursor-pointer" onClick={() => window.open(msg.imageUrl, '_blank')} />
+                    {msg.replyTo && (
+                      <div 
+                        className="mb-2 p-2 rounded bg-black/10 dark:bg-white/10 text-xs border-l-2 border-purple-400 cursor-pointer hover:bg-black/20 dark:hover:bg-white/20 transition-colors"
+                        onClick={() => {
+                          const target = document.getElementById(`msg-${msg.replyTo._id}`);
+                          if (target) {
+                            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            target.classList.add('opacity-50', 'scale-95', 'transition-all');
+                            setTimeout(() => target.classList.remove('opacity-50', 'scale-95', 'transition-all'), 300);
+                          }
+                        }}
+                      >
+                        <div className="font-bold mb-1 opacity-75">{msg.replyTo.sender?.name || 'User'}</div>
+                        <div className="truncate opacity-75">{msg.replyTo.text || 'Attachment/Card'}</div>
+                      </div>
                     )}
-                    {msg.text && <p className="text-[14.5px] leading-relaxed">{msg.text}</p>}
+                    {msg.mediaUrl && (
+                      <img src={msg.mediaUrl} alt="Attachment" className="rounded-lg mb-2 w-full object-cover max-h-64 cursor-pointer" onClick={() => window.open(msg.mediaUrl, '_blank')} />
+                    )}
+                    {msg.text && <p className="text-[14.5px] leading-relaxed pr-6 break-words whitespace-pre-wrap">{msg.text}</p>}
                     
-                    {msg.isChannelCard && msg.channelId && (
+                    {(msg.isChannelCard || msg.type === 'channel') && msg.channelId && (
                       <div className="mt-3 p-3 bg-white dark:bg-[#18112e] rounded-xl border border-purple-200 dark:border-purple-800/40 shadow-sm flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/channel/${msg.channelId._id || msg.channelId}`)}>
                         <img src={msg.channelId.imageUrls?.[0] || 'https://via.placeholder.com/80'} className="w-16 h-16 rounded-lg object-cover" alt="channel" />
                         <div className="flex-1 overflow-hidden">
@@ -241,7 +282,7 @@ const UserChat = () => {
                       </div>
                     )}
 
-                    {msg.isDealCard && msg.dealId && (
+                    {(msg.isDealCard || msg.type === 'deal') && msg.dealId && (
                       <div className="mt-3 p-4 bg-white dark:bg-[#18112e] rounded-xl border border-gray-200 dark:border-purple-800/40 shadow-sm text-gray-800 dark:text-gray-200 relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#7C3AED] to-[#A855F7]"></div>
                         <h4 className="font-bold text-gray-900 dark:text-white mb-2 pl-2">Escrow Deal Proposed</h4>
@@ -271,9 +312,99 @@ const UserChat = () => {
                         )}
                       </div>
                     )}
-                    <span className={`text-[10px] block mt-1.5 ${isMe ? 'text-purple-100' : 'text-gray-400 dark:text-gray-500'}`}>
-                      {new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
+
+                    <div className={`flex items-center justify-end mt-1 space-x-1 ${isMe ? 'text-purple-200' : 'text-gray-400 dark:text-gray-500'} text-[10px]`}>
+                      <span>{new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      {isMe && <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>}
+                    </div>
+
+                    {msg.reactions && msg.reactions.length > 0 && (
+                      <div className={`absolute -bottom-3 right-4 bg-white dark:bg-[#1E1E1E] border border-gray-200 dark:border-gray-700 rounded-full px-1.5 py-0.5 shadow-sm flex items-center z-10 scale-90 text-gray-800 dark:text-gray-200`}>
+                        {msg.reactions.map((r, i) => (
+                          <span key={i} className="text-[13px]" title={r.user?.name}>{r.reaction}</span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className={`absolute top-2 right-2 opacity-0 group-hover/msg:opacity-100 flex items-center space-x-1 transition-opacity z-20 ${isMe ? 'bg-purple-800/80' : 'bg-white/90 dark:bg-gray-800/90'} rounded-lg p-0.5 shadow-sm backdrop-blur-sm`}>
+                      <button 
+                        className="msg-action-btn p-1 rounded-md hover:bg-black/20 dark:hover:bg-white/20 transition-colors text-gray-700 dark:text-gray-300"
+                        style={{ color: isMe ? 'white' : '' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveEmojiId(activeEmojiId === msg._id ? null : msg._id);
+                          setActiveMenuId(null);
+                        }}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                      </button>
+                      <button 
+                        className="msg-action-btn p-1 rounded-md hover:bg-black/20 dark:hover:bg-white/20 transition-colors text-gray-700 dark:text-gray-300"
+                        style={{ color: isMe ? 'white' : '' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveMenuId(activeMenuId === msg._id ? null : msg._id);
+                          setActiveEmojiId(null);
+                        }}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                      </button>
+                    </div>
+
+                    {activeEmojiId === msg._id && (
+                      <div className={`msg-popup absolute -top-12 z-[60] bg-[#1E1E1E] text-white rounded-full shadow-xl flex items-center px-3 py-1.5 space-x-2 border border-gray-600 w-max max-w-none ${isMe ? 'right-0' : 'left-0'}`}>
+                        {['👍', '❤️', '😂', '😮', '😢', '🙏'].map(emoji => (
+                          <button 
+                            key={emoji} 
+                            className="hover:scale-125 transition-transform text-xl flex-shrink-0"
+                            onClick={() => {
+                              socket.emit('add_reaction', { messageId: msg._id, userId: currentUserId, reaction: emoji });
+                              setActiveEmojiId(null);
+                            }}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                        <button 
+                          className="hover:scale-110 transition-transform text-lg text-gray-400 font-bold ml-1 flex items-center justify-center w-7 h-7 rounded-full bg-white/10 flex-shrink-0"
+                          onClick={() => {
+                            setShowFullPickerId(msg._id);
+                            setActiveEmojiId(null);
+                          }}
+                        >
+                          +
+                        </button>
+                      </div>
+                    )}
+
+                    {showFullPickerId === msg._id && (
+                      <div className={`msg-popup absolute bottom-10 z-[70] bg-[#1E1E1E] rounded-xl shadow-2xl ${isMe ? 'right-0' : 'left-0'}`}>
+                        <EmojiPicker 
+                          theme="dark"
+                          onEmojiClick={(emojiData) => {
+                            socket.emit('add_reaction', { messageId: msg._id, userId: currentUserId, reaction: emojiData.emoji });
+                            setShowFullPickerId(null);
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    {activeMenuId === msg._id && (
+                      <div className={`msg-popup absolute top-10 z-[60] bg-[#1E1E1E] text-gray-200 rounded-lg shadow-xl w-32 border border-gray-600 py-1 overflow-hidden ${isMe ? 'right-0' : 'right-0'}`}>
+                        <button 
+                          className="w-full text-left px-4 py-2 hover:bg-gray-700 text-sm flex items-center transition-colors"
+                          onClick={() => { setReplyingTo(msg); setActiveMenuId(null); }}
+                        >
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg> Reply
+                        </button>
+                        <button 
+                          className="w-full text-left px-4 py-2 hover:bg-gray-700 text-sm flex items-center transition-colors"
+                          onClick={() => { navigator.clipboard.writeText(msg.text || ''); setActiveMenuId(null); message.success('Copied!'); }}
+                        >
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> Copy
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -282,7 +413,18 @@ const UserChat = () => {
           </div>
 
           {/* Input Area */}
-          <div className="p-3 bg-white dark:bg-[#18112e] border-t border-gray-100 dark:border-purple-900/30">
+          <div className="p-3 bg-white dark:bg-[#18112e] border-t border-gray-100 dark:border-purple-900/30 flex flex-col">
+            {replyingTo && (
+              <div className="flex items-center justify-between bg-gray-50 dark:bg-[#231542] p-2 mb-2 rounded border border-gray-200 dark:border-purple-900/40">
+                <div className="text-xs text-gray-500 dark:text-gray-400 truncate flex-1 pr-4">
+                  <span className="font-bold mr-2 text-purple-600 dark:text-purple-400">Replying to {replyingTo.sender?.name || 'User'}:</span>
+                  {replyingTo.text || 'Attachment/Card'}
+                </div>
+                <button onClick={() => setReplyingTo(null)} className="text-gray-400 hover:text-red-500">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+              </div>
+            )}
             <div className="flex items-center space-x-2 bg-gray-50 dark:bg-[#231542] p-1.5 rounded-full border border-gray-200 dark:border-purple-900/40 focus-within:border-purple-400 dark:focus-within:border-purple-600 focus-within:ring-2 focus-within:ring-purple-50 dark:focus-within:ring-purple-900/20 transition-all">
               <input 
                 type="file" 

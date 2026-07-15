@@ -175,7 +175,7 @@ const Stats = () => {
   return (
     <section className="relative py-16 bg-gradient-to-b from-white via-[#f7faff] to-[#eef5ff] dark:from-[#070312] dark:via-[#0d071c] dark:to-[#110824] overflow-hidden" ref={sectionRef}>
       <div className="w-[min(280px,40vw)] sm:w-[min(220px,60vw)] h-1 mx-auto mt-0 mb-10 rounded-full bg-gradient-to-r from-[rgba(229,9,20,0.9)] to-[rgba(0,184,255,0.9)] opacity-80 shadow-[0_0_22px_rgba(229,9,20,0.32)]" />
-      <Card className="stats-card-custom-bg relative max-w-[1100px] mx-auto px-6 py-10 sm:px-12 sm:py-14 rounded-[28px] shadow-[0_40px_70px_-60px_rgba(4,17,46,0.4)] dark:shadow-[0_40px_70px_-60px_rgba(0,0,0,0.7)] overflow-hidden backdrop-blur-md" bordered={false}>
+      <Card className="stats-card-custom-bg relative max-w-[1100px] mx-auto px-6 py-10 sm:px-12 sm:py-14 rounded-[28px] shadow-[0_40px_70px_-60px_rgba(4,17,46,0.4)] dark:shadow-[0_40px_70px_-60px_rgba(0,0,0,0.7)] overflow-hidden backdrop-blur-md" variant="borderless">
         <div className="text-center mb-12">
           <Title level={2} className="!m-0 font-sans !font-bold text-[clamp(1.75rem,4vw,2.6rem)] tracking-[0.04em] bg-gradient-to-r from-[rgba(229,9,20,0.92)] to-[rgba(0,184,255,0.95)] bg-clip-text !text-transparent">
             Our Impact In Numbers
@@ -185,8 +185,8 @@ const Stats = () => {
           </Text>
         </div>
         <div className="grid gap-8 grid-cols-[repeat(auto-fit,minmax(250px,1fr))]">
-          {statsData.map((stat, index) => (
-            <StatItem key={stat.key} index={index} active={hasAnimated} {...stat} />
+          {statsData.map(({ key, ...stat }, index) => (
+            <StatItem key={key} index={index} active={hasAnimated} {...stat} />
           ))}
         </div>
       </Card>

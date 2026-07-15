@@ -21,7 +21,7 @@ import {
   Typography,
   Tabs,
 } from 'antd';
-import { PictureOutlined, ReloadOutlined, UserOutlined, TeamOutlined, SafetyCertificateOutlined, SearchOutlined, DeleteOutlined, EyeOutlined, FileTextOutlined } from '@ant-design/icons';
+import { PictureOutlined, ReloadOutlined, UserOutlined, TeamOutlined, SafetyCertificateOutlined, SearchOutlined, DeleteOutlined, EyeOutlined, FileTextOutlined, MessageOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../API/api';
 import AdminChannels from './AdminChannels';
@@ -42,6 +42,8 @@ const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState('users');
+  const [openChatUserId, setOpenChatUserId] = useState(null);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -93,6 +95,11 @@ const AdminDashboard = () => {
       console.error('Error deleting user:', error);
       message.error('Failed to delete user');
     }
+  };
+
+  const handleStartChat = (user) => {
+    setOpenChatUserId(user._id);
+    setActiveTab('chats');
   };
 
   const totalUsers = users.length;
@@ -173,6 +180,9 @@ const AdminDashboard = () => {
         <Space>
           <Tooltip title="View details">
             <Button icon={<EyeOutlined />} onClick={() => handleViewDetails(record)} />
+          </Tooltip>
+          <Tooltip title="Chat with user">
+            <Button icon={<MessageOutlined />} style={{ color: '#7C3AED', borderColor: '#7C3AED' }} onClick={() => handleStartChat(record)} />
           </Tooltip>
           <Popconfirm
             title="Delete user?"
@@ -293,7 +303,7 @@ const AdminDashboard = () => {
     {
       key: 'chats',
       label: 'Chats & Deals',
-      children: <AdminChat isEmbedded={true} />,
+      children: <AdminChat isEmbedded={true} prefillUserId={openChatUserId} />,
     },
     {
       key: 'deals_management',
@@ -326,7 +336,8 @@ const AdminDashboard = () => {
       </div>
 
       <Tabs 
-        defaultActiveKey="users" 
+        activeKey={activeTab}
+        onChange={setActiveTab}
         items={tabItems} 
         destroyInactiveTabPane={true}
         size="large"

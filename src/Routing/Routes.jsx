@@ -17,7 +17,6 @@ import BlogSection from '../Pages/Blogs/Blogs';
 import UserProfile from '../Component/Profile/Profile';
 import GrowYourChannel from '../Pages/GrowYourChannel/GrowYourChannel';
 import AboutPage from '../Pages/About/About';
-import PaymentGateway from '../Pages/Payment/Payment';
 import Privacy from './Privacy';
 import PaymentSuccessful from '../Component/Success/Success';
 import Confirmation from '../Component/Success/Confirmation';
@@ -79,7 +78,6 @@ const Routes = () => {
       element: <ProtectedRoute element={<UploadChannel />} isAuthRequired={true} />
     },
 
-    { path: '/payment-gateway/:channel', element: <PaymentGateway /> },
     {
       path: '/cart',
       element: <ProtectedRoute element={<CartPage />} isAuthRequired={true} />

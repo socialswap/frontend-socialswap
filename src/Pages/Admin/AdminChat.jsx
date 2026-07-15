@@ -4,17 +4,19 @@ import io from 'socket.io-client';
 import axiosInstance, { api } from '../../API/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import EmojiPicker from 'emoji-picker-react';
 
 const { Option } = Select;
 
 const SOCKET_URL = process.env.REACT_APP_API_URL || 'http://localhost:8090';
 
-const AdminChat = ({ isEmbedded = false }) => {
+const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
   const [threads, setThreads] = useState([]);
   const [activeThread, setActiveThread] = useState(null);
   const [messages, setMessages] = useState([]);
   const [deals, setDeals] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [replyingTo, setReplyingTo] = useState(null);
   const [searchChat, setSearchChat] = useState('');
   const [searchDeal, setSearchDeal] = useState('');
   const [channels, setChannels] = useState([]);
@@ -32,6 +34,21 @@ const AdminChat = ({ isEmbedded = false }) => {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [form] = Form.useForm();
   const selectedSellerId = Form.useWatch('sellerId', form);
+  const [activeMenuId, setActiveMenuId] = useState(null);
+  const [activeEmojiId, setActiveEmojiId] = useState(null);
+  const [showFullPickerId, setShowFullPickerId] = useState(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.msg-action-btn') && !e.target.closest('.msg-popup')) {
+        setActiveMenuId(null);
+        setActiveEmojiId(null);
+        setShowFullPickerId(null);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
   
   useEffect(() => {
     const fetchSellerChannels = async () => {
@@ -91,7 +108,15 @@ const AdminChat = ({ isEmbedded = false }) => {
       fetchThreads();
     });
 
-    return () => newSocket.close();
+    newSocket.on('message_updated', (updatedMsg) => {
+      setMessages((prev) => prev.map(m => m._id === updatedMsg._id ? updatedMsg : m));
+    });
+
+    return () => {
+      newSocket.off('receive_message');
+      newSocket.off('message_updated');
+      newSocket.close();
+    };
   }, []);
 
   useEffect(() => {
@@ -140,12 +165,31 @@ const AdminChat = ({ isEmbedded = false }) => {
       const res = await axiosInstance.get(`${api}/admin/chats/${thread._id}`);
       if (res.data.success) {
         setActiveThread(res.data.thread);
-        setMessages(res.data.thread.messages);
+        setMessages(res.data.messages);
       }
     } catch (err) {
       console.error(err);
     }
   };
+
+  const loadThreadByUserId = async (userId) => {
+    try {
+      const res = await axiosInstance.get(`${api}/admin/chats/user/${userId}`);
+      if (res.data.success) {
+        setActiveThread(res.data.thread);
+        setMessages(res.data.messages);
+        fetchThreads();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (prefillUserId) {
+      loadThreadByUserId(prefillUserId);
+    }
+  }, [prefillUserId]);
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !activeThread) return;
@@ -153,11 +197,13 @@ const AdminChat = ({ isEmbedded = false }) => {
     const msgData = {
       threadId: activeThread._id,
       sender: currentUserId, 
-      text: newMessage
+      text: newMessage,
+      replyTo: replyingTo?._id || null
     };
     
     socket.emit('send_message', msgData);
     setNewMessage('');
+    setReplyingTo(null);
   };
 
   const handleImageUpload = async (e) => {
@@ -232,10 +278,11 @@ const AdminChat = ({ isEmbedded = false }) => {
     }
   };
 
-  const filteredThreads = threads.filter(t => 
-    t.user?.name?.toLowerCase().includes(searchChat.toLowerCase()) || 
-    t.user?.email?.toLowerCase().includes(searchChat.toLowerCase())
-  );
+  const filteredThreads = threads.filter(t => {
+    const p = t.participants?.find(p => p._id !== currentUserId && p !== currentUserId);
+    return p?.name?.toLowerCase().includes(searchChat.toLowerCase()) || 
+           p?.email?.toLowerCase().includes(searchChat.toLowerCase());
+  });
 
   const filteredDeals = deals.filter(deal => 
     deal.channel?.name?.toLowerCase().includes(searchDeal.toLowerCase()) ||
@@ -260,7 +307,7 @@ const AdminChat = ({ isEmbedded = false }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
               </svg>
               <span className="font-semibold text-white">
-                {activeThread ? `Chat with ${activeThread.user?.name}` : 'Chats'}
+                {activeThread ? `Chat with ${activeThread.participants?.find(p => p._id !== currentUserId && p !== currentUserId)?.name || 'User'}` : 'Chats'}
               </span>
             </div>
           </div>
@@ -282,7 +329,8 @@ const AdminChat = ({ isEmbedded = false }) => {
               </div>
               <div className="flex-1 overflow-y-auto p-2 bg-white dark:bg-[#18112e]">
                 {filteredThreads.map(thread => {
-                  const unreadCount = thread.messages?.filter(m => !m.read && m.sender?._id !== currentUserId && m.sender !== currentUserId).length || 0;
+                  const unreadCount = thread.lastMessage && !thread.lastMessage.read && thread.lastMessage.sender?._id !== currentUserId && thread.lastMessage.sender !== currentUserId ? 1 : 0;
+                  const participant = thread.participants?.find(p => p._id !== currentUserId && p !== currentUserId);
                   return (
                   <div 
                     key={thread._id} 
@@ -290,22 +338,22 @@ const AdminChat = ({ isEmbedded = false }) => {
                       loadThread(thread);
                       if (unreadCount > 0 && socket) {
                          socket.emit('mark_read', { threadId: thread._id, userId: currentUserId });
-                         setThreads(prev => prev.map(t => t._id === thread._id ? {...t, messages: t.messages.map(m => ({...m, read: true}))} : t));
+                         setThreads(prev => prev.map(t => t._id === thread._id ? {...t, lastMessage: t.lastMessage ? {...t.lastMessage, read: true} : t.lastMessage, messages: t.messages ? t.messages.map(m => ({...m, read: true})) : undefined} : t));
                       }
                     }}
                     className="flex items-center p-3 mb-1 cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-colors border-b border-gray-50 dark:border-purple-900/10 last:border-0 group relative"
                   >
                     <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/40 rounded-full flex items-center justify-center text-[#7C3AED] dark:text-[#A855F7] font-bold text-lg mr-4 uppercase shrink-0 group-hover:bg-purple-200 dark:group-hover:bg-purple-900/60 transition-colors">
-                      {thread.user?.name?.charAt(0) || 'U'}
+                      {participant?.name?.charAt(0) || 'U'}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-baseline mb-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-white truncate">{thread.user?.name}</h3>
+                        <h3 className="font-semibold text-gray-900 dark:text-white truncate">{participant?.name || 'User'}</h3>
                         <span className="text-[11px] text-gray-400 dark:text-gray-500 shrink-0 ml-2">
-                          {new Date(thread.lastMessageAt || thread.updatedAt).toLocaleDateString()}
+                          {new Date(thread.updatedAt).toLocaleDateString()}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate pr-6">{thread.user?.email}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate pr-6">{participant?.email}</p>
                     </div>
                     {unreadCount > 0 && (
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-[#F83758] text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-md">
@@ -320,23 +368,39 @@ const AdminChat = ({ isEmbedded = false }) => {
             // Active Chat View
             <div className="flex flex-col h-full overflow-hidden bg-gray-50/50 dark:bg-transparent">
 
-              <div className="flex-1 overflow-y-auto p-5 space-y-5">
+              <div className="flex-1 overflow-y-auto p-5 pt-16 pb-32 space-y-5 bg-gray-50/50 dark:bg-transparent relative">
                 {messages.map((msg, idx) => {
                   const isAdmin = msg.sender?.role === 'admin' || msg.sender === currentUserId;
                   
                   return (
-                    <div key={idx} className={`flex ${isAdmin ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[85%] rounded-2xl p-4 shadow-sm ${
+                    <div key={idx} id={`msg-${msg._id}`} className={`flex ${isAdmin ? 'justify-end' : 'justify-start'} group/msg relative mb-5`}>
+                      <div className={`max-w-[85%] rounded-2xl px-4 py-3 pb-2 shadow-sm relative ${
                         isAdmin 
                         ? 'bg-gradient-to-r from-[#7C3AED] to-[#9333EA] text-white rounded-br-sm' 
                         : 'bg-white dark:bg-[#231542] border border-gray-100 dark:border-purple-900/20 text-gray-800 dark:text-gray-200 rounded-bl-sm'
                       }`}>
-                        {msg.imageUrl && (
-                          <img src={msg.imageUrl} alt="Attachment" className="rounded-lg mb-2 w-full object-cover max-h-64 cursor-pointer" onClick={() => window.open(msg.imageUrl, '_blank')} />
+                        {msg.replyTo && (
+                          <div 
+                            className="mb-2 p-2 rounded bg-black/10 dark:bg-white/10 text-xs border-l-2 border-purple-400 cursor-pointer hover:bg-black/20 dark:hover:bg-white/20 transition-colors"
+                            onClick={() => {
+                              const target = document.getElementById(`msg-${msg.replyTo._id}`);
+                              if (target) {
+                                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                target.classList.add('opacity-50', 'scale-95', 'transition-all');
+                                setTimeout(() => target.classList.remove('opacity-50', 'scale-95', 'transition-all'), 300);
+                              }
+                            }}
+                          >
+                            <div className="font-bold mb-1 opacity-75">{msg.replyTo.sender?.name || 'User'}</div>
+                            <div className="truncate opacity-75">{msg.replyTo.text || 'Attachment/Card'}</div>
+                          </div>
                         )}
-                        {msg.text && <p className="text-[14.5px] leading-relaxed">{msg.text}</p>}
+                        {msg.mediaUrl && (
+                          <img src={msg.mediaUrl} alt="Attachment" className="rounded-lg mb-2 w-full object-cover max-h-64 cursor-pointer" onClick={() => window.open(msg.mediaUrl, '_blank')} />
+                        )}
+                        {msg.text && <p className="text-[14.5px] leading-relaxed pr-6 break-words whitespace-pre-wrap">{msg.text}</p>}
                         
-                        {msg.isChannelCard && msg.channelId && (
+                        {(msg.isChannelCard || msg.type === 'channel') && msg.channelId && (
                           <div className="mt-3 p-3 bg-white dark:bg-[#18112e] rounded-xl border border-purple-200 dark:border-purple-800/40 shadow-sm flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/channel/${msg.channelId._id || msg.channelId}`)}>
                             <img src={msg.channelId.imageUrls?.[0] || 'https://via.placeholder.com/80'} className="w-16 h-16 rounded-lg object-cover" alt="channel" />
                             <div className="flex-1 overflow-hidden">
@@ -347,7 +411,7 @@ const AdminChat = ({ isEmbedded = false }) => {
                           </div>
                         )}
 
-                        {msg.isDealCard && msg.dealId && (
+                        {(msg.isDealCard || msg.type === 'deal') && msg.dealId && (
                           <div className="mt-3 p-4 bg-white dark:bg-[#18112e] rounded-xl border border-gray-200 dark:border-purple-800/40 shadow-sm text-gray-800 dark:text-gray-200 relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#7C3AED] to-[#A855F7]"></div>
                             <h4 className="font-bold text-gray-900 dark:text-white mb-2 pl-2">Escrow Deal Issued</h4>
@@ -358,9 +422,99 @@ const AdminChat = ({ isEmbedded = false }) => {
                             </div>
                           </div>
                         )}
-                        <span className={`text-[10px] block mt-1.5 ${isAdmin ? 'text-purple-100' : 'text-gray-400 dark:text-gray-500'}`}>
-                          {new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
+
+                        <div className={`flex items-center justify-end mt-1 space-x-1 ${isAdmin ? 'text-purple-200' : 'text-gray-400 dark:text-gray-500'} text-[10px]`}>
+                          <span>{new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          {isAdmin && <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>}
+                        </div>
+
+                        {msg.reactions && msg.reactions.length > 0 && (
+                          <div className={`absolute -bottom-3 right-4 bg-white dark:bg-[#1E1E1E] border border-gray-200 dark:border-gray-700 rounded-full px-1.5 py-0.5 shadow-sm flex items-center z-10 scale-90 text-gray-800 dark:text-gray-200`}>
+                            {msg.reactions.map((r, i) => (
+                              <span key={i} className="text-[13px]" title={r.user?.name}>{r.reaction}</span>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className={`absolute top-2 right-2 opacity-0 group-hover/msg:opacity-100 flex items-center space-x-1 transition-opacity z-20 ${isAdmin ? 'bg-purple-800/80' : 'bg-white/90 dark:bg-gray-800/90'} rounded-lg p-0.5 shadow-sm backdrop-blur-sm`}>
+                          <button 
+                            className="msg-action-btn p-1 rounded-md hover:bg-black/20 dark:hover:bg-white/20 transition-colors text-gray-700 dark:text-gray-300"
+                            style={{ color: isAdmin ? 'white' : '' }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveEmojiId(activeEmojiId === msg._id ? null : msg._id);
+                              setActiveMenuId(null);
+                            }}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                          </button>
+                          <button 
+                            className="msg-action-btn p-1 rounded-md hover:bg-black/20 dark:hover:bg-white/20 transition-colors text-gray-700 dark:text-gray-300"
+                            style={{ color: isAdmin ? 'white' : '' }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveMenuId(activeMenuId === msg._id ? null : msg._id);
+                              setActiveEmojiId(null);
+                            }}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                          </button>
+                        </div>
+
+                        {activeEmojiId === msg._id && (
+                          <div className={`msg-popup absolute -top-12 z-[60] bg-[#1E1E1E] text-white rounded-full shadow-xl flex items-center px-3 py-1.5 space-x-2 border border-gray-600 w-max max-w-none ${isAdmin ? 'right-0' : 'left-0'}`}>
+                            {['👍', '❤️', '😂', '😮', '😢', '🙏'].map(emoji => (
+                              <button 
+                                key={emoji} 
+                                className="hover:scale-125 transition-transform text-xl flex-shrink-0"
+                                onClick={() => {
+                                  socket.emit('add_reaction', { messageId: msg._id, userId: currentUserId, reaction: emoji });
+                                  setActiveEmojiId(null);
+                                }}
+                              >
+                                {emoji}
+                              </button>
+                            ))}
+                            <button 
+                              className="hover:scale-110 transition-transform text-lg text-gray-400 font-bold ml-1 flex items-center justify-center w-7 h-7 rounded-full bg-white/10 flex-shrink-0"
+                              onClick={() => {
+                                setShowFullPickerId(msg._id);
+                                setActiveEmojiId(null);
+                              }}
+                            >
+                              +
+                            </button>
+                          </div>
+                        )}
+
+                        {showFullPickerId === msg._id && (
+                          <div className={`msg-popup absolute bottom-10 z-[70] bg-[#1E1E1E] rounded-xl shadow-2xl ${isAdmin ? 'right-0' : 'left-0'}`}>
+                            <EmojiPicker 
+                              theme="dark"
+                              onEmojiClick={(emojiData) => {
+                                socket.emit('add_reaction', { messageId: msg._id, userId: currentUserId, reaction: emojiData.emoji });
+                                setShowFullPickerId(null);
+                              }}
+                            />
+                          </div>
+                        )}
+
+                        {activeMenuId === msg._id && (
+                          <div className={`msg-popup absolute top-10 z-[60] bg-[#1E1E1E] text-gray-200 rounded-lg shadow-xl w-32 border border-gray-600 py-1 overflow-hidden ${isAdmin ? 'right-0' : 'right-0'}`}>
+                            <button 
+                              className="w-full text-left px-4 py-2 hover:bg-gray-700 text-sm flex items-center transition-colors"
+                              onClick={() => { setReplyingTo(msg); setActiveMenuId(null); }}
+                            >
+                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg> Reply
+                            </button>
+                            <button 
+                              className="w-full text-left px-4 py-2 hover:bg-gray-700 text-sm flex items-center transition-colors"
+                              onClick={() => { navigator.clipboard.writeText(msg.text || ''); setActiveMenuId(null); message.success('Copied!'); }}
+                            >
+                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> Copy
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -368,7 +522,18 @@ const AdminChat = ({ isEmbedded = false }) => {
                 <div ref={messagesEndRef} />
               </div>
 
-              <div className="p-3 bg-white dark:bg-[#18112e] border-t border-gray-100 dark:border-purple-900/30">
+              <div className="p-3 bg-white dark:bg-[#18112e] border-t border-gray-100 dark:border-purple-900/30 flex flex-col">
+                {replyingTo && (
+                  <div className="flex items-center justify-between bg-gray-50 dark:bg-[#231542] p-2 mb-2 rounded border border-gray-200 dark:border-purple-900/40">
+                    <div className="text-xs text-gray-500 dark:text-gray-400 truncate flex-1 pr-4">
+                      <span className="font-bold mr-2 text-purple-600 dark:text-purple-400">Replying to {replyingTo.sender?.name || 'User'}:</span>
+                      {replyingTo.text || 'Attachment/Card'}
+                    </div>
+                    <button onClick={() => setReplyingTo(null)} className="text-gray-400 hover:text-red-500">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                  </div>
+                )}
                 <div className="flex items-center space-x-2 bg-gray-50 dark:bg-[#231542] p-1.5 rounded-full border border-gray-200 dark:border-purple-900/40 focus-within:border-purple-400 dark:focus-within:border-purple-600 focus-within:ring-2 focus-within:ring-purple-50 dark:focus-within:ring-purple-900/20 transition-all">
                   <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" />
                   <button onClick={() => fileInputRef.current.click()} className="w-10 h-10 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-[#7C3AED] dark:hover:text-[#A855F7] hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-full transition-colors">
