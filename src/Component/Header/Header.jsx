@@ -84,21 +84,29 @@ const Header = () => {
     }
   }, [isLoggedIn, navigate]);
 
+  const [userAvatar, setUserAvatar] = useState(null);
+
   // ── Window Resize & Scroll Listeners ───────────────────────
   useEffect(() => {
-    const fetchCart = async () => {
+    const fetchCartAndProfile = async () => {
       if (isLoggedIn && localStorage.getItem('token')) {
         try {
-          const response = await axiosInstance.get('/cart');
-          setCartCount(response.data.channelCount);
+          const cartRes = await axiosInstance.get('/cart');
+          setCartCount(cartRes.data.channelCount);
+          
+          const profileRes = await axiosInstance.get('/profile');
+          if (profileRes.data && profileRes.data.avatar) {
+            setUserAvatar(profileRes.data.avatar);
+          }
         } catch (error) {
-          console.error('Error fetching cart count:', error);
+          console.error('Error fetching header data:', error);
         }
       } else {
         setCartCount(0);
+        setUserAvatar(null);
       }
     };
-    fetchCart();
+    fetchCartAndProfile();
   }, [isLoggedIn, location?.pathname]);
 
   useEffect(() => {
@@ -145,8 +153,9 @@ const Header = () => {
 
   const menuItems = [
     { label: 'Home', path: '/' },
-    { label: 'Monetized Channels', type: 'dropdown', monetized: 'monetized' },
-    { label: 'Non-Monetized Channels', type: 'dropdown', monetized: 'non-monetized' },
+    { label: 'Buy Channel', path: '/channels', hot: true },
+    { label: 'Monetized', type: 'dropdown', monetized: 'monetized' },
+    { label: 'Non-Monetized', type: 'dropdown', monetized: 'non-monetized' },
     { label: 'Sell Channel', path: '/user/upload-channel' },
     { label: 'Services', path: '/services' }
   ];
@@ -235,7 +244,7 @@ const Header = () => {
                 return (
                   <div className="relative group" key={item.label}>
                     <div 
-                      className="relative px-4 py-2 rounded-full text-[13px] font-bold tracking-wide uppercase transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/10 flex items-center gap-1 cursor-pointer"
+                      className="relative px-3 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/10 flex items-center gap-1 cursor-pointer whitespace-nowrap"
                       style={{ color: textMutedColor }}
                     >
                       {item.label}
@@ -274,7 +283,7 @@ const Header = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`relative px-4 py-2 rounded-full text-[13px] font-bold tracking-wide uppercase transition-all duration-200 ${
+                  className={`relative px-3 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 whitespace-nowrap ${
                     !active ? 'hover:bg-black/5 dark:hover:bg-white/10' : ''
                   }`}
                   style={{ 
@@ -304,7 +313,7 @@ const Header = () => {
             {/* More Options Dropdown */}
             <div className="relative group">
               <button 
-                className="relative px-4 py-2 rounded-full text-[13px] font-bold tracking-wide uppercase transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/10 flex items-center gap-1 cursor-pointer"
+                className="relative px-3 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/10 flex items-center gap-1 cursor-pointer whitespace-nowrap"
                 style={{ color: textMutedColor }}
               >
                 More Option
@@ -397,7 +406,7 @@ const Header = () => {
                   aria-label="Open profile"
                   onClick={() => navigate('/user/profile')}
                 >
-                  <img src="/images/userImg.jpg" alt="User avatar" className="w-10 h-10 rounded-full ring-2 ring-purple-500/50 shadow-sm" />
+                  <img src={userAvatar || "/images/userImg.jpg"} alt="User avatar" className="w-10 h-10 rounded-full ring-2 ring-purple-500/50 shadow-sm object-cover" />
                 </button>
               </>
             ) : (

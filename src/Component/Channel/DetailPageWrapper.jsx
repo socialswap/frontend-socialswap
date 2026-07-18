@@ -12,18 +12,19 @@ const DetailPageWrapper = () => {
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { id } = useParams();
+  const { username } = useParams();  // changed from :id to :username
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchChannelDetails();
-  }, [id]);
+  }, [username]);
 
   const fetchChannelDetails = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axiosInstance.get(`${api}/channels/${id}`);
+      // Use the username endpoint — falls back to _id internally for old links
+      const response = await axiosInstance.get(`${api}/channels/username/${username}`);
       setChannel(response?.data);
     } catch (err) {
       console.error('Error fetching channel details:', err);
@@ -48,6 +49,8 @@ const DetailPageWrapper = () => {
     const subscribers = formatCount(ch.subscriberCount);
     const price = ch.price ? `₹${Number(ch.price).toLocaleString('en-IN')}` : '';
     const monetized = ch.monetized ? 'Fully Monetized' : 'Non-Monetized';
+    const channelSlug = ch.customUrl || ch._id;
+    const canonicalPageUrl = `${BASE_URL}/channel/${channelSlug}`;
 
     const title =
       ch.metaTitle ||
@@ -57,13 +60,15 @@ const DetailPageWrapper = () => {
       ch.metaDescription ||
       `Buy ${name}, a ${ch.category || ''} YouTube channel with ${subscribers} subscribers and ${formatCount(ch.viewCount)} total views. ${monetized}. ${price ? `Listed at ${price}.` : ''} Buy safely on SocialSwap with escrow protection.`;
 
+    const ogImage = ch.imageUrls?.[0] || ch.logoUrl || `${BASE_URL}/images/og-default.jpg`;
+
     const channelSchema = {
       '@context': 'https://schema.org',
       '@type': 'Product',
       name,
       description,
-      image: ch.imageUrls?.[0] || ch.logoUrl,
-      url: `${BASE_URL}/channel/${ch.customUrl || ch._id}`,
+      image: ogImage,
+      url: canonicalPageUrl,
       brand: { '@type': 'Brand', name: 'SocialSwap' },
       offers: {
         '@type': 'Offer',
@@ -72,7 +77,7 @@ const DetailPageWrapper = () => {
         availability: ch.sold
           ? 'https://schema.org/SoldOut'
           : 'https://schema.org/InStock',
-        url: `${BASE_URL}/channel/${ch.customUrl || ch._id}`,
+        url: canonicalPageUrl,
         seller: { '@type': 'Organization', name: 'SocialSwap' },
       },
       additionalProperty: [
@@ -84,7 +89,7 @@ const DetailPageWrapper = () => {
       ],
     };
 
-    return { title, description, channelSchema };
+    return { title, description, ogImage, canonicalPageUrl, channelSchema };
   };
 
   if (loading) {
@@ -143,8 +148,7 @@ const DetailPageWrapper = () => {
     );
   }
 
-  const { title, description, channelSchema } = buildChannelSEO(channel);
-  const canonicalUrl = `${BASE_URL}/channel/${channel.customUrl || channel._id}`;
+  const { title, description, ogImage, canonicalPageUrl, channelSchema } = buildChannelSEO(channel);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -155,9 +159,9 @@ const DetailPageWrapper = () => {
           channel.seoKeywords?.join(', ') ||
           `${channel.category} youtube channel for sale, buy ${channel.category} channel india, ${channel.name} youtube channel`
         }
-        ogImage={channel.imageUrls?.[0] || channel.logoUrl}
+        ogImage={ogImage}
         ogType="product"
-        canonicalUrl={canonicalUrl}
+        canonicalUrl={canonicalPageUrl}
         noIndex={channel.noIndex}
         structuredData={channelSchema}
         breadcrumbs={[

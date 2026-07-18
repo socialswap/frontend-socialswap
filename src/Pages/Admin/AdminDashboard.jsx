@@ -20,6 +20,8 @@ import {
   Empty,
   Typography,
   Tabs,
+  ConfigProvider,
+  theme,
 } from 'antd';
 import { PictureOutlined, ReloadOutlined, UserOutlined, TeamOutlined, SafetyCertificateOutlined, SearchOutlined, DeleteOutlined, EyeOutlined, FileTextOutlined, MessageOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -31,6 +33,7 @@ import AdminBanners from './AdminBanners';
 import AdminBlogs from './AdminBlogs';
 import AdminDeals from './AdminDeals';
 import AdminServices from './AdminServices';
+import AdminUserChannels from './AdminUserChannels';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -46,6 +49,21 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('users');
   const [openChatUserId, setOpenChatUserId] = useState(null);
   const [form] = Form.useForm();
+
+  const [isDarkMode, setIsDarkMode] = useState(
+    document.documentElement.classList.contains('dark') || 
+    document.documentElement.getAttribute('data-theme') === 'dark'
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const isDark = document.documentElement.classList.contains('dark') || 
+                     document.documentElement.getAttribute('data-theme') === 'dark';
+      setIsDarkMode(isDark);
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     fetchUsers();
@@ -127,8 +145,12 @@ const AdminDashboard = () => {
         const initials = (record?.name || record?.email || 'U').charAt(0).toUpperCase();
         return (
           <Space>
-            <Avatar style={{ backgroundColor: '#1890ff' }} icon={!record?.name && !record?.email ? <UserOutlined /> : null}>
-              {record?.name || record?.email ? initials : null}
+            <Avatar 
+              src={record?.avatar} 
+              style={{ backgroundColor: '#1890ff' }} 
+              icon={!record?.name && !record?.email && !record?.avatar ? <UserOutlined /> : null}
+            >
+              {!record?.avatar && (record?.name || record?.email) ? initials : null}
             </Avatar>
             <div>
               <div className="font-medium">{record?.name || '-'}</div>
@@ -335,21 +357,30 @@ const AdminDashboard = () => {
       label: 'Services',
       children: <AdminServices />,
     },
+    {
+      key: 'user_channels',
+      label: "User's Channel",
+      children: <AdminUserChannels />,
+    },
   ];
 
   return (
-    <div className="mt-20 px-3 pb-8 md:px-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
-        <Title level={2} style={{ margin: 0 }}>Admin Dashboard</Title>
-        <Space wrap className="justify-start md:justify-end">
-          <Tooltip title="Refresh">
-            <Button icon={<ReloadOutlined />} onClick={fetchUsers} loading={loading}>
-              Refresh
-            </Button>
-          </Tooltip>
-        </Space>
-      </div>
-
+    <ConfigProvider 
+      theme={{ 
+        algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
+        token: isDarkMode ? {
+          colorBgBase: '#07030F',
+          colorBgContainer: '#171127',
+          colorBgElevated: '#1f1635',
+          colorBorder: 'rgba(255,255,255,0.08)',
+          colorPrimary: '#7C3AED',
+          colorTextBase: '#ffffff',
+        } : {
+          colorPrimary: '#7C3AED',
+        }
+      }}
+    >
+      <div className="max-w-7xl mx-auto mt-20 px-4 pb-8 sm:px-6 lg:px-8">
       <Tabs 
         activeKey={activeTab}
         onChange={setActiveTab}
@@ -357,6 +388,13 @@ const AdminDashboard = () => {
         destroyInactiveTabPane={true}
         size="large"
         className="admin-dashboard-tabs"
+        tabBarExtraContent={
+          <Tooltip title="Refresh">
+            <Button icon={<ReloadOutlined />} onClick={fetchUsers} loading={loading}>
+              Refresh
+            </Button>
+          </Tooltip>
+        }
       />
 
       <Modal
@@ -367,8 +405,13 @@ const AdminDashboard = () => {
         destroyOnClose
       >
         <Space align="start" className="mb-4">
-          <Avatar size={48} style={{ backgroundColor: '#1677ff' }} icon={<UserOutlined />}>
-            {(selectedUser?.name || selectedUser?.email || 'U').charAt(0).toUpperCase()}
+          <Avatar 
+            size={48} 
+            src={selectedUser?.avatar} 
+            style={{ backgroundColor: '#1677ff' }} 
+            icon={!selectedUser?.avatar ? <UserOutlined /> : null}
+          >
+            {!selectedUser?.avatar ? (selectedUser?.name || selectedUser?.email || 'U').charAt(0).toUpperCase() : null}
           </Avatar>
           <div>
             <Title level={5} style={{ margin: 0 }}>{selectedUser?.name || '-'}</Title>
@@ -420,6 +463,7 @@ const AdminDashboard = () => {
         </Form>
       </Modal>
     </div>
+    </ConfigProvider>
   );
 };
 

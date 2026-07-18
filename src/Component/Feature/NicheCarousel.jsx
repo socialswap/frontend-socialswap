@@ -48,21 +48,21 @@ const N = niches.length;
 
 const floatingElements = [
   { icon: Heart, left: '5%', delay: '0s', duration: '3s', color: '#EF4444', size: 24 },
-  { icon: ThumbsUp, left: '15%', delay: '1.5s', duration: '3.5s', color: '#3B82F6', size: 20 },
-  { icon: MessageSquare, left: '25%', delay: '0.8s', duration: '4s', color: '#10B981', size: 22 },
-  { icon: Bell, left: '35%', delay: '2.2s', duration: '3.2s', color: '#F59E0B', size: 20 },
-  { icon: Flame, left: '45%', delay: '0.3s', duration: '3.8s', color: '#EF4444', size: 26 },
-  { icon: Star, left: '55%', delay: '2.7s', duration: '3.6s', color: '#EAB308', size: 24 },
-  { icon: PlayIcon, left: '65%', delay: '1s', duration: '2.8s', color: '#EF4444', size: 18 },
-  { icon: Share2, left: '75%', delay: '2.4s', duration: '3.4s', color: '#8B5CF6', size: 20 },
-  { icon: Smile, left: '85%', delay: '0.5s', duration: '3.1s', color: '#14B8A6', size: 24 },
-  { icon: Zap, left: '92%', delay: '1.9s', duration: '2.9s', color: '#F59E0B', size: 22 },
-  { icon: Music, left: '12%', delay: '2.1s', duration: '3.7s', color: '#EC4899', size: 20 },
-  { icon: Camera, left: '28%', delay: '0.7s', duration: '4.2s', color: '#6366F1', size: 24 },
-  { icon: Gift, left: '48%', delay: '1.3s', duration: '3.3s', color: '#F43F5E', size: 26 },
-  { icon: Award, left: '68%', delay: '0.2s', duration: '3.9s', color: '#EAB308', size: 28 },
-  { icon: TrendingUp, left: '82%', delay: '2.8s', duration: '3.0s', color: '#10B981', size: 22 },
-  { icon: Coffee, left: '95%', delay: '1.1s', duration: '3.5s', color: '#8B5CF6', size: 20 },
+  { icon: ThumbsUp, left: '15%', delay: '-1.5s', duration: '3.5s', color: '#3B82F6', size: 20 },
+  { icon: MessageSquare, left: '25%', delay: '-0.8s', duration: '4s', color: '#10B981', size: 22 },
+  { icon: Bell, left: '35%', delay: '-2.2s', duration: '3.2s', color: '#F59E0B', size: 20 },
+  { icon: Flame, left: '45%', delay: '-0.3s', duration: '3.8s', color: '#EF4444', size: 26 },
+  { icon: Star, left: '55%', delay: '-2.7s', duration: '3.6s', color: '#EAB308', size: 24 },
+  { icon: PlayIcon, left: '65%', delay: '-1s', duration: '2.8s', color: '#EF4444', size: 18 },
+  { icon: Share2, left: '75%', delay: '-2.4s', duration: '3.4s', color: '#8B5CF6', size: 20 },
+  { icon: Smile, left: '85%', delay: '-0.5s', duration: '3.1s', color: '#14B8A6', size: 24 },
+  { icon: Zap, left: '92%', delay: '-1.9s', duration: '2.9s', color: '#F59E0B', size: 22 },
+  { icon: Music, left: '12%', delay: '-2.1s', duration: '3.7s', color: '#EC4899', size: 20 },
+  { icon: Camera, left: '28%', delay: '-0.7s', duration: '4.2s', color: '#6366F1', size: 24 },
+  { icon: Gift, left: '48%', delay: '-1.3s', duration: '3.3s', color: '#F43F5E', size: 26 },
+  { icon: Award, left: '68%', delay: '-0.2s', duration: '3.9s', color: '#EAB308', size: 28 },
+  { icon: TrendingUp, left: '82%', delay: '-2.8s', duration: '3.0s', color: '#10B981', size: 22 },
+  { icon: Coffee, left: '95%', delay: '-1.1s', duration: '3.5s', color: '#8B5CF6', size: 20 },
 ];
 
 const NicheCarousel = () => {
@@ -229,16 +229,14 @@ const NicheCarousel = () => {
         y: isMobile ? -1000 : -2000,
         x: isMobile ? -1000 : -2000,
         scale: isMobile ? 4.0 : 8.0,
-        rotation: 2160, // 6 full spins like a fan
-        rotationY: 1080, // 3 coin spins
-        autoAlpha: 0, // opacity 0 and visibility hidden
+        rotation: 2160,
+        autoAlpha: 0,
       },
       {
         y: 0,
         x: 0,
         scale: 1,
         rotation: 0,
-        rotationY: 0,
         autoAlpha: 1,
         duration: 1.0,
         delay: 0.5,
@@ -249,7 +247,6 @@ const NicheCarousel = () => {
             { y: 15 }, 
             { y: 0, duration: 0.5, ease: "elastic.out(1, 0.2)" }
           );
-          
           // Dust Rings Expanding
           gsap.fromTo('.dust-ring-1', 
             { scale: 0.8, opacity: 0.8, autoAlpha: 1 }, 
@@ -259,7 +256,6 @@ const NicheCarousel = () => {
             { scale: 0.8, opacity: 0.6, autoAlpha: 1 }, 
             { scale: 3.5, opacity: 0, duration: 0.8, ease: "power2.out" }
           );
-          
           // Dust Particles Exploding Outward
           for(let i = 0; i < 8; i++) {
             const angle = (i * 45) * (Math.PI / 180);

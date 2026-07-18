@@ -60,7 +60,7 @@ const Routes = () => {
     { path: '/shipping-policy', element: <ShippingAndCancellationPolicy /> },
     { path: '/stats', element: <Stats /> },
     { path: '/feature', element: <FeaturedListings /> },
-    { path: '/channel/:id', element: <DetailPageWrapper /> },
+    { path: '/channel/:username', element: <DetailPageWrapper /> },
     { path: '/how-to', element: <ChannelTransactionSteps /> },
     { path: '/blogs', element: <BlogSection /> },
     { path: '/blogs/:id', element: <BlogDetail /> },

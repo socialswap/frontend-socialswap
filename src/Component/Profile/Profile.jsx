@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, Button, List, message, Spin, Modal, Form, Input, Switch } from 'antd';
 import { 
   UserOutlined, 
@@ -8,15 +8,17 @@ import {
   LockOutlined,
   QuestionCircleOutlined,
   LogoutOutlined,
-  ArrowLeftOutlined,
   TransactionOutlined,
-  BellOutlined
+  BellOutlined,
+  CameraOutlined,
+  PhoneOutlined
 } from '@ant-design/icons';
 import styled from 'styled-components';
 import axios from 'axios';
 import axiosInstance, { api } from '../../API/api';
 import { useNavigate } from 'react-router-dom';
 import { subscribeToPush, unsubscribeFromPush } from '../../App';
+import imageCompression from 'browser-image-compression';
 
 // Previous styled components remain the same...
 const StyledCard = styled(Card)`
@@ -24,16 +26,15 @@ const StyledCard = styled(Card)`
   max-width: 100%;
   margin: 0;
   border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.65)) padding-box,
-              linear-gradient(120deg, #7c3aed, #06b6d4, #f43f5e) border-box;
-  border: 1px solid transparent;
-  box-shadow: 0 20px 40px rgba(17, 12, 46, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card, 0 8px 32px rgba(124,58,237,0.1));
   backdrop-filter: blur(10px);
   transition: transform 220ms ease, box-shadow 220ms ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 24px 48px rgba(17, 12, 46, 0.12);
+    box-shadow: var(--shadow-purple, 0 12px 40px rgba(124,58,237,0.15));
   }
 `;
 
@@ -83,17 +84,39 @@ const ProfileHeader = styled.div`
     box-shadow: 0 10px 24px rgba(17, 12, 46, 0.12), 0 0 0 6px rgba(124, 58, 237, 0.08);
     object-fit: cover;
   }
+  
+  .avatar-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #7c3aed;
+    color: white;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+  }
+  
+  .avatar-overlay:hover {
+    transform: scale(1.1);
+    background: #6d28d9;
+  }
 
   .username {
     font-size: 1.2rem;
     font-weight: 700;
     margin: 0.6rem 0 0.15rem;
-    color: #0f172a;
+    color: var(--text-primary);
     letter-spacing: 0.2px;
   }
 
   .user-handle {
-    color: #64748b;
+    color: var(--text-secondary);
     margin: 0;
     font-size: 0.9rem;
   }
@@ -124,21 +147,21 @@ const StyledList = styled(List)`
     cursor: pointer;
     border-radius: 14px;
     margin: 6px 8px;
-    border: 1px solid rgba(124, 58, 237, 0.08);
-    background: rgba(255,255,255,0.6);
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
     transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
     
     &:hover {
-      background-color: rgba(124, 58, 237, 0.04);
+      background-color: rgba(124, 58, 237, 0.08);
       transform: translateY(-1px);
-      box-shadow: 0 10px 22px rgba(17, 12, 46, 0.06);
-      border-color: rgba(124, 58, 237, 0.18);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-color: rgba(124, 58, 237, 0.3);
     }
 
     .ant-list-item-meta-title {
       margin: 0;
       font-weight: 600;
-      color: #0f172a;
+      color: var(--text-primary);
     }
   }
 `;
@@ -146,8 +169,10 @@ const StyledList = styled(List)`
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const [isEditProfileModalVisible, setIsEditProfileModalVisible] = useState(false);
+  const fileInputRef = useRef(null);
   const [passwordForm] = Form.useForm();
   const [profileForm] = Form.useForm();
   const navigate = useNavigate();
@@ -228,7 +253,10 @@ const UserProfile = () => {
         headers: getAuthHeader()
       });
       setUser(response.data);
-      profileForm.setFieldsValue({ name: response.data.name });
+      profileForm.setFieldsValue({ 
+        name: response.data.name,
+        mobile: response.data.mobile
+      });
     } catch (error) {
       message.error('Failed to fetch user profile');
     } finally {
@@ -253,6 +281,46 @@ const UserProfile = () => {
       message.error('Failed to update profile');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAvatarUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      setUploadingAvatar(true);
+      message.loading({ content: 'Optimizing and uploading image...', key: 'avatarUpload' });
+      
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+        fileType: 'image/webp',
+      };
+      const compressedFile = await imageCompression(file, options);
+      
+      const formData = new FormData();
+      formData.append('avatar', compressedFile, compressedFile.name.replace(/\.[^/.]+$/, "") + ".webp");
+
+      const response = await axiosInstance.post(`${api}/profile/avatar`, formData, {
+        headers: {
+          ...getAuthHeader(),
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (response.data.success) {
+        setUser(prev => ({ ...prev, avatar: response.data.url }));
+        message.success({ content: 'Profile photo updated successfully!', key: 'avatarUpload' });
+        // Optionally update localStorage if Header relies on it, though Header fetches it now
+      }
+    } catch (error) {
+      console.error('Avatar upload failed:', error);
+      message.error({ content: 'Failed to upload profile photo', key: 'avatarUpload' });
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -323,8 +391,25 @@ const UserProfile = () => {
       <StyledCard bordered={false}>
         <ProfileHeader>
           <span className="header-text">Profile</span>
-          <div className="avatar-container m-auto flex align-center justify-center">
-            <img src="/images/userImg.jpg" alt="" style={{height:'82px'}}/>
+          <div className="avatar-container m-auto flex items-center justify-center">
+            <div className="relative inline-block">
+              <Spin spinning={uploadingAvatar}>
+                <img src={user?.avatar || "/images/userImg.jpg"} alt="User Avatar" />
+              </Spin>
+              <div 
+                className="avatar-overlay" 
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <CameraOutlined style={{ fontSize: '14px' }} />
+              </div>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                style={{ display: 'none' }} 
+                accept="image/*"
+                onChange={handleAvatarUpload}
+              />
+            </div>
           </div>
           <h3 className="username">{user?.name || 'User Name'}</h3>
           <p className="user-handle">@{user?.handle || user?.name?.toLowerCase().replace(/\s/g, '') || 'username'}</p>
@@ -362,7 +447,7 @@ const UserProfile = () => {
           form={profileForm}
           layout="vertical"
           onFinish={handleProfileEdit}
-          initialValues={{ name: user?.name }}
+          initialValues={{ name: user?.name, mobile: user?.mobile }}
         >
           <Form.Item
             name="name"
@@ -373,6 +458,16 @@ const UserProfile = () => {
             ]}
           >
             <Input prefix={<UserOutlined />} />
+          </Form.Item>
+          <Form.Item
+            name="mobile"
+            label="Mobile Number"
+            rules={[
+              { required: false, message: 'Please enter your mobile number' },
+              { pattern: /^[0-9]{10}$/, message: 'Please enter a valid 10-digit mobile number' }
+            ]}
+          >
+            <Input prefix={<PhoneOutlined />} placeholder="e.g. 9876543210" />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={loading}>

@@ -255,7 +255,6 @@ export default function UploadChannel() {
       if (!form.contactNumber.trim()) errors.contactNumber = 'Contact number is required';
     }
     if (step === 3) {
-      if (!banner && !bannerPreview) errors.banner = 'Banner image is required';
       const totalScreenshots = existingImages.length + images.length;
       if (totalScreenshots < 2) errors.images = 'At least 2 channel screenshots required';
       if (totalScreenshots > 4) errors.images = 'Maximum 4 channel screenshots allowed';
@@ -274,9 +273,7 @@ export default function UploadChannel() {
     const formData = new FormData();
     Object.entries(form).forEach(([k, v]) => formData.append(k, typeof v === 'boolean' ? String(v) : v));
     
-    if (banner) {
-      formData.append('banner', banner);
-    }
+    // Banner removed
     images.forEach(img => {
       formData.append('images', img);
     });
@@ -668,31 +665,7 @@ export default function UploadChannel() {
                 </div>
               )}
 
-              {/* Banner Upload */}
-                  <div className="mb-6">
-                    <p className="text-xs font-semibold text-gray-500 dark:text-white/50 mb-2">
-                      Banner / Thumbnail <span className="font-normal text-gray-400 dark:text-white/30">(1 image required)</span>
-                    </p>
-                    {bannerPreview ? (
-                      <div className="relative rounded-xl overflow-hidden h-40">
-                        <img src={bannerPreview} alt="Banner" className="w-full h-full object-cover" />
-                        <button
-                          onClick={() => { setBanner(null); setBannerPreview(null); }}
-                          className="absolute top-2 right-2 w-7 h-7 bg-black/60 hover:bg-red-500 rounded-full flex items-center justify-center text-gray-900 dark:text-white transition-colors"
-                        ><X size={14} /></button>
-                      </div>
-                    ) : (
-                      <label className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl p-10 cursor-pointer transition-all
-                        ${fieldErrors.banner ? 'border-red-500/40' : 'border-gray-300 dark:border-white/[0.12] hover:border-purple-500 hover:bg-purple-500/[0.06]'}
-                        text-gray-400 dark:text-white/30 hover:text-purple-400`}>
-                        <Upload size={30} />
-                        <span className="text-sm font-medium">Click to upload banner image</span>
-                        <span className="text-xs">PNG, JPG up to 10MB</span>
-                        <input type="file" accept="image/*" onChange={handleBanner} className="hidden" />
-                      </label>
-                    )}
-                    {fieldErrors.banner && <p className="text-red-400 text-xs mt-1">{fieldErrors.banner}</p>}
-                  </div>
+              {/* Banner Upload removed */}
 
                   {/* Channel Screenshots */}
                   <div>
@@ -767,21 +740,21 @@ function Field({ label, icon, error, children }) {
         <span className="text-gray-400 dark:text-white/35">{icon}</span>{label}
       </label>
       <div className={`[&_input]:w-full [&_select]:w-full [&_textarea]:w-full
-        [&_input]:bg-white/[0.05] [&_select]:bg-white/[0.05] [&_textarea]:bg-white/[0.05]
+        [&_input]:bg-gray-50 dark:[&_input]:bg-white/[0.06] [&_select]:bg-gray-50 dark:[&_select]:bg-white/[0.06] [&_textarea]:bg-gray-50 dark:[&_textarea]:bg-white/[0.06]
         [&_input]:border [&_select]:border [&_textarea]:border
         ${error
           ? '[&_input]:border-red-500/40 [&_select]:border-red-500/40 [&_textarea]:border-red-500/40'
-          : '[&_input]:border-gray-200 dark:border-white/10 [&_select]:border-gray-200 dark:border-white/10 [&_textarea]:border-gray-200 dark:border-white/10'
+          : '[&_input]:border-gray-200 dark:[&_input]:border-white/10 [&_select]:border-gray-200 dark:[&_select]:border-white/10 [&_textarea]:border-gray-200 dark:[&_textarea]:border-white/10'
         }
         [&_input]:rounded-xl [&_select]:rounded-xl [&_textarea]:rounded-xl
         [&_input]:px-3.5 [&_select]:px-3.5 [&_textarea]:px-3.5
         [&_input]:py-2.5 [&_select]:py-2.5 [&_textarea]:py-2.5
         [&_input]:text-sm [&_select]:text-sm [&_textarea]:text-sm
-        [&_input]:text-gray-900 dark:text-white [&_select]:text-gray-900 dark:text-white [&_textarea]:text-gray-900 dark:text-white
+        [&_input]:text-gray-900 dark:[&_input]:text-white [&_select]:text-gray-900 dark:[&_select]:text-white [&_textarea]:text-gray-900 dark:[&_textarea]:text-white
         [&_input]:outline-none [&_select]:outline-none [&_textarea]:outline-none
         [&_input]:transition-all [&_select]:transition-all [&_textarea]:transition-all
         [&_input:focus]:border-purple-500 [&_select:focus]:border-purple-500 [&_textarea:focus]:border-purple-500
-        [&_input:focus]:bg-purple-500/[0.08] [&_select:focus]:bg-purple-500/[0.08] [&_textarea:focus]:bg-purple-500/[0.08]
+        [&_input:focus]:bg-purple-50/[0.5] dark:[&_input:focus]:bg-purple-500/[0.08] [&_select:focus]:bg-purple-50/[0.5] dark:[&_select:focus]:bg-purple-500/[0.08] [&_textarea:focus]:bg-purple-50/[0.5] dark:[&_textarea:focus]:bg-purple-500/[0.08]
         [&_select_option]:bg-[#1a1330] [&_textarea]:resize-y [&_input[type=date]]:color-scheme-dark`}>
         {children}
       </div>

@@ -500,7 +500,7 @@ const AdminBlogs = ({ isEmbedded = false }) => {
         </motion.div>
 
         {/* Search + Tabs */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+        <div className="bg-white dark:bg-[#171127] rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 p-4 mb-4">
           <div className="flex flex-col sm:flex-row gap-3 mb-4">
             <Input
               placeholder="Search blogs by title or author..."
@@ -544,7 +544,7 @@ const AdminBlogs = ({ isEmbedded = false }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+          className="bg-white dark:bg-[#171127] rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 overflow-hidden"
         >
           <Table
             dataSource={filteredBlogs}

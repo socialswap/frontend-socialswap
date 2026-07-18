@@ -1,6 +1,7 @@
 import React from 'react';
 import Routes  from './Routing/Routes';
-import { BrowserRouter as Router, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-dom';
+import { MessageOutlined } from '@ant-design/icons';
 import Header from './Component/Header/Header';
 import MobileFooter from './Component/Header/MobileFooter';
 import { WhatsappIcon } from 'react-share';
@@ -102,6 +103,7 @@ export async function unsubscribeFromPush() {
 // ── component ──────────────────────────────────────────────────────────────
 const AppContent = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isBlogPage = location.pathname.startsWith('/blogs');
 
   React.useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
@@ -175,10 +177,36 @@ const AppContent = () => {
 
       <Routes />
       <MobileFooter />
-      <WhatsappIcon
-        onClick={handleMakeOffer} size={40} round
-        style={{ position: 'fixed', bottom: '2rem', right: '2rem', cursor: 'pointer' }}
-      />
+      {!isBlogPage && (
+        <>
+          <div
+            onClick={() => navigate('/user/chat')}
+            style={{
+              position: 'fixed',
+              bottom: '5.2rem',
+              right: '2rem',
+              cursor: 'pointer',
+              width: '40px',
+              height: '40px',
+              backgroundColor: '#7C3AED',
+              borderRadius: '50%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              color: 'white',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              zIndex: 9999
+            }}
+            title="Open Chat"
+          >
+            <MessageOutlined style={{ fontSize: '20px' }} />
+          </div>
+          <WhatsappIcon
+            onClick={handleMakeOffer} size={40} round
+            style={{ position: 'fixed', bottom: '2rem', right: '2rem', cursor: 'pointer', zIndex: 9999 }}
+          />
+        </>
+      )}
       {!isBlogPage && <Footer />}
     </>
   );

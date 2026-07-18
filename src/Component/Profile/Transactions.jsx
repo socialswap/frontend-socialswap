@@ -10,8 +10,17 @@ const { Text, Title } = Typography;
 
 const StyledTransactionCard = styled(Card)`
   margin-bottom: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  
+  .ant-typography, .ant-space-item {
+    color: var(--text-primary) !important;
+  }
+  .ant-typography-secondary {
+    color: var(--text-secondary) !important;
+  }
 `;
 
 const TransactionAmount = styled.span`
@@ -24,7 +33,20 @@ const TransactionAmount = styled.span`
 const CartItemsContainer = styled.div`
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--border);
+`;
+
+const StyledTabsContainer = styled.div`
+  .ant-tabs-tab {
+    color: var(--text-secondary) !important;
+  }
+  .ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: var(--primary) !important;
+    text-shadow: 0 0 0.25px currentcolor;
+  }
+  .ant-tabs-ink-bar {
+    background: var(--primary) !important;
+  }
 `;
 
 const RefreshButton = styled(Button)`
@@ -252,17 +274,20 @@ const TransactionsPanel = () => {
   return (
     <div style={{ padding: '20px', margin: '4rem 0' }}>
       <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: '20px' }}>
-        <Title level={4}>My Activity</Title>
+        <Title level={4} style={{ color: 'var(--text-primary)', margin: 0 }}>My Activity</Title>
         <Button 
           type="primary" 
           icon={<WhatsAppOutlined />}
           onClick={handleWhatsAppSupport}
+          style={{ background: 'var(--btn-gradient)', border: 'none' }}
         >
           Need Help?
         </Button>
       </Space>
       
-      <Tabs defaultActiveKey="deals" items={tabItems} />
+      <StyledTabsContainer>
+        <Tabs defaultActiveKey="deals" items={tabItems} />
+      </StyledTabsContainer>
     </div>
   );
 };

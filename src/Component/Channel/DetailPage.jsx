@@ -7,7 +7,7 @@ import {
   DollarOutlined, SafetyOutlined, FireOutlined, ClockCircleOutlined,
   YoutubeOutlined, ThunderboltOutlined, RiseOutlined,
   TrophyOutlined, LineChartOutlined, HeartOutlined, MessageOutlined,
-  PlaySquareOutlined
+  PlaySquareOutlined, ShareAltOutlined, CopyOutlined, CheckOutlined
 } from '@ant-design/icons';
 import axiosInstance, { api } from '../../API/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,7 +22,9 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
   const [relatedChannels, setRelatedChannels] = useState([]);
   const [sellerChannels, setSellerChannels] = useState([]);
   
-  const { id } = useParams();
+  const [showShare, setShowShare] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const { username } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,22 +53,22 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
   }, []);
 
   useEffect(() => {
-    // If we're on a new ID and channel isn't loaded via props, fetch it
+    // If we're on a new channel and channel isn't loaded via props, fetch it
     const loadData = async () => {
       try {
-        if (!initialChannel && id) {
-          const res = await axiosInstance.get(`${api}/channels/${id}`);
+        if (!initialChannel && username) {
+          const res = await axiosInstance.get(`${api}/channels/username/${username}`);
           setChannel(res.data);
           fetchAdditionalChannels(res.data);
         } else if (channel) {
           fetchAdditionalChannels(channel);
         }
       } catch (err) {
-        console.error("Failed to fetch channel", err);
+        console.error('Failed to fetch channel', err);
       }
     };
     loadData();
-  }, [id, initialChannel, fetchAdditionalChannels]);
+  }, [username, initialChannel, fetchAdditionalChannels, channel]);
 
   // Keep existing logic
   const checkCartStatus = useCallback(async () => {
@@ -74,11 +76,12 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
     try {
       const response = await axiosInstance.get(`${api}/cart`);
       const cartItems = response.data.channels || []; // Ensure array
-      setIsInCart(cartItems.some((item) => item._id === id));
+      const currentChannelId = channel?._id || initialChannel?._id;
+      setIsInCart(cartItems.some((item) => item._id === currentChannelId));
     } catch (err) {
       console.error('Cart check failed:', err);
     }
-  }, [id]);
+  }, [channel?._id, initialChannel?._id]);
 
   useEffect(() => { checkCartStatus(); }, [checkCartStatus]);
 
@@ -210,6 +213,21 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                     ) : (
                        <span className="text-gray-500 dark:text-gray-400 italic">No external link provided</span>
                     )}
+                    {/* YouTube Visit Button */}
+                    <a
+                      href={(() => {
+                        const url = channel.customUrl || '';
+                        if (url.startsWith('http')) return url;
+                        if (url.startsWith('@') || url.startsWith('UC')) return `https://www.youtube.com/${url}`;
+                        if (url) return `https://www.youtube.com/@${url}`;
+                        return `https://www.youtube.com/results?search_query=${encodeURIComponent(channel.name)}`;
+                      })()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition shadow-md shadow-red-500/30 active:scale-95"
+                    >
+                      <YoutubeOutlined className="text-sm" /> View on YouTube
+                    </a>
                   </div>
                   
                   {/* Buttons */}
@@ -227,7 +245,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                           navigate('/login');
                           return;
                         }
-                        navigate('/chat', { state: { requestDeal: channel } });
+                        navigate('/user/chat', { state: { requestDeal: channel } });
                       }} className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white text-sm font-bold py-2.5 px-6 rounded-full transition shadow-lg shadow-blue-500/30 active:scale-95 flex items-center gap-2">
                         <MessageOutlined /> Contact Admin to Buy
                       </button>
@@ -238,6 +256,90 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                     <button onClick={handleAddToCart} className={`w-10 h-10 flex items-center justify-center rounded-full border transition active:scale-95 ${isInCart ? 'bg-red-50 dark:bg-red-900/30 text-red-500 border-red-200 dark:border-red-800' : 'bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700 hover:text-red-500 hover:border-red-200 dark:hover:border-red-800 shadow-sm'}`}>
                       <HeartOutlined className="text-base" />
                     </button>
+
+                    {/* Share Button */}
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowShare(v => !v)}
+                        className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:text-purple-600 hover:border-purple-300 dark:hover:border-purple-600 transition shadow-sm active:scale-95"
+                        title="Share this channel"
+                      >
+                        <ShareAltOutlined className="text-base" />
+                      </button>
+
+                      {/* Share Dropdown */}
+                      <AnimatePresence>
+                        {showShare && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 8 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 8 }}
+                            transition={{ duration: 0.15 }}
+                            className="absolute bottom-12 right-0 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-4 z-50"
+                          >
+                            <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Share this channel</p>
+
+                            {/* Copy Link */}
+                            <button
+                              onClick={() => {
+                                const url = `https://www.socialswap.in/channel/${channel.customUrl || channel._id}`;
+                                navigator.clipboard.writeText(url).then(() => {
+                                  setCopied(true);
+                                  message.success('Link copied!');
+                                  setTimeout(() => setCopied(false), 2000);
+                                });
+                              }}
+                              className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition text-left"
+                            >
+                              <span className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-600">
+                                {copied ? <CheckOutlined /> : <CopyOutlined />}
+                              </span>
+                              <div>
+                                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{copied ? 'Copied!' : 'Copy Link'}</p>
+                                <p className="text-xs text-gray-400 truncate max-w-[150px]">/channel/{channel.customUrl || channel._id}</p>
+                              </div>
+                            </button>
+
+                            {/* WhatsApp */}
+                            <a
+                              href={`https://wa.me/?text=${encodeURIComponent(`Check out this YouTube channel for sale on SocialSwap! 🎬\n${channel.name} — ₹${channel.price}\nhttps://www.socialswap.in/channel/${channel.customUrl || channel._id}`)}`}
+                              target="_blank" rel="noopener noreferrer"
+                              className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                            >
+                              <span className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center text-green-600 text-lg">💬</span>
+                              <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">Share on WhatsApp</p>
+                            </a>
+
+                            {/* Twitter/X */}
+                            <a
+                              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`🎬 ${channel.name} YouTube channel for sale! ${channel.subscriberCount?.toLocaleString()} subscribers. Check it out on SocialSwap 👇`)}&url=${encodeURIComponent(`https://www.socialswap.in/channel/${channel.customUrl || channel._id}`)}`}
+                              target="_blank" rel="noopener noreferrer"
+                              className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                            >
+                              <span className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center text-sky-600 font-bold text-sm">𝕏</span>
+                              <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">Share on X (Twitter)</p>
+                            </a>
+
+                            {/* Native Share if available */}
+                            {'share' in navigator && (
+                              <button
+                                onClick={() => {
+                                  navigator.share({
+                                    title: `${channel.name} – YouTube Channel for Sale`,
+                                    text: `Buy ${channel.name} on SocialSwap! ${channel.subscriberCount?.toLocaleString()} subscribers, listed at ₹${channel.price}.`,
+                                    url: `https://www.socialswap.in/channel/${channel.customUrl || channel._id}`,
+                                  }).catch(() => {});
+                                }}
+                                className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition text-left"
+                              >
+                                <span className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center text-orange-500">📤</span>
+                                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">More options...</p>
+                              </button>
+                            )}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -249,13 +351,21 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
               <div className="flex flex-col gap-4">
                 <div className="w-full bg-gray-50 dark:bg-gray-900 rounded-xl overflow-hidden aspect-video flex items-center justify-center border border-gray-100 dark:border-gray-700 shadow-sm relative group max-h-[400px]">
                   {mainImage ? (
-                    <Image 
-                      src={mainImage} 
-                      alt={channel.name} 
-                      rootClassName="w-full h-full flex items-center justify-center"
-                      className="w-full h-full object-contain transition duration-300 group-hover:scale-[1.02]" 
-                      style={{ objectFit: 'contain', width: '100%', height: '100%' }}
-                    />
+                    <Image.PreviewGroup 
+                      items={channel.imageUrls?.length ? channel.imageUrls : [mainImage]}
+                      preview={{ 
+                        current: currentImageIndex, 
+                        onChange: (current) => setCurrentImageIndex(current) 
+                      }}
+                    >
+                      <Image 
+                        src={mainImage} 
+                        alt={channel.name} 
+                        rootClassName="w-full h-full flex items-center justify-center"
+                        className="w-full h-full object-contain transition duration-300 group-hover:scale-[1.02]" 
+                        style={{ objectFit: 'contain', width: '100%', height: '100%' }}
+                      />
+                    </Image.PreviewGroup>
                   ) : (
                     <span className="text-5xl text-gray-300"><YoutubeOutlined /></span>
                   )}
@@ -370,11 +480,25 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
             {relatedChannels.length > 0 && (
               <div className="pt-2">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Related Products</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {relatedChannels.map(c => (
-                    <ChannelCard key={c._id} channel={c} />
-                  ))}
-                </div>
+                <motion.div
+                  layout
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+                >
+                  <AnimatePresence>
+                    {relatedChannels.map(c => (
+                      <motion.div
+                        key={c._id}
+                        layout
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <ChannelCard channel={c} />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </motion.div>
               </div>
             )}
           </div>
@@ -387,11 +511,11 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center text-center">
               <div className="relative mb-3">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-md overflow-hidden">
-                  {channel.seller?.avatar ? <img src={channel.seller.avatar} alt="Seller" className="w-full h-full object-cover"/> : <UserOutlined />}
+                  {(channel.createdBy?.avatar || channel.seller?.avatar) ? <img src={channel.createdBy?.avatar || channel.seller?.avatar} alt="Seller" className="w-full h-full object-cover"/> : <UserOutlined />}
                 </div>
                 <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">{channel.seller?.name || 'Seller'}</h3>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">{channel.createdBy?.name || channel.seller?.name || 'Seller'}</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-1 justify-center">
                 <span className="text-green-500 text-lg"><CheckCircleFilled /></span>
                 <span className="ml-2 text-gray-400 dark:text-gray-500">●</span> 

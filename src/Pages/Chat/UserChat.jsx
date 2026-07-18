@@ -295,15 +295,15 @@ const UserChat = () => {
                     {msg.mediaUrl && (
                       <img src={msg.mediaUrl} alt="Attachment" className="rounded-lg mb-2 w-full object-cover max-h-64 cursor-pointer" onClick={() => window.open(msg.mediaUrl, '_blank')} />
                     )}
-                    {msg.text && <p className="text-[14.5px] leading-relaxed pr-6 break-words whitespace-pre-wrap">{msg.text}</p>}
+                    {msg.text && <p className="text-[13.5px] md:text-[14.5px] leading-relaxed pr-6 break-words whitespace-pre-wrap">{msg.text}</p>}
                     
                     {(msg.isChannelCard || msg.type === 'channel') && msg.channelId && (
                       <div className="mt-3 p-3 bg-white dark:bg-[#18112e] rounded-xl border border-purple-200 dark:border-purple-800/40 shadow-sm flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/channel/${msg.channelId._id || msg.channelId}`)}>
                         <img src={msg.channelId.imageUrls?.[0] || 'https://via.placeholder.com/80'} className="w-16 h-16 rounded-lg object-cover" alt="channel" />
                         <div className="flex-1 overflow-hidden">
-                          <h4 className="font-bold text-sm text-gray-900 dark:text-white truncate">{msg.channelId.name || 'Unknown Channel'}</h4>
-                          <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">{msg.channelId.category} • {msg.channelId.subscriberCount?.toLocaleString()} subs</p>
-                          <p className="text-sm font-bold text-purple-600 dark:text-purple-400 mt-1">${msg.channelId.price}</p>
+                          <h4 className="font-bold text-xs md:text-sm text-gray-900 dark:text-white truncate">{msg.channelId.name || 'Unknown Channel'}</h4>
+                          <p className="text-[10px] md:text-[11px] text-gray-500 dark:text-gray-400 mt-1">{msg.channelId.category} • {msg.channelId.subscriberCount?.toLocaleString()} subs</p>
+                          <p className="text-xs md:text-sm font-bold text-purple-600 dark:text-purple-400 mt-1">${msg.channelId.price}</p>
                         </div>
                       </div>
                     )}
@@ -311,9 +311,9 @@ const UserChat = () => {
                     {(msg.isDealCard || msg.type === 'deal') && msg.dealId && (
                       <div className="mt-3 p-4 bg-white dark:bg-[#18112e] rounded-xl border border-gray-200 dark:border-purple-800/40 shadow-sm text-gray-800 dark:text-gray-200 relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#7C3AED] to-[#A855F7]"></div>
-                        <h4 className="font-bold text-gray-900 dark:text-white mb-2 pl-2">Escrow Deal Proposed</h4>
+                        <h4 className="font-bold text-sm md:text-base text-gray-900 dark:text-white mb-2 pl-2">Escrow Deal Proposed</h4>
                         
-                        <div className="space-y-1 mb-4 bg-gray-50 dark:bg-[#231542] p-3 rounded-lg border border-gray-100 dark:border-purple-900/20 text-[13px]">
+                        <div className="space-y-1 mb-4 bg-gray-50 dark:bg-[#231542] p-3 rounded-lg border border-gray-100 dark:border-purple-900/20 text-xs md:text-[13px]">
                           <p className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Status:</span> <span className={`font-semibold uppercase ${msg.dealId.status === 'accepted' ? 'text-green-600 dark:text-green-400' : msg.dealId.status === 'rejected' ? 'text-red-500 dark:text-red-400' : 'text-yellow-600 dark:text-yellow-400'}`}>{msg.dealId.status}</span></p>
                           {msg.dealId.payment && <p className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Payment:</span> <span className={`font-semibold uppercase ${msg.dealId.payment === 'paid' ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>{msg.dealId.payment}</span></p>}
                           {msg.dealId.channel?.name && <p className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Channel:</span> <span className="font-medium truncate max-w-[150px] text-gray-800 dark:text-gray-200">{msg.dealId.channel.name}</span></p>}

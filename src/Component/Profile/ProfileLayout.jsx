@@ -18,6 +18,7 @@ const LayoutContainer = styled.div`
   margin: 6rem auto 2rem;
   padding: 0 1rem;
   gap: 2rem;
+  color: var(--text-primary);
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -28,6 +29,10 @@ const LayoutContainer = styled.div`
 const Sidebar = styled.div`
   width: 250px;
   flex-shrink: 0;
+  position: sticky;
+  top: 6rem;
+  align-self: flex-start;
+  height: max-content;
 
   @media (max-width: 768px) {
     display: none;
@@ -88,22 +93,33 @@ const NavItem = styled(NavLink)`
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--text-secondary);
   font-weight: 500;
   transition: all 0.2s ease;
   text-decoration: none;
 
   &:hover {
-    background: rgba(124, 58, 237, 0.05);
+    background: rgba(124, 58, 237, 0.08);
     color: var(--purple-primary);
   }
 
   &.active {
-    background: rgba(124, 58, 237, 0.1);
-    color: var(--purple-primary);
+    background: rgba(124, 58, 237, 0.12);
+    color: var(--primary, #a855f7);
     font-weight: 600;
-    border-left: 4px solid var(--purple-primary);
+    position: relative;
+  }
+  
+  &.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--primary, #a855f7);
+    border-radius: 8px 0 0 8px;
   }
 `;
 

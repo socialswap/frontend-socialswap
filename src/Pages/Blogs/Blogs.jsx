@@ -122,66 +122,69 @@ const BlogSection = () => {
             <Empty description="No blogs yet" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {blogs.map((item) => (
               <motion.article
                 key={item._id}
-                className="group relative rounded-2xl overflow-hidden border border-gray-200 bg-white/80 backdrop-blur shadow-sm transition-all duration-300 hover:shadow-xl"
+                className="group relative rounded-2xl overflow-hidden border border-gray-200 bg-white/80 backdrop-blur shadow-sm transition-all duration-300 hover:shadow-xl flex flex-col-reverse sm:flex-row h-full"
                 variants={fadeUp}
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: true, amount: 0.3 }}
-                whileHover={{ y: -6 }}
+                whileHover={{ y: -4 }}
               >
-                <div className="relative">
-                  <motion.img
-                    src={item.imageUrl || '/images/yt3.png'}
-                    alt={item.title}
-                    width="400"
-                    height="200"
-                    className="w-full h-48 object-cover"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.4 }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/0 to-transparent pointer-events-none" />
-                  <div className="absolute top-3 left-3 flex gap-2">
-                    <span className="px-3 py-1 text-xs rounded-full bg-[#FF4D4D] text-white shadow-md">
-                      {new Date(item.createdAt).toLocaleDateString('en-IN', {
-                        day: 'numeric',
-                        month: 'short',
-                      })}
-                    </span>
-                    {item.category && (
-                      <span className="px-3 py-1 text-xs rounded-full bg-black/60 text-white shadow-md">
-                        {item.category}
+                {/* Left Side: Text and Content */}
+                <div className="flex-1 p-5 flex flex-col justify-between">
+                  <div>
+                    <div className="flex gap-2 mb-3">
+                      <span className="px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded bg-red-50 text-red-600 border border-red-100 shadow-sm">
+                        {new Date(item.createdAt).toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                        })}
                       </span>
-                    )}
+                      {item.category && (
+                        <span className="px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded bg-gray-100 text-gray-700 border border-gray-200 shadow-sm">
+                          {item.category}
+                        </span>
+                      )}
+                    </div>
+                    <h2 className="text-base md:text-lg font-bold tracking-tight line-clamp-2 mb-2 text-gray-900 transition-colors group-hover:text-red-600">
+                      {item.title}
+                    </h2>
+                    <Paragraph style={{ color: '#6B7280', marginBottom: 14, fontSize: '13px' }}>
+                      {item.excerpt?.length > 100
+                        ? `${item.excerpt.slice(0, 100)}...`
+                        : item.excerpt}
+                    </Paragraph>
                   </div>
-                </div>
-                <div className="p-5">
-                  <h2 className="text-lg font-bold tracking-tight line-clamp-2 mb-2 text-gray-900 transition-colors group-hover:text-red-600">
-                    {item.title}
-                  </h2>
-                  <Paragraph style={{ color: '#6B7280', marginBottom: 14 }}>
-                    {item.excerpt?.length > 140
-                      ? `${item.excerpt.slice(0, 140)}...`
-                      : item.excerpt}
-                  </Paragraph>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mt-2">
                     {item.readTime && (
-                      <span className="text-xs text-gray-400">
+                      <span className="text-[11px] font-medium text-gray-500">
                         {item.readTime} min read
                       </span>
                     )}
                     <motion.button
                       onClick={() => navigate(`/blogs/${item.slug || item._id}`)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="ml-auto inline-flex items-center gap-2 rounded-full px-4 py-2 text-white text-sm font-semibold bg-gradient-to-r from-[#FF4D4D] to-[#ff9f40] shadow-md hover:shadow-lg"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="ml-auto inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-red-600 text-[13px] font-bold hover:bg-red-50 transition-colors"
                     >
-                      Read More <ArrowRightOutlined />
+                      Read More <ArrowRightOutlined className="text-[11px]" />
                     </motion.button>
                   </div>
+                </div>
+
+                {/* Right Side: Image */}
+                <div className="relative w-full sm:w-2/5 md:w-1/3 lg:w-2/5 shrink-0 overflow-hidden">
+                  <motion.img
+                    src={item.imageUrl || '/images/yt3.png'}
+                    alt={item.title}
+                    className="w-full h-48 sm:h-full object-cover"
+                    whileHover={{ scale: 1.08 }}
+                    transition={{ duration: 0.4 }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-l from-transparent to-black/10 pointer-events-none" />
                 </div>
               </motion.article>
             ))}
