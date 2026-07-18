@@ -73,7 +73,7 @@ const MyChannels = () => {
         <motion.button
           whileHover={{ scale: 1.03, y: -1 }}
           whileTap={{ scale: 0.97 }}
-          onClick={() => navigate('/upload-channel')}
+          onClick={() => navigate('/user/upload-channel')}
           className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold rounded-xl text-sm hover:opacity-90 transition-opacity"
         >
           <Plus size={15} /> List New Channel
@@ -115,7 +115,7 @@ const MyChannels = () => {
             List your first YouTube channel and reach thousands of buyers on SocialSwap.
           </p>
           <button
-            onClick={() => navigate('/upload-channel')}
+            onClick={() => navigate('/user/upload-channel')}
             className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold rounded-xl text-sm hover:opacity-90 transition-opacity mt-2"
           >
             <Plus size={15} /> List Your First Channel

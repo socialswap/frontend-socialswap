@@ -30,11 +30,11 @@ const MobileFooter = () => {
 
   const navItems = [
     { icon: Youtube, label: 'Channels', path: '/channels' },
-    { icon: PlusSquare, label: 'Sell', path: '/upload-channel' },
+    { icon: PlusSquare, label: 'Sell', path: '/user/upload-channel' },
     { icon: Server, label: 'Services', path: '/services' },
-    { icon: MessageSquare, label: 'Chats', path: '/chats' },
+    { icon: MessageSquare, label: 'Chats', path: '/user/chat' },
     isLoggedIn 
-      ? { icon: User, label: 'Profile', path: '/profile' }
+      ? { icon: User, label: 'Profile', path: '/user/profile' }
       : { icon: LogIn, label: 'Log in', path: '/login' }
   ];
 

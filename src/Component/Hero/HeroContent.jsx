@@ -15,8 +15,9 @@ const SCROLLER_WORDS = [
 
 /**
  * BlurTextScroller — Vertical rolling wheel with real-time blur and depth animation.
+ * Fully theme-aware: uses CSS variables for all colors.
  */
-const BlurTextScroller = ({ prefersReducedMotion }) => {
+const BlurTextScroller = ({ prefersReducedMotion, isLightMode }) => {
   const [index, setIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -58,17 +59,20 @@ const BlurTextScroller = ({ prefersReducedMotion }) => {
     <div className="flex items-center justify-center w-full">
       <div className="relative w-full h-[100px] md:h-[120px] flex items-center justify-center bg-transparent border-none overflow-visible">
         {/* Flex positioned indicator arrow to stay left of text wheel */}
-        <motion.div 
+        <motion.div
           key={index}
-          className="flex items-center justify-center z-[5] mr-3 md:mr-10" 
-          style={{ zIndex: 10, willChange: 'transform, opacity' }}
+          className="flex items-center justify-center z-[5] mr-3 md:mr-10"
+          style={{ zIndex: 10, willChange: 'transform, opacity', color: 'var(--text-primary)' }}
           initial={prefersReducedMotion ? { x: 0, y: 0, opacity: 1 } : { y: 15, x: -10, opacity: 0.6 }}
           animate={{ x: 0, y: 0, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 120, damping: 18, mass: 0.8 }}
         >
-          <ArrowRight className="text-white w-6 h-6 md:w-[54px] md:h-[54px] opacity-90 animate-scroller-arrow-bounce" />
+          <ArrowRight
+            className="w-6 h-6 md:w-[54px] md:h-[54px] opacity-90 animate-scroller-arrow-bounce"
+            style={{ color: 'var(--text-primary)' }}
+          />
         </motion.div>
-        <div 
+        <div
           className="relative w-[200px] md:w-[450px] h-full flex items-center justify-start"
           style={{ position: 'relative', width: isMobile ? '180px' : '420px', justifyContent: 'flex-start', perspective: '1200px', transformStyle: 'preserve-3d' }}
         >
@@ -85,7 +89,7 @@ const BlurTextScroller = ({ prefersReducedMotion }) => {
               const zVal = Math.abs(offset) * -curveZ;
               const rZVal = offset * angleMultiplier;
               const xVal = Math.abs(offset) * xShiftMultiplier;
-              
+
               return (
                 <motion.div
                   key={key}
@@ -125,14 +129,16 @@ const BlurTextScroller = ({ prefersReducedMotion }) => {
                     damping: 24,
                     mass: 0.8,
                   }}
-                  className={`font-sans text-2xl md:text-[4rem] font-black tracking-[-0.05em] pointer-events-none whitespace-nowrap ${isActive ? 'text-white' : 'text-[#9C96B8]'}`}
+                  className="font-sans text-2xl md:text-[4rem] font-black tracking-[-0.05em] pointer-events-none whitespace-nowrap"
                   style={{
                     position: 'absolute',
                     top: topOffset,
-                    left: 0, // Left-aligned within the wheel
+                    left: 0,
                     transformOrigin: 'left center',
                     zIndex: 5 - Math.abs(offset),
                     willChange: 'transform, opacity',
+                    /* Active word uses primary text; inactive uses muted — adapts to theme */
+                    color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
                   }}
                 >
                   {word}
@@ -148,9 +154,10 @@ const BlurTextScroller = ({ prefersReducedMotion }) => {
 
 /**
  * HeroContent — the text overlay rendered on top of the background.
- * Keeps the existing heading and subtitle, adds glassmorphism CTA cards.
+ * Fully theme-aware: all colors driven by CSS variables.
+ * Receives `isLightMode` prop from `HeroNew` to optionally adjust card surfaces.
  */
-const HeroContent = ({ prefersReducedMotion }) => {
+const HeroContent = ({ prefersReducedMotion, isLightMode }) => {
   const navigate = useNavigate();
 
   // Premium Apple/Stripe-style entrance animations
@@ -163,21 +170,74 @@ const HeroContent = ({ prefersReducedMotion }) => {
       ? { duration: 0 }
       : { duration: 0.85, delay, ease: [0.16, 1, 0.3, 1] };
 
+  /* ── Card surface styles vary per theme ─────────────────────
+     Dark  → bg-glass with purple-tinted border
+     Light → frosted white glass with lavender border + drop shadow  */
+  const buyCardStyle = isLightMode
+    ? {
+        background: 'rgba(255, 255, 255, 0.72)',
+        border: '1px solid rgba(124, 77, 255, 0.20)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        boxShadow: '0 4px 24px rgba(124, 77, 255, 0.10)',
+      }
+    : {
+        background: 'var(--bg-glass)',
+        border: '1px solid rgba(124, 58, 237, 0.3)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+      };
+
+  const sellCardStyle = isLightMode
+    ? {
+        background: 'rgba(255, 255, 255, 0.72)',
+        border: '1px solid rgba(72, 174, 255, 0.22)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        boxShadow: '0 4px 24px rgba(72, 174, 255, 0.10)',
+      }
+    : {
+        background: 'var(--bg-glass)',
+        border: '1px solid rgba(217, 70, 239, 0.3)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+      };
+
+  const infoCardStyle = isLightMode
+    ? {
+        background: 'rgba(255, 255, 255, 0.65)',
+        border: '1px solid var(--border-glow)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        boxShadow: '0 2px 12px rgba(124, 77, 255, 0.08)',
+      }
+    : {
+        background: 'var(--bg-glass)',
+        border: '1px solid var(--border-glow)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+      };
+
   return (
     <div className="flex flex-col items-center text-center w-full z-10 px-4 pt-[4.75rem] pb-[1.5rem] sm:px-5 sm:py-8 sm:max-w-[800px] lg:max-w-[850px] lg:p-0">
       {/* ── Heading ──────────────────────────────────────────── */}
       <motion.h1
-        className="font-sans font-extrabold text-[1.45rem] sm:text-[clamp(2rem,4vw,3rem)] leading-[1.2] sm:leading-[1.15] text-white mt-0 mb-3 tracking-[-0.02em] order-1"
+        className="font-sans font-extrabold text-[1.45rem] sm:text-[clamp(2rem,4vw,3rem)] leading-[1.2] sm:leading-[1.15] mt-0 mb-3 tracking-[-0.02em] order-1"
+        style={{ color: 'var(--text-primary)' }}
         {...slideUp}
         transition={transition(0.15)}
       >
         The Most Trusted Platform to{' '}
-        <span className="bg-gradient-to-br from-[#7C3AED] via-[#A855F7] to-[#D946EF] bg-clip-text text-transparent">Buy &amp; Sell</span> Established YouTube Channels
+        <span className="bg-gradient-to-br from-[#7C4DFF] via-[#9B72FF] to-[#48AEFF] bg-clip-text text-transparent">
+          Buy &amp; Sell
+        </span>{' '}
+        Established YouTube Channels
       </motion.h1>
 
       {/* ── Subtitle ─────────────────────────────────────────── */}
       <motion.p
-        className="font-sans text-[0.825rem] sm:text-[clamp(0.95rem,1.8vw,1.1rem)] text-[#E2DFEE] mb-[5.5rem] sm:mb-6 max-w-[600px] leading-[1.5] sm:leading-[1.6] order-2"
+        className="font-sans text-[0.825rem] sm:text-[clamp(0.95rem,1.8vw,1.1rem)] mb-[5.5rem] sm:mb-6 max-w-[600px] leading-[1.5] sm:leading-[1.6] order-2"
+        style={{ color: 'var(--text-secondary)' }}
         {...slideUp}
         transition={transition(0.3)}
       >
@@ -191,7 +251,7 @@ const HeroContent = ({ prefersReducedMotion }) => {
         transition={transition(0.4)}
         className="relative w-full mt-6 mb-10 flex justify-center pointer-events-none order-5 lg:order-3"
       >
-        <BlurTextScroller prefersReducedMotion={prefersReducedMotion} />
+        <BlurTextScroller prefersReducedMotion={prefersReducedMotion} isLightMode={isLightMode} />
       </motion.div>
 
       {/* ── Buy / Sell Cards ─────────────────────────────────── */}
@@ -202,61 +262,137 @@ const HeroContent = ({ prefersReducedMotion }) => {
       >
         {/* Buy Channel */}
         <motion.div
-          className="group relative flex flex-row items-center justify-start gap-2 sm:gap-[0.85rem] p-2 sm:px-5 sm:py-[0.85rem] h-[54px] sm:h-[72px] bg-bg-glass backdrop-blur-[20px] border border-[rgba(124,58,237,0.3)] hover:border-[#8B5CF6] hover:shadow-[0_8px_40px_rgba(124,58,237,0.35)] active:shadow-[0_4px_16px_rgba(124,58,237,0.2)] rounded-[12px] sm:rounded-[16px] text-text-primary cursor-pointer no-underline overflow-hidden transition-all duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] font-sans before:content-[''] before:absolute before:inset-0 before:rounded-[12px] sm:before:rounded-[16px] before:bg-gradient-to-br before:from-[rgba(124,58,237,0.15)] before:to-[rgba(168,85,247,0.08)] before:opacity-0 hover:before:opacity-100 active:before:opacity-100 before:transition-opacity before:duration-[350ms] motion-reduce:transition-none motion-reduce:hover:transform-none"
+          className="group relative flex flex-row items-center justify-start gap-2 sm:gap-[0.85rem] p-2 sm:px-5 sm:py-[0.85rem] h-[54px] sm:h-[72px] rounded-[12px] sm:rounded-[16px] cursor-pointer overflow-hidden transition-all duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none motion-reduce:hover:transform-none"
+          style={buyCardStyle}
           role="button"
           tabIndex={0}
           onClick={() => navigate('/channels')}
           onKeyDown={(e) => e.key === 'Enter' && navigate('/channels')}
-          whileHover={prefersReducedMotion ? {} : { y: -4, scale: 1.01 }}
+          whileHover={prefersReducedMotion
+            ? {}
+            : {
+                y: -4,
+                scale: 1.01,
+                boxShadow: isLightMode
+                  ? '0 8px 40px rgba(124, 77, 255, 0.18)'
+                  : '0 8px 40px rgba(124, 58, 237, 0.35)',
+                borderColor: isLightMode ? 'rgba(124, 77, 255, 0.40)' : '#8B5CF6',
+              }
+          }
           whileTap={prefersReducedMotion ? {} : { scale: 0.985 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
         >
-          <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0 transition-all duration-300 ease z-[2] bg-[rgba(124,58,237,0.15)] group-hover:scale-105 group-hover:bg-[rgba(124,58,237,0.25)]">
-            <ShoppingCart className="z-[2] text-purple-primary w-4 h-4 sm:w-5 sm:h-5" size={20} />
+          <div
+            className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0 transition-all duration-300 ease z-[2] group-hover:scale-105"
+            style={{ background: 'rgba(124, 77, 255, 0.15)' }}
+          >
+            <ShoppingCart
+              className="z-[2] w-4 h-4 sm:w-5 sm:h-5"
+              style={{ color: 'var(--primary)' }}
+              size={20}
+            />
           </div>
           <div className="flex flex-col items-start text-left z-[2]">
-            <span className="font-bold text-[0.825rem] sm:text-[0.95rem] tracking-[0.02em]">Buy Channel</span>
-            <span className="text-[0.625rem] sm:text-[0.75rem] text-text-muted mt-0 sm:mt-[0.15rem]">Browse listings</span>
+            <span
+              className="font-bold text-[0.825rem] sm:text-[0.95rem] tracking-[0.02em]"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              Buy Channel
+            </span>
+            <span
+              className="text-[0.625rem] sm:text-[0.75rem] mt-0 sm:mt-[0.15rem]"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              Browse listings
+            </span>
           </div>
         </motion.div>
 
         {/* Sell Channel */}
         <motion.div
-          className="group relative flex flex-row items-center justify-start gap-2 sm:gap-[0.85rem] p-2 sm:px-5 sm:py-[0.85rem] h-[54px] sm:h-[72px] bg-bg-glass backdrop-blur-[20px] border border-[rgba(217,70,239,0.3)] hover:border-[#D946EF] hover:shadow-[0_8px_40px_rgba(217,70,239,0.35)] active:shadow-[0_4px_16px_rgba(124,58,237,0.2)] rounded-[12px] sm:rounded-[16px] text-text-primary cursor-pointer no-underline overflow-hidden transition-all duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] font-sans before:content-[''] before:absolute before:inset-0 before:rounded-[12px] sm:before:rounded-[16px] before:bg-gradient-to-br before:from-[rgba(124,58,237,0.15)] before:to-[rgba(168,85,247,0.08)] before:opacity-0 hover:before:opacity-100 active:before:opacity-100 before:transition-opacity before:duration-[350ms] motion-reduce:transition-none motion-reduce:hover:transform-none"
+          className="group relative flex flex-row items-center justify-start gap-2 sm:gap-[0.85rem] p-2 sm:px-5 sm:py-[0.85rem] h-[54px] sm:h-[72px] rounded-[12px] sm:rounded-[16px] cursor-pointer overflow-hidden transition-all duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none motion-reduce:hover:transform-none"
+          style={sellCardStyle}
           role="button"
           tabIndex={0}
-          onClick={() => navigate('/seller-dashboard')}
-          onKeyDown={(e) => e.key === 'Enter' && navigate('/seller-dashboard')}
-          whileHover={prefersReducedMotion ? {} : { y: -4, scale: 1.01 }}
+          onClick={() => navigate('/user/upload-channel')}
+          onKeyDown={(e) => e.key === 'Enter' && navigate('/user/upload-channel')}
+          whileHover={prefersReducedMotion
+            ? {}
+            : {
+                y: -4,
+                scale: 1.01,
+                boxShadow: isLightMode
+                  ? '0 8px 40px rgba(72, 174, 255, 0.20)'
+                  : '0 8px 40px rgba(217, 70, 239, 0.35)',
+                borderColor: isLightMode ? 'rgba(72, 174, 255, 0.45)' : '#D946EF',
+              }
+          }
           whileTap={prefersReducedMotion ? {} : { scale: 0.985 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
         >
-          <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0 transition-all duration-300 ease z-[2] bg-[rgba(217,70,239,0.15)] group-hover:scale-105 group-hover:bg-[rgba(217,70,239,0.25)]">
-            <TrendingUp className="z-[2] text-accent-pink w-4 h-4 sm:w-5 sm:h-5" size={20} />
+          <div
+            className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0 transition-all duration-300 ease z-[2] group-hover:scale-105"
+            style={{ background: isLightMode ? 'rgba(72, 174, 255, 0.14)' : 'rgba(217, 70, 239, 0.15)' }}
+          >
+            <TrendingUp
+              className="z-[2] w-4 h-4 sm:w-5 sm:h-5"
+              style={{ color: isLightMode ? 'var(--accent-cyan)' : 'var(--accent-pink)' }}
+              size={20}
+            />
           </div>
           <div className="flex flex-col items-start text-left z-[2]">
-            <span className="font-bold text-[0.825rem] sm:text-[0.95rem] tracking-[0.02em]">Sell Channel</span>
-            <span className="text-[0.625rem] sm:text-[0.75rem] text-text-muted mt-0 sm:mt-[0.15rem]">List yours now</span>
+            <span
+              className="font-bold text-[0.825rem] sm:text-[0.95rem] tracking-[0.02em]"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              Sell Channel
+            </span>
+            <span
+              className="text-[0.625rem] sm:text-[0.75rem] mt-0 sm:mt-[0.15rem]"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              List yours now
+            </span>
           </div>
         </motion.div>
       </motion.div>
 
       {/* ── What is SocialSwap? ──────────────────────────────── */}
       <motion.div
-        className="group w-full max-w-full sm:max-w-[480px] flex items-center justify-center gap-3 p-[0.65rem_1rem] sm:p-[0.85rem_1.5rem] bg-bg-glass backdrop-blur-[16px] border border-border-glow rounded-[12px] sm:rounded-[16px] text-text-secondary cursor-pointer font-sans font-semibold text-[0.85rem] sm:text-[0.95rem] transition-all duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-bg-card hover:border-primary hover:text-text-primary hover:shadow-[0_4px_20px_rgba(124,58,237,0.2)] order-4 lg:order-5 motion-reduce:transition-none"
+        className="group w-full max-w-full sm:max-w-[480px] flex items-center justify-center gap-3 p-[0.65rem_1rem] sm:p-[0.85rem_1.5rem] rounded-[12px] sm:rounded-[16px] cursor-pointer font-sans font-semibold text-[0.85rem] sm:text-[0.95rem] transition-all duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] order-4 lg:order-5 motion-reduce:transition-none"
+        style={{
+          ...infoCardStyle,
+          color: 'var(--text-secondary)',
+        }}
         role="button"
         tabIndex={0}
         onClick={() => navigate('/about')}
         onKeyDown={(e) => e.key === 'Enter' && navigate('/about')}
         {...slideUp}
         transition={transition(0.7)}
-        whileHover={prefersReducedMotion ? {} : { y: -3, scale: 1.005 }}
+        whileHover={prefersReducedMotion
+          ? {}
+          : {
+              y: -3,
+              scale: 1.005,
+              borderColor: 'var(--primary)',
+              color: 'var(--text-primary)',
+              boxShadow: '0 4px 20px rgba(124, 77, 255, 0.15)',
+            }
+        }
         whileTap={prefersReducedMotion ? {} : { scale: 0.99 }}
-        style={{ originX: 0.5, originY: 0.5 }}
+        style={{ originX: 0.5, originY: 0.5, ...infoCardStyle, color: 'var(--text-secondary)' }}
       >
-        <Sparkles className="flex-shrink-0 w-[15px] h-[15px] sm:w-[18px] sm:h-[18px] text-accent-blue animate-pulse" size={18} />
+        <Sparkles
+          className="flex-shrink-0 w-[15px] h-[15px] sm:w-[18px] sm:h-[18px] animate-pulse"
+          style={{ color: 'var(--accent-blue)' }}
+          size={18}
+        />
         <span>What is SocialSwap?</span>
-        <ArrowRight className="ml-auto opacity-60 transition-all duration-300 w-[14px] h-[14px] sm:w-4 sm:h-4 group-hover:translate-x-1 group-hover:opacity-100" size={16} />
+        <ArrowRight
+          className="ml-auto opacity-60 transition-all duration-300 w-[14px] h-[14px] sm:w-4 sm:h-4 group-hover:translate-x-1 group-hover:opacity-100"
+          size={16}
+        />
       </motion.div>
     </div>
   );

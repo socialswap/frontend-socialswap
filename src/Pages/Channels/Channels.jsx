@@ -51,14 +51,31 @@ const Channels = () => {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const categoryFromUrl = searchParams.get('category');
+    const monetizationFromUrl = searchParams.get('monetization');
+    const maxPriceFromUrl = searchParams.get('maxPrice');
     
-    if (categoryFromUrl) {
-      setFilters(prev => ({
-        ...prev,
-        category: [categoryFromUrl]
-      }));
-      setShowAdvancedFilters(true); // Open advanced filters to show the applied filter
-    }
+    setFilters(prev => {
+      const newFilters = { ...prev };
+      let updated = false;
+
+      if (categoryFromUrl) {
+        newFilters.category = [categoryFromUrl];
+        updated = true;
+      }
+      
+      if (monetizationFromUrl) {
+        newFilters.monetization = [monetizationFromUrl];
+        updated = true;
+      }
+
+      if (maxPriceFromUrl) {
+        newFilters.priceRange = [[0, parseInt(maxPriceFromUrl)]];
+        updated = true;
+      }
+
+      if (updated) setShowAdvancedFilters(true);
+      return newFilters;
+    });
   }, [location.search]);
 
   useEffect(() => {
@@ -422,35 +439,7 @@ const Channels = () => {
                 ])}
               </div>
 
-        {/* Views Range Filter */}
-              <div>
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-                  <FaEye className="text-green-500" />
-                  Views Range
-                </h4>
-                {renderRangeCheckboxes("viewsRange", [
-                  { value: [0, 1000000], label: "0 - 1M" },
-                  { value: [1000000, 5000000], label: "1M - 5M" },
-                  { value: [5000000, 10000000], label: "5M - 10M" },
-                  { value: [10000000, 50000000], label: "10M - 50M" },
-                  { value: [50000000, 99999999], label: "50M+" },
-                ])}
-              </div>
 
-              {/* Estimated Earnings Filter */}
-              <div>
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-                  <FaDollarSign className="text-yellow-500" />
-                  Est. Monthly Earnings
-                </h4>
-                {renderRangeCheckboxes("estimatedEarnings", [
-                  { value: [0, 100], label: "₹0 - ₹100" },
-                  { value: [100, 500], label: "₹100 - ₹500" },
-                  { value: [500, 1000], label: "₹500 - ₹1000" },
-                  { value: [1000, 5000], label: "₹1000 - ₹5000" },
-                  { value: [5000, 9999999], label: "₹5000+" },
-                ])}
-              </div>
 
               {/* Price Range Filter */}
               <div>

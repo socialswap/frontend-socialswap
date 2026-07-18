@@ -41,7 +41,7 @@ const ChannelCard = ({ channel }) => {
     }
 
     if (isInCart) {
-      navigate('/cart');
+      navigate('/user/cart');
       return;
     }
 
@@ -53,6 +53,7 @@ const ChannelCard = ({ channel }) => {
       });
       setIsInCart(true);
       message.success('Channel added to cart');
+      navigate('/user/cart');
     } catch (error) {
       console.error('Failed to add channel to cart', error);
       message.error('Unable to add channel to cart right now.');

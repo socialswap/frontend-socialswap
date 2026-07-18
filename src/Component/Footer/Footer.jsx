@@ -55,7 +55,7 @@ const Footer = () => {
       title: 'Quick Links',
       links: [
         { label: 'All Channels', to: '/channels' },
-        { label: 'Sell Channel', to: '/seller-dashboard' },
+        { label: 'Sell Channel', to: '/user/upload-channel' },
         { label: 'How To', to: '/how-to' },
         { label: 'Grow Your Channels', to: '/grow' },
       ],

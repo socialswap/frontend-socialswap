@@ -39,7 +39,7 @@ const Login = () => {
       return navigate('/');
     }
     if (user.role === 'seller') {
-      return navigate('/seller-dashboard');
+      return navigate('/user/upload-channel');
     }
     if (user.role === 'admin') {
       return navigate('/admin-dashboard');

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Button, List, message, Spin, Modal, Form, Input } from 'antd';
+import { Card, Button, List, message, Spin, Modal, Form, Input, Switch } from 'antd';
 import { 
   UserOutlined, 
   SettingOutlined, 
@@ -9,12 +9,14 @@ import {
   QuestionCircleOutlined,
   LogoutOutlined,
   ArrowLeftOutlined,
-  TransactionOutlined
+  TransactionOutlined,
+  BellOutlined
 } from '@ant-design/icons';
 import styled from 'styled-components';
 import axios from 'axios';
 import axiosInstance, { api } from '../../API/api';
 import { useNavigate } from 'react-router-dom';
+import { subscribeToPush, unsubscribeFromPush } from '../../App';
 
 // Previous styled components remain the same...
 const StyledCard = styled(Card)`
@@ -150,6 +152,70 @@ const UserProfile = () => {
   const [profileForm] = Form.useForm();
   const navigate = useNavigate();
 
+  // Notification toggle state — checks REAL subscription, not just browser permission
+  const [notifEnabled, setNotifEnabled] = useState(false);
+  const [notifLoading, setNotifLoading] = useState(false);
+
+  // Check if a real push subscription currently exists in the browser
+  const checkSubscriptionStatus = async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+    if (!('Notification' in window) || Notification.permission !== 'granted') return false;
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      return !!sub; // true if subscribed, false if not
+    } catch {
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    checkSubscriptionStatus().then(setNotifEnabled);
+  }, []);
+
+  const handleNotifToggle = async (checked) => {
+    setNotifLoading(true);
+    try {
+      if (checked) {
+        // Request browser permission first
+        const perm = await Notification.requestPermission();
+        if (perm === 'granted') {
+          const sub = await subscribeToPush();
+          if (sub) {
+            setNotifEnabled(true);
+            message.success('🔔 Push notifications enabled!');
+          } else {
+            setNotifEnabled(false);
+            message.error('Failed to subscribe. Please try again.');
+          }
+        } else if (perm === 'denied') {
+          setNotifEnabled(false);
+          message.warning(
+            'Notifications are blocked. Click the 🔒 icon in your browser address bar → Notifications → Allow.',
+            6
+          );
+        }
+      } else {
+        // Unsubscribe from push manager AND remove from backend
+        await unsubscribeFromPush();
+        const stillActive = await checkSubscriptionStatus();
+        setNotifEnabled(stillActive);
+        if (!stillActive) {
+          message.success('🔕 Push notifications disabled.');
+          message.info(
+            'Note: Browser-level permission stays "Allowed" — only our app stops sending you pushes.',
+            5
+          );
+        }
+      }
+    } catch (err) {
+      console.error('[Push Toggle]', err);
+      message.error('Something went wrong. Try refreshing.');
+    } finally {
+      setNotifLoading(false);
+    }
+  };
+
 
   const getAuthHeader = () => {
     const token = localStorage.getItem('token');
@@ -218,12 +284,29 @@ const UserProfile = () => {
     {
       title: 'Change Password',
       icon: <LockOutlined />,
-      onClick: () => setIsPasswordModalVisible(true)
+      onClick: () => setIsPasswordModalVisible(true),
+      action: null
+    },
+    {
+      title: 'Push Notifications',
+      icon: <BellOutlined />,
+      onClick: null,
+      action: (
+        <Switch
+          checked={notifEnabled}
+          loading={notifLoading}
+          onChange={handleNotifToggle}
+          checkedChildren="On"
+          unCheckedChildren="Off"
+          style={{ background: notifEnabled ? '#6d28d9' : undefined }}
+        />
+      )
     },
     {
       title: 'Help & Support',
       icon: <QuestionCircleOutlined />,
-      onClick: () => handleMakeOffer()
+      onClick: () => handleMakeOffer(),
+      action: null
     }
   ];
 
@@ -254,7 +337,11 @@ const UserProfile = () => {
           itemLayout="horizontal"
           dataSource={menuItems}
           renderItem={item => (
-            <List.Item onClick={item.onClick}>
+            <List.Item
+              onClick={item.action ? undefined : item.onClick}
+              style={{ cursor: item.action ? 'default' : 'pointer' }}
+              extra={item.action}
+            >
               <List.Item.Meta
                 avatar={item.icon}
                 title={item.title}

@@ -96,49 +96,71 @@
 }
 
 /* ── Light Mode ─────────────────────────────────────────────── */
+/* Premium Apple HIG · Soft Glass UI · Warm White + Lavender    */
 .light,
 [data-theme="light"] {
-  /* Backgrounds */
-  --bg-primary:       #F8F7FF;
-  --bg-secondary:     #FFFFFF;
-  --bg-hero:          #F8F5FF;
-  --bg-card:          #F2EEFF;
-  --bg-glass:         rgba(255, 255, 255, 0.75);
+  /* ── Backgrounds ─────────────────────────────── */
+  --bg-primary:       #FAFAFC;                       /* warm off-white with subtle lavender tint   */
+  --bg-secondary:     #FFFFFF;                       /* pure white for cards / panels              */
+  --bg-hero:          #F2EFFF;                       /* deeper lavender for hero backdrop          */
+  --bg-card:          rgba(255, 255, 255, 0.80);     /* frosted white glass surface                */
+  --bg-glass:         rgba(255, 255, 255, 0.62);     /* lighter frosted glass                      */
 
-  /* Borders */
-  --border:           rgba(0,0,0,0.08);
-  --border-glow:      rgba(124, 58, 237, 0.18);
+  /* ── Borders ─────────────────────────────────── */
+  --border:           #ECECF5;                       /* very soft lavender border — no harshness   */
+  --border-glow:      rgba(124, 77, 255, 0.18);
 
-  /* Brand */
-  --primary:          #7C3AED;
-  --primary-hover:    #6D28D9;
-  --primary-active:   #5B21B6;
+  /* ── Brand ───────────────────────────────────── */
+  --primary:          #7C4DFF;                       /* soft purple accent — used sparingly        */
+  --primary-hover:    #6A3FE0;
+  --primary-active:   #5932CB;
   --purple-primary:   var(--primary);
   --purple-hover:     var(--primary-hover);
-  
-  /* Accent */
-  --accent-purple:    #A855F7;
+
+  /* ── Accent ──────────────────────────────────── */
+  --accent-purple:    #9B72FF;                       /* lighter purple for gradients               */
   --purple-secondary: var(--accent-purple);
-  --accent-cyan:      #06B6D4;
+  --accent-cyan:      #48AEFF;                       /* sky-blue — replaces cyan in light mode     */
   --accent-pink:      var(--accent-cyan);
-  --accent-blue:      #4F46E5;
+  --accent-blue:      #5B68FF;                       /* soft indigo                                */
 
-  /* Text */
-  --text-primary:     #18181B;
-  --text-secondary:   #52525B;
-  --text-muted:       #71717A;
-  --text-disabled:    #B4AFCB;
+  /* ── Semantic ────────────────────────────────── */
+  --success:          #22C55E;
+  --warning:          #F59E0B;
+  --error:            #EF4444;
 
-  /* Shadows */
-  --shadow:           rgba(124,58,237,0.15);
-  --shadow-card:      0 8px 32px var(--shadow);
-  --shadow-purple:    0 0 40px var(--shadow);
-  --shadow-pink:      0 0 30px rgba(6, 182, 212, 0.15);
+  /* ── Text ────────────────────────────────────── */
+  --text-primary:     #1A1830;                       /* deep navy — rich but not pure black        */
+  --text-secondary:   #5A556F;                       /* muted purple-grey                          */
+  --text-muted:       #9490A8;                       /* soft lavender-grey                         */
+  --text-disabled:    #C5C2D5;
 
-  /* Glows */
-  --glow-hero:        rgba(124, 58, 237, 0.15);
-  --glow-pink:        rgba(6, 182, 212, 0.10);
-  --glow-blue:        rgba(79, 70, 229, 0.10);
+  /* ── Shadows — very soft, no dark harshness ──── */
+  --shadow:           rgba(124, 77, 255, 0.10);
+  --shadow-card:      0 4px 24px rgba(124, 77, 255, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+  --shadow-purple:    0 8px 40px rgba(124, 77, 255, 0.16);
+  --shadow-pink:      0 8px 32px rgba(72, 174, 255, 0.14);
+
+  /* ── Gradients ───────────────────────────────── */
+  --btn-gradient:     linear-gradient(135deg, #7C4DFF 0%, #9B72FF 50%, #48AEFF 100%);
+  --hero-gradient:    linear-gradient(135deg, #F4F2FF 0%, #EEF0FF 50%, #F8FAFF 100%);
+  --shimmer-gradient: linear-gradient(90deg,
+      rgba(124, 77, 255, 0) 0%,
+      rgba(155, 114, 255, 0.12) 50%,
+      rgba(124, 77, 255, 0) 100%);
+
+  /* ── Glows — gentle, not saturated ──────────── */
+  --glow-hero:        rgba(124, 77, 255, 0.12);
+  --glow-pink:        rgba(72, 174, 255, 0.10);
+  --glow-blue:        rgba(91, 104, 255, 0.10);
+
+  /* ── Star colours (light-adapted) ────────────── */
+  --star-white:       #7C4DFF;
+  --star-purple:      var(--accent-purple);
+  --star-blue:        var(--accent-blue);
+  --star-pink:        var(--accent-cyan);
+
+  /* Transitions & radius inherited from :root */
 }
 
 /* ============================================================
@@ -809,4 +831,238 @@ a:hover {
   background: radial-gradient(circle at 20% 20%, rgba(124, 58, 237, 0.18), transparent 45%),
     radial-gradient(circle at 80% 15%, rgba(217, 70, 239, 0.2), transparent 50%),
     radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.16), transparent 48%);
+}
+
+/* ============================================================
+   LIGHT MODE STATS CARD OVERRIDE
+   ============================================================ */
+
+.light .stats-card-custom-bg,
+[data-theme="light"] .stats-card-custom-bg {
+  background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.94) 0%,
+      rgba(250, 250, 252, 0.90) 40%,
+      rgba(255, 255, 255, 0.96) 100%
+    ),
+    radial-gradient(circle at 25% 25%, rgba(124, 77, 255, 0.08), transparent 55%),
+    repeating-linear-gradient(
+      45deg,
+      rgba(124, 77, 255, 0.04) 0px,
+      rgba(124, 77, 255, 0.04) 2px,
+      transparent 2px,
+      transparent 22px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(72, 174, 255, 0.04) 0px,
+      rgba(72, 174, 255, 0.04) 2px,
+      transparent 2px,
+      transparent 22px
+    );
+  background-size: cover, 520px 520px, 140px 140px, 140px 140px;
+  background-blend-mode: normal, screen, multiply, multiply;
+}
+
+.light .stats-card-custom-bg::before,
+[data-theme="light"] .stats-card-custom-bg::before {
+  background: radial-gradient(circle at 20% 20%, rgba(124, 77, 255, 0.10), transparent 45%),
+    radial-gradient(circle at 80% 15%, rgba(72, 174, 255, 0.12), transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(91, 104, 255, 0.08), transparent 48%);
+}
+
+/* ============================================================
+   AURORA BACKGROUND KEYFRAMES (Light Hero)
+   ============================================================ */
+
+@keyframes aurora-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1);       opacity: 0.55; }
+  33%       { transform: translate(60px, -40px) scale(1.08); opacity: 0.65; }
+  66%       { transform: translate(-40px, 30px) scale(0.96); opacity: 0.50; }
+}
+
+@keyframes aurora-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1);        opacity: 0.45; }
+  40%       { transform: translate(-70px, 50px) scale(1.12); opacity: 0.55; }
+  70%       { transform: translate(50px, -30px) scale(0.94); opacity: 0.40; }
+}
+
+@keyframes aurora-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1);        opacity: 0.35; }
+  50%       { transform: translate(40px, 60px) scale(1.10); opacity: 0.50; }
+}
+
+@keyframes aurora-drift-4 {
+  0%, 100% { transform: translate(0, 0) scale(1);        opacity: 0.30; }
+  50%       { transform: translate(-50px, -40px) scale(1.06); opacity: 0.42; }
+}
+
+@keyframes mesh-shimmer {
+  0%, 100% { opacity: 0.018; }
+  50%       { opacity: 0.032; }
+}
+
+.animate-aurora-1 { animation: aurora-drift-1 18s ease-in-out infinite; }
+.animate-aurora-2 { animation: aurora-drift-2 22s ease-in-out infinite; }
+.animate-aurora-3 { animation: aurora-drift-3 16s ease-in-out infinite; }
+.animate-aurora-4 { animation: aurora-drift-4 26s ease-in-out infinite; }
+.animate-mesh-shimmer { animation: mesh-shimmer 8s ease-in-out infinite; }
+
+/* ============================================================
+   LIGHT MODE ANTD COMPONENT OVERRIDES
+   ============================================================ */
+
+/* ── Light: Input ─── */
+.light .ant-input,
+.light .ant-input-affix-wrapper,
+[data-theme="light"] .ant-input,
+[data-theme="light"] .ant-input-affix-wrapper {
+  background: #FFFFFF !important;
+  border-color: #ECECF5 !important;
+  color: #1A1830 !important;
+  box-shadow: 0 1px 4px rgba(124, 77, 255, 0.06) !important;
+}
+
+.light .ant-input:focus,
+.light .ant-input-affix-wrapper-focused,
+[data-theme="light"] .ant-input:focus,
+[data-theme="light"] .ant-input-affix-wrapper-focused {
+  border-color: #7C4DFF !important;
+  box-shadow: 0 0 0 3px rgba(124, 77, 255, 0.12) !important;
+}
+
+/* ── Light: Card ─── */
+.light .ant-card,
+[data-theme="light"] .ant-card {
+  background: rgba(255, 255, 255, 0.80) !important;
+  border-color: #ECECF5 !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  box-shadow: 0 4px 24px rgba(124, 77, 255, 0.08), 0 1px 4px rgba(0,0,0,0.04) !important;
+}
+
+.light .ant-card-head,
+[data-theme="light"] .ant-card-head {
+  border-bottom-color: #ECECF5 !important;
+  color: #1A1830 !important;
+}
+
+/* ── Light: Modal ─── */
+.light .ant-modal-content,
+[data-theme="light"] .ant-modal-content {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid #ECECF5 !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  box-shadow: 0 24px 80px rgba(124, 77, 255, 0.14) !important;
+}
+
+.light .ant-modal-header,
+[data-theme="light"] .ant-modal-header {
+  border-bottom-color: #ECECF5 !important;
+  background: transparent !important;
+}
+
+.light .ant-modal-title,
+.light .ant-modal-close,
+[data-theme="light"] .ant-modal-title,
+[data-theme="light"] .ant-modal-close {
+  color: #1A1830 !important;
+}
+
+/* ── Light: Drawer ─── */
+.light .ant-drawer-content,
+[data-theme="light"] .ant-drawer-content {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.light .ant-drawer-header,
+[data-theme="light"] .ant-drawer-header {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-bottom: 1px solid #ECECF5 !important;
+}
+
+.light .ant-drawer-title,
+.light .ant-drawer-close,
+[data-theme="light"] .ant-drawer-title,
+[data-theme="light"] .ant-drawer-close {
+  color: #1A1830 !important;
+}
+
+/* ── Light: Steps ─── */
+.light .ant-steps-item-process .ant-steps-item-icon,
+[data-theme="light"] .ant-steps-item-process .ant-steps-item-icon {
+  background: linear-gradient(135deg, #7C4DFF 0%, #9B72FF 100%) !important;
+  border-color: #7C4DFF !important;
+}
+
+/* ── Light: Spin ─── */
+.light .ant-spin-dot-spin .ant-spin-dot-item,
+[data-theme="light"] .ant-spin-dot-spin .ant-spin-dot-item {
+  background-color: #7C4DFF !important;
+}
+
+/* ── Light: Badge ─── */
+.light .ant-badge-count,
+[data-theme="light"] .ant-badge-count {
+  background: linear-gradient(135deg, #7C4DFF, #9B72FF) !important;
+  box-shadow: 0 2px 8px rgba(124, 77, 255, 0.30) !important;
+}
+
+/* ── Light: Notification ─── */
+.light .ant-notification-notice,
+[data-theme="light"] .ant-notification-notice {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid #ECECF5 !important;
+  backdrop-filter: blur(16px) !important;
+  box-shadow: 0 8px 40px rgba(124, 77, 255, 0.12) !important;
+}
+
+.light .ant-notification-notice-message,
+[data-theme="light"] .ant-notification-notice-message {
+  color: #1A1830 !important;
+}
+
+.light .ant-notification-notice-description,
+[data-theme="light"] .ant-notification-notice-description {
+  color: #5A556F !important;
+}
+
+/* ── Light: Carousel Dots ─── */
+.light .ant-carousel .slick-dots li button,
+[data-theme="light"] .ant-carousel .slick-dots li button {
+  background: #ECECF5 !important;
+}
+.light .ant-carousel .slick-dots li.slick-active button,
+[data-theme="light"] .ant-carousel .slick-dots li.slick-active button {
+  background: #7C4DFF !important;
+}
+
+/* ── Light: Scrollbar ─── */
+.light ::-webkit-scrollbar-track,
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #F4F2FF;
+}
+.light ::-webkit-scrollbar-thumb,
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #ECECF5;
+}
+.light ::-webkit-scrollbar-thumb:hover,
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #7C4DFF;
+}
+
+/* ── Light: Selection ─── */
+.light ::selection,
+[data-theme="light"] ::selection {
+  background: rgba(124, 77, 255, 0.15);
+  color: #1A1830;
+}
+
+/* ── Light: Hover-lift shadow override ─── */
+.light .hover-lift:hover,
+[data-theme="light"] .hover-lift:hover {
+  box-shadow: 0 20px 50px rgba(124, 77, 255, 0.12), 0 4px 12px rgba(0,0,0,0.05);
 }

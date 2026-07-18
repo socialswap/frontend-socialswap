@@ -44,7 +44,7 @@ export const ChannelCard = ({ channel }) => {
     }
 
     if (isInCart) {
-      navigate('/cart');
+      navigate('/user/cart');
       return;
     }
 

@@ -340,7 +340,7 @@ const FeaturedCategories = () => {
             border: 'none',
             boxShadow: 'var(--purple-glow)',
           }}
-          onClick={() => navigate('/seller-dashboard')}
+          onClick={() => navigate('/user/upload-channel')}
         >
           <ShopOutlined className="mr-2 text-xl" />
           Sell Your Channel

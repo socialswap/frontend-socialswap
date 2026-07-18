@@ -32,6 +32,8 @@ import BlogDetail from '../Pages/Blogs/BlogDetail';
 import UserChat from '../Pages/Chat/UserChat';
 import AdminChat from '../Pages/Admin/AdminChat';
 import ProfileLayout from '../Component/Profile/ProfileLayout';
+import ServicesPage from '../Pages/Services/ServicesPage';
+import ServiceDetail from '../Pages/Services/ServiceDetail';
 const ProtectedRoute = ({ element, isAuthRequired = false, isGuestRequired = false }) => {
   const token = localStorage.getItem('token');
 
@@ -64,13 +66,13 @@ const Routes = () => {
     { path: '/blogs/:id', element: <BlogDetail /> },
     { path: '/about', element: <AboutPage /> },
     { 
-      path: '/transactions', 
+      path: '/user/transactions', 
       element: <ProtectedRoute element={<ProfileLayout><TransactionsPanel /></ProfileLayout>} isAuthRequired={true} /> 
     },
 
-    { path: '/my-channels', element: <ProtectedRoute element={<ProfileLayout><MyChannels /></ProfileLayout>} isAuthRequired={true} /> },
+    { path: '/user/my-channels', element: <ProtectedRoute element={<ProfileLayout><MyChannels /></ProfileLayout>} isAuthRequired={true} /> },
     {
-      path: '/upload-channel',
+      path: '/user/upload-channel',
       element: <ProtectedRoute element={<UploadChannel />} isAuthRequired={true} />
     },
     {
@@ -79,14 +81,14 @@ const Routes = () => {
     },
 
     {
-      path: '/cart',
+      path: '/user/cart',
       element: <ProtectedRoute element={<CartPage />} isAuthRequired={true} />
     },
     {
       path: '/login',
       element: <ProtectedRoute element={<Login />} isGuestRequired={true} />
     },
-    { path: '/orders', element: <ProtectedRoute element={<ProfileLayout><Orders /></ProfileLayout>} isAuthRequired={true} /> },
+    { path: '/user/orders', element: <ProtectedRoute element={<ProfileLayout><Orders /></ProfileLayout>} isAuthRequired={true} /> },
     {
       path: '/signup',
       element: <ProtectedRoute element={<Signup />} isGuestRequired={true} />
@@ -99,17 +101,19 @@ const Routes = () => {
     },
     { path: '/unauthorized', element: <UnauthorizedComponent /> },
     { 
-      path: '/profile', 
+      path: '/user/profile', 
       element: <ProtectedRoute element={<ProfileLayout><UserProfile /></ProfileLayout>} isAuthRequired={true} />
     },
     { 
-      path: '/chat', 
+      path: '/user/chat', 
       element: <ProtectedRoute element={<UserChat />} isAuthRequired={true} />
     },
     { 
       path: '/admin/chats', 
       element: <ProtectedRoute element={<AdminChat />} isAuthRequired={true} />
     },
+    { path: '/services', element: <ServicesPage /> },
+    { path: '/services/:slug', element: <ServiceDetail /> },
     { path: '*', element: <NotFoundPage /> }
   ];
 

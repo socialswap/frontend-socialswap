@@ -30,6 +30,7 @@ import AdminChat from './AdminChat';
 import AdminBanners from './AdminBanners';
 import AdminBlogs from './AdminBlogs';
 import AdminDeals from './AdminDeals';
+import AdminServices from './AdminServices';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -152,6 +153,15 @@ const AdminDashboard = () => {
         ) : (
           <Tag color="green">User</Tag>
         ),
+    },
+    {
+      title: 'Channels',
+      dataIndex: 'channelCount',
+      key: 'channelCount',
+      sorter: (a, b) => (a.channelCount || 0) - (b.channelCount || 0),
+      render: (count) => (
+        <Tag color="purple">{count || 0} Posted</Tag>
+      ),
     },
     {
       title: 'Status',
@@ -320,6 +330,11 @@ const AdminDashboard = () => {
       label: 'Blog Management',
       children: <AdminBlogs isEmbedded={true} />,
     },
+    {
+      key: 'services',
+      label: 'Services',
+      children: <AdminServices />,
+    },
   ];
 
   return (
@@ -358,6 +373,11 @@ const AdminDashboard = () => {
           <div>
             <Title level={5} style={{ margin: 0 }}>{selectedUser?.name || '-'}</Title>
             <Text type="secondary">{selectedUser?.email || '-'}</Text>
+            {selectedUser?.channelCount !== undefined && (
+              <div className="mt-1">
+                <Tag color="purple">{selectedUser.channelCount} Channels Posted</Tag>
+              </div>
+            )}
           </div>
         </Space>
         <Form layout="vertical" form={form} onFinish={handleUpdateUser}>

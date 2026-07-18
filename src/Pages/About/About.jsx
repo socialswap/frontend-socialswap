@@ -662,7 +662,7 @@ const AboutPage = () => {
         <CTAHint>New listings added daily</CTAHint>
         <StyledButton
           size="large"
-          onClick={() => navigate('/seller-dashboard')}
+          onClick={() => navigate('/user/upload-channel')}
         >
           List Your Channel
         </StyledButton>

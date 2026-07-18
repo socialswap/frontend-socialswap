@@ -34,14 +34,41 @@ const Sidebar = styled.div`
   }
 `;
 
-const MobileSidebarHeader = styled.div`
+const MobileTopNav = styled.div`
   display: none;
-  justify-content: space-between;
-  align-items: center;
+  overflow-x: auto;
+  white-space: nowrap;
+  gap: 1rem;
+  padding-bottom: 1rem;
   margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
 
   @media (max-width: 768px) {
     display: flex;
+  }
+`;
+
+const MobileNavItem = styled(NavLink)`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  background: var(--bg-secondary);
+  transition: all 0.2s ease;
+  text-decoration: none;
+
+  &.active {
+    background: var(--purple-primary);
+    color: white;
   }
 `;
 
@@ -114,10 +141,10 @@ const ProfileLayout = ({ children }) => {
   };
 
   const navLinks = [
-    { path: '/profile', label: 'Profile', icon: <UserOutlined /> },
-    { path: '/my-channels', label: 'My Channels', icon: <VideoCameraOutlined /> },
-    { path: '/transactions', label: 'My Deals', icon: <TransactionOutlined /> },
-    { path: '/orders', label: 'Orders', icon: <ShoppingOutlined /> },
+    { path: '/user/profile', label: 'Profile', icon: <UserOutlined /> },
+    { path: '/user/my-channels', label: 'My Channels', icon: <VideoCameraOutlined /> },
+    { path: '/user/transactions', label: 'My Deals', icon: <TransactionOutlined /> },
+    { path: '/user/orders', label: 'Orders', icon: <ShoppingOutlined /> },
   ];
 
   const SidebarContent = () => (
@@ -143,35 +170,20 @@ const ProfileLayout = ({ children }) => {
 
   return (
     <LayoutContainer>
-      {/* Mobile Drawer Trigger */}
-      <MobileSidebarHeader>
-        <h2 className="text-xl font-bold text-text-primary">
-          {navLinks.find(link => link.path === location.pathname)?.label || 'Dashboard'}
-        </h2>
-        <Button 
-          type="text" 
-          icon={<MenuOutlined />} 
-          onClick={() => setDrawerVisible(true)} 
-          style={{ color: 'var(--text-primary)' }}
-        />
-      </MobileSidebarHeader>
+      {/* Mobile Top Navigation */}
+      <MobileTopNav>
+        {navLinks.map((link) => (
+          <MobileNavItem key={link.path} to={link.path}>
+            {link.icon}
+            {link.label}
+          </MobileNavItem>
+        ))}
+      </MobileTopNav>
 
       {/* Desktop Sidebar */}
       <Sidebar>
         <SidebarContent />
       </Sidebar>
-
-      {/* Mobile Sidebar Drawer */}
-      <Drawer
-        title="Menu"
-        placement="left"
-        onClose={() => setDrawerVisible(false)}
-        open={drawerVisible}
-        width={250}
-        styles={{ body: { padding: '1rem' } }}
-      >
-        <SidebarContent />
-      </Drawer>
 
       {/* Main Content */}
       <ContentArea>

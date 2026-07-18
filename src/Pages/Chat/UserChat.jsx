@@ -16,6 +16,7 @@ const UserChat = () => {
   const [replyingTo, setReplyingTo] = useState(null);
   const [searchDeal, setSearchDeal] = useState('');
   const [selectedDeal, setSelectedDeal] = useState(null);
+  const [mobileTab, setMobileTab] = useState('chat'); // 'chat' or 'deals'
   const [isDealModalVisible, setIsDealModalVisible] = useState(false);
   const [socket, setSocket] = useState(null);
   const messagesEndRef = useRef(null);
@@ -84,7 +85,7 @@ const UserChat = () => {
   }, [socket, thread]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
   }, [messages]);
 
   useEffect(() => {
@@ -216,17 +217,42 @@ const UserChat = () => {
   );
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#f5f5f5] via-[#ffffff] to-[#fafafa] dark:bg-gradient-to-br dark:from-[#070312] dark:via-[#110824] dark:to-[#0D071C] pt-[100px] pb-10 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-[#f5f5f5] via-[#ffffff] to-[#fafafa] dark:bg-gradient-to-br dark:from-[#070312] dark:via-[#110824] dark:to-[#0D071C] pt-[100px] pb-10 px-4 sm:px-6 lg:px-8 font-sans">
+      
+      {/* Mobile Tab Navigation */}
+      <div className="w-full max-w-7xl flex md:hidden mb-4 bg-white dark:bg-[#18112e] rounded-xl p-1 border border-gray-200 dark:border-purple-900/30 shadow-sm">
+        <button
+          onClick={() => setMobileTab('chat')}
+          className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
+            mobileTab === 'chat' 
+              ? 'bg-[#7C3AED] text-white shadow-md' 
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#231542]'
+          }`}
+        >
+          Chat with Admin
+        </button>
+        <button
+          onClick={() => setMobileTab('deals')}
+          className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
+            mobileTab === 'deals' 
+              ? 'bg-[#7C3AED] text-white shadow-md' 
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#231542]'
+          }`}
+        >
+          Escrow Deals
+        </button>
+      </div>
+
       <div className="w-full max-w-7xl flex flex-col md:flex-row gap-6 h-[80vh]">
         
         {/* Left Pane: Chat */}
-        <div className="flex-1 bg-white dark:bg-[#18112e] rounded-[20px] shadow-lg border border-gray-200 dark:border-purple-900/30 overflow-hidden flex flex-col">
+        <div className={`${mobileTab === 'chat' ? 'flex' : 'hidden'} md:flex flex-1 bg-white dark:bg-[#18112e] rounded-[20px] shadow-lg border border-gray-200 dark:border-purple-900/30 overflow-hidden flex-col`}>
           {/* Header */}
           <div className="px-6 py-4 bg-gradient-to-r from-[#7C3AED] to-[#A855F7] dark:from-[#6D28D9] dark:to-[#9333EA] flex items-center justify-center shadow-sm">
             <svg className="w-5 h-5 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
             </svg>
-            <span className="font-semibold text-white">Chats</span>
+            <span className="font-semibold text-white">Chat with Admin</span>
           </div>
 
           {/* Chat Interface */}
@@ -461,7 +487,7 @@ const UserChat = () => {
         </div>
 
         {/* Right Pane: Deals */}
-        <div className="flex-1 bg-white dark:bg-[#18112e] rounded-[20px] shadow-lg border border-gray-200 dark:border-purple-900/30 overflow-hidden flex flex-col">
+        <div className={`${mobileTab === 'deals' ? 'flex' : 'hidden'} md:flex flex-1 bg-white dark:bg-[#18112e] rounded-[20px] shadow-lg border border-gray-200 dark:border-purple-900/30 overflow-hidden flex-col`}>
           {/* Header */}
           <div className="px-6 py-4 bg-gradient-to-r from-[#7C3AED] to-[#A855F7] dark:from-[#6D28D9] dark:to-[#9333EA] flex items-center justify-center shadow-sm">
             <svg className="w-5 h-5 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

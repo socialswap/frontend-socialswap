@@ -5,12 +5,11 @@ import WhyChannelKart from '../../Component/WhyChannelCart/WhyChannelCard/WhyCha
 import FeaturedCategories from '../Hero/Hero';
 import Testimonials from '../../Component/Testimonials/Testimonials';
 import Process from '../../Component/Steps/Buyer/Buyer';
-import VideoSection from '../../Component/VideoSection/VideoSection';
 import PromotionalBanner from '../../Component/Banner/Banner';
 import AllChannels from '../../Component/Feature/AllChannels';
 import TopChannelsCarousel from '../../Component/Feature/TopChannelsCarousel';
-import HeroNew from '../../Component/Hero/Hero';
 import SEOHead from '../../Component/SEO/SEOHead';
+import NicheCarousel from '../../Component/Feature/NicheCarousel';
 
 const websiteSchema = {
   '@context': 'https://schema.org',
@@ -50,15 +49,14 @@ const HomePage = () => {
         ogType="website"
         structuredData={[websiteSchema, orgSchema]}
       />
-      {/* ── Premium Hero Section ─── */}
-      <HeroNew />
+      {/* ── Niche Carousel Hero ─── */}
+      <NicheCarousel />
 
       <div className='max-w-[100%] mx-auto'>
         <div className='w-[100vw] max-w-[100vw] sm:max-w-[100vw] sm:w-[100vw] m-auto'>
           <FeaturedCategories />
           <Stats />
           <PromotionalBanner/>
-          <VideoSection/>
         </div>
         <FeaturedListings />
         <TopChannelsCarousel />
