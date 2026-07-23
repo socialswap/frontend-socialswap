@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Carousel, Typography } from 'antd';
 import { StarFilled, YoutubeFilled } from '@ant-design/icons';
+import { motion } from 'framer-motion';
 
 const { Title, Text } = Typography;
 
@@ -215,10 +216,33 @@ const Testimonials = () => {
   return (
     <div className="w-full py-20 testimonials-section bg-bg-primary text-text-primary transition-all duration-300">
       <div className="container mx-auto px-4">
-        <Title level={2} className="text-center mb-12 gradient-heading text-text-primary">
-          <span>What Our Users Say</span>
-        </Title>
-        <div className="relative testimonials-carousel">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
+          }}
+        >
+          <motion.div 
+            variants={{
+              hidden: { opacity: 0, y: 30 },
+              visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+            }}
+          >
+            <Title level={2} className="text-center mb-12 gradient-heading text-text-primary">
+              <span>What Our Users Say</span>
+            </Title>
+          </motion.div>
+        </motion.div>
+        <motion.div 
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: 0.7, type: "spring", stiffness: 200, damping: 20 }}
+          className="relative testimonials-carousel"
+        >
           <style>{`
             .testimonials-section {
               position: relative;
@@ -504,7 +528,7 @@ const Testimonials = () => {
               </div>
             ))}
           </Carousel>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

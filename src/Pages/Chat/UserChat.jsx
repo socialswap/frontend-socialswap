@@ -5,6 +5,7 @@ import axiosInstance, { api } from '../../API/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import EmojiPicker from 'emoji-picker-react';
+import useChatSounds from '../../Utils/useChatSounds';
 
 const SOCKET_URL = process.env.REACT_APP_API_URL || 'http://localhost:8090';
 
@@ -33,6 +34,7 @@ const UserChat = () => {
   }
   const navigate = useNavigate();
   const location = useLocation();
+  const { playIncomingSound, playNotificationSound } = useChatSounds();
   const [requestProcessed, setRequestProcessed] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState(null);
@@ -71,6 +73,14 @@ const UserChat = () => {
       
       socket.on('receive_message', (msg) => {
         setMessages((prev) => [...prev, msg]);
+
+        // Determine sender — play sound only for messages from the other side
+        const senderId = msg.sender?._id || msg.sender;
+        const isFromOther = senderId && senderId !== currentUserId;
+        if (isFromOther) {
+          // User is actively looking at the chat → soft incoming ping
+          playIncomingSound();
+        }
       });
 
       socket.on('message_updated', (updatedMsg) => {

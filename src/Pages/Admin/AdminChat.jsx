@@ -5,6 +5,7 @@ import axiosInstance, { api } from '../../API/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import EmojiPicker from 'emoji-picker-react';
+import useChatSounds from '../../Utils/useChatSounds';
 
 const { Option } = Select;
 
@@ -38,6 +39,8 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
   const [activeEmojiId, setActiveEmojiId] = useState(null);
   const [showFullPickerId, setShowFullPickerId] = useState(null);
   const [mobileTab, setMobileTab] = useState('chat');
+  // In-app live notification toasts (shown even when no thread is open)
+  const [liveToasts, setLiveToasts] = useState([]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -72,6 +75,10 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const chatContainerRef = useRef(null);
+  // Keep a ref to activeThread so the socket handler (closed over on mount) can
+  // always read the LATEST value without needing to re-register.
+  const activeThreadRef = useRef(null);
+  const { playIncomingSound, playNotificationSound } = useChatSounds();
   
   const token = localStorage.getItem('token');
   let currentUserId = null;
@@ -105,9 +112,79 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
     const newSocket = io(SOCKET_URL);
     setSocket(newSocket);
 
+    // ── CRITICAL FIX: join the 'admins' room so backend push/socket
+    // notifications reach this admin via io.to('admins').emit(...)
+    newSocket.on('connect', () => {
+      newSocket.emit('global_connect', { userId: currentUserId, role: 'admin' });
+    });
+    // Also emit immediately if already connected (reconnect scenario)
+    if (newSocket.connected) {
+      newSocket.emit('global_connect', { userId: currentUserId, role: 'admin' });
+    }
+
     newSocket.on('receive_message', (msg) => {
       setMessages((prev) => [...prev, msg]);
       fetchThreads();
+
+      // Play correct sound based on whether admin is viewing the thread that got the message
+      const msgThreadId = msg.conversationId || msg.threadId;
+      const senderId    = msg.sender?._id || msg.sender;
+      const isFromOther = senderId && senderId !== currentUserId;
+
+      if (isFromOther) {
+        const currentThread = activeThreadRef.current;
+        const isActiveThread = currentThread && (
+          currentThread._id === msgThreadId ||
+          currentThread._id === msg.conversationId
+        );
+
+        if (isActiveThread) {
+          // Admin is already looking at this chat → soft incoming ping
+          playIncomingSound();
+        } else {
+          // Message is for a different (or no) thread → alert notification
+          playNotificationSound();
+        }
+      }
+    });
+
+    // ─── global_notification: fires for ALL messages sent to any thread
+    // even when the admin has not opened that thread yet.
+    // This is the primary real-time alert path.
+    newSocket.on('global_notification', ({ threadId, message: msg }) => {
+      // 1. Always refresh thread list so unread badge updates
+      fetchThreads();
+
+      const senderId = msg.sender?._id || msg.sender;
+      const isFromOther = senderId && senderId !== currentUserId;
+      if (!isFromOther) return;
+
+      const currentThread = activeThreadRef.current;
+      const isViewingThatThread = currentThread && currentThread._id === threadId;
+
+      if (isViewingThatThread) {
+        // Admin is already reading this exact conversation
+        playIncomingSound();
+      } else {
+        // Admin is NOT looking at this chat — play strong alert + show toast
+        playNotificationSound();
+
+        const senderName = msg.sender?.name || 'A user';
+        const preview    = msg.text
+          ? msg.text.slice(0, 60) + (msg.text.length > 60 ? '…' : '')
+          : msg.mediaUrl ? '📷 Image'
+          : '📋 Update';
+
+        const toastId = Date.now();
+        setLiveToasts(prev => [
+          ...prev,
+          { id: toastId, senderName, preview, threadId }
+        ]);
+        // Auto-dismiss after 6 seconds
+        setTimeout(() => {
+          setLiveToasts(prev => prev.filter(t => t.id !== toastId));
+        }, 6000);
+      }
     });
 
     newSocket.on('message_updated', (updatedMsg) => {
@@ -116,10 +193,16 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
 
     return () => {
       newSocket.off('receive_message');
+      newSocket.off('global_notification');
       newSocket.off('message_updated');
       newSocket.close();
     };
   }, []);
+
+  // Keep activeThreadRef in sync so the socket closure can read the latest value
+  useEffect(() => {
+    activeThreadRef.current = activeThread;
+  }, [activeThread]);
 
   useEffect(() => {
     if (activeThread && socket) {
@@ -295,7 +378,55 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
 
   return (
     <div className={`flex flex-col justify-center items-center bg-gradient-to-br from-[#f5f5f5] via-[#ffffff] to-[#fafafa] dark:bg-gradient-to-br dark:from-[#070312] dark:via-[#110824] dark:to-[#0D071C] font-sans ${isEmbedded ? 'w-full h-full p-0 bg-transparent dark:bg-transparent' : 'min-h-screen pt-[100px] pb-10 px-4 sm:px-6 lg:px-8'}`}>
-      
+
+      {/* ── Live in-app notification toasts ─────────────────────────────────
+          These fire immediately via global_notification socket event,
+          even before any thread is opened. Stack from top-right. */}
+      <div style={{
+        position: 'fixed', top: 80, right: 20,
+        zIndex: 99999, display: 'flex', flexDirection: 'column', gap: 10,
+        pointerEvents: 'none'
+      }}>
+        {liveToasts.map(toast => (
+          <div
+            key={toast.id}
+            onClick={() => {
+              // Find the thread and open it
+              const thread = threads.find(t => t._id === toast.threadId);
+              if (thread) loadThread(thread);
+              setLiveToasts(prev => prev.filter(t => t.id !== toast.id));
+            }}
+            style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+            className="flex items-start gap-3 bg-[#1e1040] border border-purple-700/60 text-white
+                       rounded-2xl shadow-2xl px-4 py-3 max-w-[300px] w-[300px]
+                       animate-fade-in hover:bg-[#2a1860] transition-colors"
+          >
+            {/* Avatar */}
+            <div className="w-9 h-9 rounded-full bg-purple-600 flex items-center justify-center
+                            font-bold text-sm shrink-0 uppercase shadow-md">
+              {toast.senderName.charAt(0)}
+            </div>
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex justify-between items-center mb-0.5">
+                <span className="font-semibold text-sm text-purple-200 truncate">
+                  {toast.senderName}
+                </span>
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    setLiveToasts(prev => prev.filter(t => t.id !== toast.id));
+                  }}
+                  className="ml-2 text-gray-500 hover:text-white text-xs shrink-0"
+                >✕</button>
+              </div>
+              <p className="text-xs text-gray-300 truncate">{toast.preview}</p>
+              <p className="text-[10px] text-purple-400 mt-1 font-medium">Tap to open chat →</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Mobile Tab Navigation */}
       <div className={`w-full max-w-7xl flex md:hidden mb-4 bg-white dark:bg-[#18112e] rounded-xl p-1 border border-gray-200 dark:border-purple-900/30 shadow-sm ${isEmbedded ? 'hidden' : 'flex'}`}>
         <button

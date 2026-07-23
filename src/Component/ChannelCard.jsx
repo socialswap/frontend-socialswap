@@ -156,18 +156,13 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
           )}
         </div>
 
-        {/* Channel Name Overlay */}
+        {/* Category & Language Overlay */}
         <div className="absolute bottom-3 left-4 right-4">
-          <div className="flex items-start gap-2">
-            <h3 className="text-base text-white font-bold line-clamp-1 flex-1 drop-shadow-lg">
-              {channel.name}
-            </h3>
-            {channel.verified && (
-              <CheckCircleFilled className="text-blue-400 text-base flex-shrink-0 mt-1" />
-            )}
-          </div>
-          <p className="text-[10px] text-gray-200 drop-shadow">
+          <h3 className="text-xs text-white font-bold line-clamp-1 drop-shadow-lg">
             {channel.category || "N/A"} • {channel.channelType || "Standard"}
+          </h3>
+          <p className="text-[10px] text-gray-200 drop-shadow">
+            {channel.my_language || "English"} • {channel.country?.trim() || "Global"}
           </p>
         </div>
       </div>
@@ -189,10 +184,13 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
             )}
           </div>
           <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">
-                {channel.my_language || "English"} • {channel.country?.trim() || "Global"}
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm font-bold text-gray-800 dark:text-gray-200 line-clamp-1">
+                {channel.name}
               </p>
+              {channel.verified && (
+                <CheckCircleFilled className="text-blue-500 text-xs flex-shrink-0" />
+              )}
             </div>
             <Tag
               color={channel.monetized ? "green" : "default"}

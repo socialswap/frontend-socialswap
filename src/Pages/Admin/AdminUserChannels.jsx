@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Select, Table, Button, Modal, Form, Input, InputNumber, Switch, Tag, Popconfirm, message, Empty, Typography, Avatar, Tooltip } from 'antd';
-import { EditOutlined, DeleteOutlined, ArrowLeftOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, ArrowLeftOutlined, EyeOutlined, UserOutlined, TagOutlined } from '@ant-design/icons';
 import axiosInstance, { api } from '../../API/api';
 
 const { Option } = Select;
@@ -108,6 +108,14 @@ const AdminUserChannels = () => {
 
   const handleEditClick = (channel) => {
     setEditingChannel(channel);
+
+    // A channel is considered sold if the boolean flag is true OR if the
+    // status string was set to "sold" / "Sold" (older records only used status).
+    const isSold =
+      channel.sold === true ||
+      (typeof channel.status === 'string' &&
+        channel.status.toLowerCase() === 'sold');
+
     form.setFieldsValue({
       name: channel.name,
       channelLink: channel.channelLink,
@@ -131,6 +139,8 @@ const AdminUserChannels = () => {
       monetized: channel.monetized || false,
       organicGrowth: channel.organicGrowth || false,
       status: channel.status || 'Available',
+      sold: isSold,
+      soldPrice: channel.soldPrice || '',
       userEmail: channel.contactInfo?.email || '',
       contactNumber: channel.contactInfo?.phone || '',
     });
@@ -656,6 +666,80 @@ const AdminUserChannels = () => {
                 <Option value="pending">Under Review</Option>
               </Select>
             </Form.Item>
+          </div>
+
+          {/* Section 6: Mark as Sold */}
+          <div className="border-b border-gray-100 pb-2 mb-4 mt-6">
+            <h3 className="text-xs font-semibold text-red-500 uppercase tracking-wider flex items-center gap-1">
+              <TagOutlined /> Mark as Sold
+            </h3>
+          </div>
+
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #fff5f5 0%, #fff 100%)',
+              border: '1px solid #fecaca',
+              borderRadius: 10,
+              padding: '16px 20px',
+              marginBottom: 8,
+            }}
+          >
+            <div className="grid grid-cols-2 gap-4 items-start">
+              <Form.Item
+                name="sold"
+                label={<span className="font-semibold text-gray-800">Mark Channel as Sold</span>}
+                valuePropName="checked"
+                extra={
+                  <span className="text-xs text-gray-500">
+                    Enabling this will hide the channel from the marketplace and flag it as sold.
+                  </span>
+                }
+              >
+                <Switch
+                  checkedChildren="✅ Sold"
+                  unCheckedChildren="Not Sold"
+                  style={{ minWidth: 90 }}
+                  onChange={(checked) => {
+                    // Auto-sync the status dropdown when toggled
+                    if (checked) {
+                      form.setFieldValue('status', 'sold');
+                    } else {
+                      form.setFieldValue('status', 'approved');
+                    }
+                  }}
+                />
+              </Form.Item>
+
+              <Form.Item
+                noStyle
+                shouldUpdate={(prev, cur) => prev.sold !== cur.sold}
+              >
+                {({ getFieldValue }) =>
+                  getFieldValue('sold') ? (
+                    <Form.Item
+                      name="soldPrice"
+                      label={<span className="font-semibold text-gray-800">Sold Price (₹)</span>}
+                      rules={[{ required: true, message: 'Please enter the sold price' }]}
+                      extra={
+                        <span className="text-xs text-gray-500">
+                          The final price at which this channel was sold.
+                        </span>
+                      }
+                    >
+                      <InputNumber
+                        size="large"
+                        className="w-full"
+                        min={0}
+                        placeholder="e.g. 25000"
+                        prefix="₹"
+                        formatter={(val) => val ? `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : ''}
+                        parser={(val) => val.replace(/,/g, '')}
+                      />
+                    </Form.Item>
+                  ) : null
+                }
+              </Form.Item>
+            </div>
           </div>
 
           <Form.Item 

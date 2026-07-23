@@ -96,7 +96,7 @@ const Routes = () => {
     { path: '/channels', element: <ChannelList /> },
     { path: '/grow', element: <GrowYourChannel /> },
     {
-      path: '/admin-dashboard',
+      path: '/admin/dashboard',
       element: <ProtectedRoute element={<AdminDashboard />} isAuthRequired={true} />
     },
     { path: '/unauthorized', element: <UnauthorizedComponent /> },

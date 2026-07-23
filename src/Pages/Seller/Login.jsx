@@ -42,7 +42,7 @@ const Login = () => {
       return navigate('/user/upload-channel');
     }
     if (user.role === 'admin') {
-      return navigate('/admin-dashboard');
+      return navigate('/admin/dashboard');
     }
   };
 

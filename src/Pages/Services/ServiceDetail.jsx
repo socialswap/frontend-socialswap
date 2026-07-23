@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import axiosInstance, { api } from '../../API/api';
+import SEOHead from '../../Component/SEO/SEOHead';
 
 const FaqItem = ({ question, answer }) => {
   const [open, setOpen] = useState(false);
@@ -82,9 +83,34 @@ const ServiceDetail = () => {
     );
   }
 
+  const faqSchema = service.faq?.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: service.faq.map(item => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      }
+    }))
+  } : null;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f8f5ff] via-white to-[#faf8ff] dark:from-[#070312] dark:via-[#110824] dark:to-[#0D071C] pt-24 pb-20 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-5xl mx-auto">
+    <>
+      <SEOHead
+        title={`${service.serviceName} | SocialSwap Services`}
+        description={service.description?.substring(0, 150) || `Buy ${service.serviceName} service on SocialSwap.`}
+        canonicalUrl={`https://www.socialswap.in/services/${service.slug}`}
+        faqSchema={faqSchema}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Services', url: '/services' },
+          { name: service.serviceName },
+        ]}
+      />
+      <div className="min-h-screen bg-gradient-to-br from-[#f8f5ff] via-white to-[#faf8ff] dark:from-[#070312] dark:via-[#110824] dark:to-[#0D071C] pt-24 pb-20 px-4 sm:px-6 lg:px-8 font-sans">
+        <div className="max-w-5xl mx-auto">
 
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500 mb-8">
@@ -207,6 +233,7 @@ const ServiceDetail = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

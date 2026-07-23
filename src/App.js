@@ -67,15 +67,20 @@ export async function subscribeToPush() {
     await navigator.serviceWorker.ready;
     console.log('[Push] SW ready. VAPID key starts with:', VAPID_PUBLIC_KEY.substring(0, 10));
 
-    // Always clear old subscription first — prevents AbortError from VAPID key mismatch
     const existing = await reg.pushManager.getSubscription();
+
     if (existing) {
-      console.log('[Push] Clearing old subscription...');
-      await existing.unsubscribe();
+      // ── Already subscribed: just re-sync the existing endpoint to the backend.
+      // Do NOT unsubscribe — that would invalidate the endpoint stored in the DB
+      // and cause a race where the next push hits a 410 Gone and deletes the record.
+      console.log('[Push] Re-syncing existing subscription to backend...');
+      await saveToBackend(existing);
+      return existing;
     }
 
+    // ── No existing subscription — create a new one
     const key = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
-    console.log('[Push] Subscribing with new VAPID key...');
+    console.log('[Push] No existing subscription. Creating new one...');
     const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
     console.log('[Push] Subscription created:', sub.endpoint.substring(0, 60) + '...');
     await saveToBackend(sub);
@@ -85,6 +90,7 @@ export async function subscribeToPush() {
     return null;
   }
 }
+
 
 export async function unsubscribeFromPush() {
   if (!('serviceWorker' in navigator)) return;

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Youtube, Link, Tag, FileText, DollarSign,
+  Youtube, Link, Tag, FileText, IndianRupee,
   Users, Video, TrendingUp, Eye, Globe,
   Languages, Clock, Shield, BadgeCheck,
   Image as ImageIcon, ChevronRight, ChevronLeft,
@@ -75,6 +75,11 @@ export default function UploadChannel() {
       fetchChannelDetails();
     }
   }, [id]);
+
+  // Scroll to top when step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step]);
 
   const fetchChannelDetails = async () => {
     try {
@@ -452,14 +457,14 @@ export default function UploadChannel() {
                 {/* Fetched Channel Preview Card */}
                 {fetchedChannel && (
                   <motion.div
-                    className="mt-6 relative bg-[#0f0f0f] border border-gray-200 dark:border-white/10 rounded-2xl p-5 sm:p-6 overflow-hidden"
+                    className="mt-6 relative bg-white dark:bg-[#0f0f0f] border border-gray-200 dark:border-white/10 rounded-2xl p-5 sm:p-6 overflow-hidden shadow-sm dark:shadow-none"
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                   >
                     {/* Header Layout */}
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 relative z-10">
                       {/* Avatar */}
-                      <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden shrink-0 border border-gray-200 dark:border-white/10 shadow-xl bg-black">
+                      <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden shrink-0 border border-gray-200 dark:border-white/10 shadow-md dark:shadow-xl bg-gray-100 dark:bg-black">
                         {fetchedChannel.avatar ? (
                           <img src={fetchedChannel.avatar} alt="Avatar" className="w-full h-full object-cover" />
                         ) : (
@@ -483,7 +488,7 @@ export default function UploadChannel() {
                             <span>{formatCompact(fetchedChannel.videoCount)} videos</span>
                           </div>
                           
-                          <p className="text-[0.8rem] text-gray-500 dark:text-white/50 line-clamp-2 mb-3 leading-relaxed max-w-xl">
+                          <p className="text-[0.8rem] text-gray-600 dark:text-white/50 line-clamp-2 mb-3 leading-relaxed max-w-xl">
                             {fetchedChannel.description || 'No description available for this channel.'}
                           </p>
 
@@ -495,8 +500,8 @@ export default function UploadChannel() {
                         </div>
 
                         {/* Static Subscribe Button */}
-                        <div className="shrink-0 flex justify-center sm:justify-end mt-2 sm:mt-0">
-                          <div className="px-4 py-1.5 bg-white text-black font-semibold rounded-full text-sm hover:bg-gray-200 transition-colors cursor-default">
+                        <div className="shrink-0 flex items-center justify-center sm:justify-end mt-2 sm:mt-0">
+                          <div className="px-4 py-1.5 bg-gray-900 text-white dark:bg-white dark:text-black font-semibold rounded-full text-sm hover:opacity-90 transition-opacity cursor-default">
                             Subscribe
                           </div>
                         </div>
@@ -513,13 +518,13 @@ export default function UploadChannel() {
                         )}
                         {form.estimatedEarnings && (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full text-[0.7rem] font-bold tracking-wide uppercase">
-                            <DollarSign size={13} /> Earnings: ${form.estimatedEarnings}/mo
+                            <IndianRupee size={13} /> Earnings: ₹{form.estimatedEarnings}/mo
                           </span>
                         )}
                       </div>
                     )}
                     
-                    <button onClick={clearFetch} className="absolute top-3 right-3 text-gray-400 dark:text-white/20 hover:text-gray-900 dark:text-white transition-colors z-20 bg-black/50 p-1.5 rounded-full" title="Clear">
+                    <button onClick={clearFetch} className="absolute top-3 right-3 text-gray-400 dark:text-white/40 hover:text-gray-900 dark:hover:text-white transition-colors z-20 bg-gray-100 dark:bg-black/50 p-1.5 rounded-full" title="Clear">
                       <X size={14} />
                     </button>
                   </motion.div>
@@ -570,7 +575,7 @@ export default function UploadChannel() {
                 <TrendingUp size={17} className="text-purple-400" /> Stats & Pricing
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label={<span>Asking Price <span className="normal-case text-gray-500 dark:text-white/50 ml-1 font-normal tracking-normal">(Write your Selling price in Dollar)</span></span>} icon={<DollarSign size={13} />} error={fieldErrors.price}>
+                <Field label={<span>Asking Price <span className="normal-case text-gray-500 dark:text-white/50 ml-1 font-normal tracking-normal">(Write your Selling price in INR)</span></span>} icon={<IndianRupee size={13} />} error={fieldErrors.price}>
                   <input name="price" type="number" placeholder="e.g. 50000" value={form.price} onChange={handleChange} />
                 </Field>
                 <Field label="Category" icon={<Tag size={13} />} error={fieldErrors.category}>
@@ -599,7 +604,7 @@ export default function UploadChannel() {
                     {LANGUAGES.map(l => <option key={l} value={l}>{l}</option>)}
                   </select>
                 </Field>
-                <Field label="Estimated Monthly Earnings ($)" icon={<DollarSign size={13} />} error={fieldErrors.estimatedEarnings}>
+                <Field label="Estimated Monthly Earnings (₹)" icon={<IndianRupee size={13} />} error={fieldErrors.estimatedEarnings}>
                   <input name="estimatedEarnings" type="number" placeholder="e.g. 500" value={form.estimatedEarnings} onChange={handleChange} />
                 </Field>
                 <Field label="Recent Views (Last 48 Hours)" icon={<TrendingUp size={13} />} error={fieldErrors.recentViews}>
@@ -755,7 +760,7 @@ function Field({ label, icon, error, children }) {
         [&_input]:transition-all [&_select]:transition-all [&_textarea]:transition-all
         [&_input:focus]:border-purple-500 [&_select:focus]:border-purple-500 [&_textarea:focus]:border-purple-500
         [&_input:focus]:bg-purple-50/[0.5] dark:[&_input:focus]:bg-purple-500/[0.08] [&_select:focus]:bg-purple-50/[0.5] dark:[&_select:focus]:bg-purple-500/[0.08] [&_textarea:focus]:bg-purple-50/[0.5] dark:[&_textarea:focus]:bg-purple-500/[0.08]
-        [&_select_option]:bg-[#1a1330] [&_textarea]:resize-y [&_input[type=date]]:color-scheme-dark`}>
+        [&_select_option]:bg-white dark:[&_select_option]:bg-[#1a1330] [&_textarea]:resize-y dark:[&_input[type=date]]:color-scheme-dark`}>
         {children}
       </div>
       {error && <p className="text-red-400 text-[0.7rem]">{error}</p>}

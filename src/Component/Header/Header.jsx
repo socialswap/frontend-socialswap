@@ -14,6 +14,7 @@ import {
 import { ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import axiosInstance from '../../API/api';
+import useChatSounds from '../../Utils/useChatSounds';
 
 const SOCKET_URL = process.env.REACT_APP_API_URL || 'http://localhost:8090';
 
@@ -27,6 +28,10 @@ const Header = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [cartPulse, setCartPulse] = useState(false);
+  
+  // ── Global Toast Notifications ──────────────────────────────
+  const [liveToasts, setLiveToasts] = useState([]);
+  const { playNotificationSound } = useChatSounds();
 
   // ── Theme State & Logic ────────────────────────────────────
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
@@ -62,20 +67,27 @@ const Header = () => {
         socket.emit('global_connect', { userId: currentUserId, role });
         
         socket.on('global_notification', (data) => {
-          // Do not show popup if already on the chat page
           const isChatActive = window.location.pathname.includes('/chat');
           if (!isChatActive) {
-            notification.info({
-              message: `New Message from ${data.message.sender?.name || (role === 'admin' ? 'User' : 'Escrow Agent')}`,
-              description: data.message.text || 'You received a new attachment or Escrow Deal.',
-              placement: 'topRight',
-              duration: 6,
-              style: { cursor: 'pointer', borderRadius: '12px', border: '1px solid #e9d5ff' },
-              onClick: () => {
-                if (role === 'admin') navigate('/admin/chats');
-                else navigate('/user/chat');
-              }
-            });
+            playNotificationSound();
+            
+            const msg = data.message || {};
+            const senderName = msg.sender?.name || (role === 'admin' ? 'User' : 'Escrow Agent');
+            const preview = msg.text
+              ? msg.text.slice(0, 60) + (msg.text.length > 60 ? '…' : '')
+              : msg.mediaUrl ? '📷 Image'
+              : '📋 Update';
+              
+            const toastId = Date.now();
+            setLiveToasts(prev => [
+              ...prev,
+              { id: toastId, senderName, preview, role }
+            ]);
+            
+            // Auto-dismiss after 6 seconds
+            setTimeout(() => {
+              setLiveToasts(prev => prev.filter(t => t.id !== toastId));
+            }, 6000);
           }
         });
         
@@ -173,7 +185,7 @@ const Header = () => {
   if (isLoggedIn) {
     moreOptions.unshift({ label: 'Chat', path: '/user/chat' });
     if (isAdmin) {
-      moreOptions.unshift({ label: 'Admin Dashboard', path: '/admin-dashboard' });
+      moreOptions.unshift({ label: 'Admin Dashboard', path: '/admin/dashboard' });
     }
   }
 
@@ -533,6 +545,54 @@ const Header = () => {
           </div>
         </div>
       </Drawer>
+
+      {/* ── Global Live in-app notification toasts ──────────────────────────
+          Fires on all pages EXCEPT the chat pages, so admin/users get alerts
+          even when browsing the Dashboard or Channels. */}
+      <div style={{
+        position: 'fixed', top: 80, right: 20,
+        zIndex: 99999, display: 'flex', flexDirection: 'column', gap: 10,
+        pointerEvents: 'none'
+      }}>
+        {liveToasts.map(toast => (
+          <div
+            key={toast.id}
+            onClick={() => {
+              // Navigate to the correct chat page when clicked
+              if (toast.role === 'admin') navigate('/admin/chats');
+              else navigate('/user/chat');
+              setLiveToasts(prev => prev.filter(t => t.id !== toast.id));
+            }}
+            style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+            className="flex items-start gap-3 bg-[#1e1040] border border-purple-700/60 text-white
+                       rounded-2xl shadow-2xl px-4 py-3 max-w-[300px] w-[300px]
+                       animate-fade-in hover:bg-[#2a1860] transition-colors"
+          >
+            {/* Avatar */}
+            <div className="w-9 h-9 rounded-full bg-purple-600 flex items-center justify-center
+                            font-bold text-sm shrink-0 uppercase shadow-md">
+              {toast.senderName.charAt(0)}
+            </div>
+            {/* Content */}
+            <div className="flex-1 min-w-0 text-left">
+              <div className="flex justify-between items-center mb-0.5">
+                <span className="font-semibold text-sm text-purple-200 truncate">
+                  {toast.senderName}
+                </span>
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    setLiveToasts(prev => prev.filter(t => t.id !== toast.id));
+                  }}
+                  className="ml-2 text-gray-500 hover:text-white text-xs shrink-0"
+                >✕</button>
+              </div>
+              <p className="text-xs text-gray-300 truncate">{toast.preview}</p>
+              <p className="text-[10px] text-purple-400 mt-1 font-medium">Tap to open chat →</p>
+            </div>
+          </div>
+        ))}
+      </div>
     </header>
   );
 };

@@ -40,6 +40,8 @@ import {
 import axiosInstance, { api } from '../../API/api';
 import { motion } from 'framer-motion';
 import imageCompression from 'browser-image-compression';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const { TextArea } = Input;
 const { Title, Text } = Typography;
@@ -69,6 +71,7 @@ const AdminBlogs = ({ isEmbedded = false }) => {
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [saving, setSaving] = useState(false);
+  const [isHtmlMode, setIsHtmlMode] = useState(false);
   const [, setDummy] = useState(0);
 
   const fetchBlogs = useCallback(async () => {
@@ -95,6 +98,7 @@ const AdminBlogs = ({ isEmbedded = false }) => {
       featured: false,
       noIndex: false,
       author: 'SocialSwap Team',
+      faq: [],
     });
     setModalOpen(true);
   };
@@ -637,12 +641,43 @@ const AdminBlogs = ({ isEmbedded = false }) => {
                 />
               </Form.Item>
 
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-gray-700 font-medium">Full Content</span>
+                <div className="flex gap-3 items-center">
+                  <Button 
+                    size="small" 
+                    onClick={() => {
+                      let val = form.getFieldValue('content') || '';
+                      val = val.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ');
+                      // Quill wraps pasted lines in <p></p> tags. If we unescape, we might get <p><h3>...</h3></p>
+                      // We can just set the unescaped value and let HTML mode show it cleanly.
+                      form.setFieldsValue({ content: val });
+                      message.success('Escaped HTML fixed! Please review it.');
+                    }}
+                  >
+                    Fix Garbled Text
+                  </Button>
+                  <Switch 
+                    checked={isHtmlMode} 
+                    onChange={setIsHtmlMode} 
+                    checkedChildren="HTML Mode" 
+                    unCheckedChildren="Visual Editor" 
+                  />
+                </div>
+              </div>
               <Form.Item
                 name="content"
-                label="Full Content"
                 rules={[{ required: true, message: 'Content is required' }]}
               >
-                <TextArea rows={12} placeholder="Write your full blog content here..." />
+                {isHtmlMode ? (
+                  <TextArea 
+                    rows={15} 
+                    className="font-mono text-sm" 
+                    placeholder="<p>Write your raw HTML here...</p>" 
+                  />
+                ) : (
+                  <ReactQuill theme="snow" style={{ height: '400px', marginBottom: '50px' }} />
+                )}
               </Form.Item>
 
               <Row gutter={16}>
@@ -884,6 +919,49 @@ const AdminBlogs = ({ isEmbedded = false }) => {
                   </div>
                 )}
               </Form.Item>
+            </TabPane>
+
+            {/* ── FAQ Tab ── */}
+            <TabPane tab={<span><FileTextOutlined /> FAQs</span>} key="faq">
+              <div className="p-3 bg-purple-50 rounded-xl mb-4 border border-purple-100">
+                <p className="text-sm text-purple-700">
+                  ❓ Add Frequently Asked Questions to feature in Google's "People Also Ask" section.
+                </p>
+              </div>
+              <Form.List name="faq">
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map(({ key, name, ...restField }) => (
+                      <div key={key} className="flex gap-2 items-start mb-4 p-4 border border-gray-100 rounded-lg bg-gray-50">
+                        <div className="flex-1 space-y-3">
+                          <Form.Item
+                            {...restField}
+                            name={[name, 'question']}
+                            rules={[{ required: true, message: 'Missing question' }]}
+                            className="mb-0"
+                          >
+                            <Input placeholder="Question" />
+                          </Form.Item>
+                          <Form.Item
+                            {...restField}
+                            name={[name, 'answer']}
+                            rules={[{ required: true, message: 'Missing answer' }]}
+                            className="mb-0"
+                          >
+                            <TextArea placeholder="Answer" rows={2} />
+                          </Form.Item>
+                        </div>
+                        <Button type="text" danger icon={<DeleteOutlined />} onClick={() => remove(name)} />
+                      </div>
+                    ))}
+                    <Form.Item>
+                      <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                        Add FAQ
+                      </Button>
+                    </Form.Item>
+                  </>
+                )}
+              </Form.List>
             </TabPane>
           </Tabs>
 

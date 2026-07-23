@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Youtube, Plus, Users, Eye, Video, DollarSign,
+  Youtube, Plus, Users, Eye, Video, IndianRupee,
   Globe, Clock, BadgeCheck, TrendingUp, ExternalLink,
   AlertCircle, Loader2, CheckCircle, XCircle, Timer, Edit, Trash2
 } from 'lucide-react';
@@ -155,7 +155,7 @@ const MyChannels = () => {
                     {/* Price Badge */}
                     {ch.price && (
                       <div className="absolute top-2.5 right-2.5 flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-950/70 backdrop-blur-sm text-white text-[0.65rem] font-bold">
-                        <DollarSign size={10} />{ch.price}
+                        <IndianRupee size={10} />{ch.price}
                       </div>
                     )}
                   </div>
@@ -219,7 +219,7 @@ const MyChannels = () => {
                       <StatCell icon={<Users size={11} />} label="Subs" value={fmt(ch.subscriberCount)} />
                       <StatCell icon={<Eye size={11} />} label="Views" value={fmt(ch.viewCount)} />
                       <StatCell icon={<Video size={11} />} label="Videos" value={fmt(ch.videoCount)} />
-                      <StatCell icon={<DollarSign size={11} />} label="Earnings" value={ch.estimatedEarnings ? `$${fmt(ch.estimatedEarnings)}` : '—'} />
+                      <StatCell icon={<IndianRupee size={11} />} label="Earnings" value={ch.estimatedEarnings ? `₹${fmt(ch.estimatedEarnings)}` : '—'} />
                       <StatCell icon={<TrendingUp size={11} />} label="Recent" value={fmt(ch.recentViews)} />
                       <StatCell icon={<Clock size={11} />} label="Hrs" value={fmt(ch.watchTimeHours)} />
                     </div>

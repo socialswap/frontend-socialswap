@@ -4,22 +4,34 @@ import axiosInstance, { api as API_BASE_URL } from '../../API/api';
 import Carousel from './Carousel';
 import ChannelCard from '../ChannelCard';
 
-const TopChannelsCarousel = () => {
-  const [topChannels, setTopChannels] = useState([]);
+const BestForBeginners = () => {
+  const [beginnerChannels, setBeginnerChannels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchTopChannels = async () => {
+    const fetchChannels = async () => {
       try {
         const response = await axiosInstance.get(`${API_BASE_URL}/channels`);
         const payload = response?.data ?? {};
-        const list = Array.isArray(payload?.channels)
+        let list = Array.isArray(payload?.channels)
           ? payload.channels
           : Array.isArray(payload)
           ? payload
           : [];
-        setTopChannels(list.slice(0, 8));
+        
+        // Sort by price ascending (cheapest first) for "Beginners"
+        
+        // Sort by price ascending and take top 8 for "Beginners"
+        const sortedList = (payload.channels || [])
+          .filter(ch => ch.status === 'Available' && ch.price)
+          .sort((a, b) => {
+            const priceA = parseFloat((a.price || '0').replace(/[^0-9.-]+/g, ''));
+            const priceB = parseFloat((b.price || '0').replace(/[^0-9.-]+/g, ''));
+            return priceA - priceB;
+          });
+
+        setBeginnerChannels(sortedList.slice(0, 8));
         setLoading(false);
       } catch (err) {
         setError('Unable to load channels right now.');
@@ -27,18 +39,11 @@ const TopChannelsCarousel = () => {
       }
     };
 
-    fetchTopChannels();
+    fetchChannels();
   }, []);
 
   return (
-    <section
-      className="relative py-16 px-4 sm:px-6 lg:px-8 overflow-hidden bg-bg-secondary text-text-primary transition-all duration-300"
-    >
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-16 -right-10 w-72 h-72 bg-purple-primary/10 blur-3xl rounded-full" />
-        <div className="absolute -bottom-10 -left-10 w-72 h-72 bg-accent-pink/10 blur-3xl rounded-full" />
-      </div>
-
+    <section className="relative py-16 px-4 sm:px-6 lg:px-8 overflow-hidden bg-bg-primary text-text-primary transition-all duration-300">
       <div className="relative z-10 mx-auto">
         <motion.div
           initial="hidden"
@@ -57,12 +62,12 @@ const TopChannelsCarousel = () => {
             }}
             className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase mb-4"
             style={{
-              background: 'rgba(124, 58, 237, 0.1)',
-              color: 'var(--purple-primary)',
-              border: '1px solid rgba(124, 58, 237, 0.2)',
+              background: 'rgba(16, 185, 129, 0.1)', // Emerald green hint for beginners
+              color: '#10B981',
+              border: '1px solid rgba(16, 185, 129, 0.2)',
             }}
           >
-            Curated Selection
+            Start Your Journey
           </motion.span>
           <motion.h2 
             variants={{
@@ -71,7 +76,7 @@ const TopChannelsCarousel = () => {
             }}
             className="text-3xl sm:text-4xl font-bold text-text-primary mb-3"
           >
-            Highly Valuable / Top Rated Channels
+            Best For Beginners
           </motion.h2>
           <motion.p 
             variants={{
@@ -80,7 +85,7 @@ const TopChannelsCarousel = () => {
             }}
             className="text-text-secondary max-w-2xl mx-auto"
           >
-            Fresh inventory updated daily — discover vetted channels ready for acquisition, presented in the same immersive carousel experience as our Most Demanding list.
+            Kickstart your YouTube journey with these affordable, monetized channels. Perfect for those looking to start earning from day one without breaking the bank.
           </motion.p>
         </motion.div>
 
@@ -110,7 +115,7 @@ const TopChannelsCarousel = () => {
             >
               {error}
             </motion.div>
-          ) : topChannels.length > 0 ? (
+          ) : beginnerChannels.length > 0 ? (
             <motion.div
               key="content"
               initial={{ opacity: 0, y: 20 }}
@@ -119,7 +124,7 @@ const TopChannelsCarousel = () => {
               transition={{ duration: 0.3 }}
             >
               <Carousel>
-                {topChannels.map((channel) => (
+                {beginnerChannels.map((channel) => (
                   <ChannelCard key={channel?._id} channel={channel} />
                 ))}
               </Carousel>
@@ -132,7 +137,7 @@ const TopChannelsCarousel = () => {
               exit={{ opacity: 0 }}
               className="text-center text-text-secondary py-12"
             >
-              No channels are available right now. Please check back shortly.
+              No beginner channels are available right now.
             </motion.div>
           )}
         </AnimatePresence>
@@ -141,4 +146,4 @@ const TopChannelsCarousel = () => {
   );
 };
 
-export default TopChannelsCarousel;
+export default BestForBeginners;

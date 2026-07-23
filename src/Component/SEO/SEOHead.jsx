@@ -17,6 +17,7 @@ const SEOHead = ({
   structuredData,
   article,
   breadcrumbs,
+  faqSchema,
 }) => {
   const fullTitle = title
     ? `${title} | ${SITE_NAME}`
@@ -95,6 +96,11 @@ const SEOHead = ({
       {breadcrumbSchema && (
         <script type="application/ld+json">
           {JSON.stringify(breadcrumbSchema)}
+        </script>
+      )}
+      {faqSchema && (
+        <script type="application/ld+json">
+          {JSON.stringify(faqSchema)}
         </script>
       )}
     </Helmet>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ExternalLink, DollarSign, TrendingUp } from "lucide-react";
+import { ExternalLink, IndianRupee, TrendingUp } from "lucide-react";
 import { message } from "antd";
 import axiosInstance from "../../API/api";
 
@@ -126,7 +126,7 @@ const ChannelCard = ({ channel }) => {
         <div className="absolute top-2 left-2 flex flex-wrap gap-2">
           {channel?.monetized && (
             <span className="bg-success text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
-              <DollarSign size={12} />
+              <IndianRupee size={12} />
               Monetized
             </span>
           )}

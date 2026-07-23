@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Typography, Skeleton, Button } from 'antd';
+import { Typography, Skeleton, Button, message } from 'antd';
 import axiosInstance, { api } from '../../API/api';
 import { motion } from 'framer-motion';
 import SEOHead from '../../Component/SEO/SEOHead';
@@ -12,22 +12,51 @@ const BlogDetail = () => {
   const { id } = useParams(); // can be slug or _id
   const navigate = useNavigate();
   const [blog, setBlog] = useState(null);
+  const [recentBlogs, setRecentBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    const fetchBlog = async () => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight > 0) {
+        const progress = Math.min(100, Math.max(0, (scrollTop / docHeight) * 100));
+        setScrollProgress(progress);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
       try {
-        const res = await axiosInstance.get(`${api}/blogs/${id}`);
-        setBlog(res?.data?.blog);
+        setLoading(true);
+        const [blogRes, recentRes] = await Promise.all([
+          axiosInstance.get(`${api}/blogs/${id}`),
+          axiosInstance.get(`${api}/blogs?limit=5`)
+        ]);
+        setBlog(blogRes?.data?.blog);
+        const recent = (recentRes?.data?.blogs || [])
+          .filter(b => b._id !== blogRes?.data?.blog?._id)
+          .slice(0, 4);
+        setRecentBlogs(recent);
       } catch (err) {
         setError('Blog not found');
       } finally {
         setLoading(false);
       }
     };
-    fetchBlog();
+    fetchData();
   }, [id]);
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(canonicalUrl);
+    message.success('Link copied to clipboard!');
+  };
 
   if (loading) {
     return (
@@ -83,6 +112,19 @@ const BlogDetail = () => {
     wordCount: blog.content?.split(/\s+/).length,
   };
 
+  const faqSchema = blog.faq?.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: blog.faq.map(item => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      }
+    }))
+  } : null;
+
   return (
     <>
       <SEOHead
@@ -105,162 +147,171 @@ const BlogDetail = () => {
           { name: 'Blog', url: '/blogs' },
           { name: blog.title },
         ]}
+        faqSchema={faqSchema}
       />
 
-      <div className="relative min-h-screen bg-gradient-to-b from-white to-gray-50 text-gray-900 pt-24 pb-16 px-4 overflow-hidden">
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-        >
-          <motion.div
-            className="absolute -top-24 -right-20 w-96 h-96 rounded-full blur-3xl"
-            style={{
-              background:
-                'linear-gradient(135deg, rgba(255,77,77,0.12), rgba(255,159,64,0.12))',
-            }}
-            animate={{ y: [0, -12, 0], x: [0, 10, 0] }}
-            transition={{ duration: 12, repeat: Infinity }}
-          />
-          <motion.div
-            className="absolute -bottom-32 -left-16 w-96 h-96 rounded-full blur-3xl"
-            style={{
-              background:
-                'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(16,185,129,0.1))',
-            }}
-            animate={{ y: [0, 10, 0], x: [0, -10, 0] }}
-            transition={{ duration: 14, repeat: Infinity }}
-          />
-        </motion.div>
-
-        <div className="relative max-w-4xl mx-auto">
-          {/* Breadcrumb nav */}
-          <nav aria-label="breadcrumb" className="mb-6">
-            <ol className="flex items-center gap-2 text-sm text-gray-500">
-              <li>
-                <Link to="/" className="hover:text-red-500 transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li><span className="mx-1">/</span></li>
-              <li>
-                <Link to="/blogs" className="hover:text-red-500 transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li><span className="mx-1">/</span></li>
-              <li className="text-gray-700 font-medium line-clamp-1">{blog.title}</li>
-            </ol>
-          </nav>
-
-          <div className="mb-4 flex flex-wrap items-center gap-3">
-            {blog.category && (
-              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-red-50 text-red-600 border border-red-200">
-                {blog.category}
-              </span>
-            )}
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-red-500 shadow-[0_0_12px_3px_rgba(239,68,68,0.5)]" />
-              <span className="text-sm text-gray-500">
-                {new Date(blog.createdAt).toLocaleDateString('en-IN', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })}
-              </span>
-            </div>
-            {blog.readTime && (
-              <span className="text-sm text-gray-500">· {blog.readTime} min read</span>
-            )}
-            <motion.button
-              onClick={() => navigate('/blogs')}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="ml-auto inline-flex items-center gap-2 rounded-full px-4 py-2 text-white text-sm font-semibold bg-gradient-to-r from-[#FF4D4D] to-[#ff9f40] shadow-md hover:shadow-lg"
-            >
-              ← Back to Blogs
-            </motion.button>
-          </div>
-
-          <motion.h1
-            className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4 text-gray-900"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {blog.title}
-          </motion.h1>
-
-          {/* Author info */}
-          <div className="flex items-center gap-3 mb-8 pb-6 border-b border-gray-100">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-red-400 to-orange-400 flex items-center justify-center text-white font-bold text-sm">
-              {blog.author?.[0]?.toUpperCase() || 'S'}
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-900">
-                {blog.author || 'SocialSwap Team'}
-              </p>
-              <p className="text-xs text-gray-500">
-                {new Date(blog.createdAt).toLocaleDateString('en-IN', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })}
-              </p>
-            </div>
-          </div>
-
-          {blog.imageUrl && (
-            <motion.div
-              className="rounded-2xl overflow-hidden mb-8 shadow-[0_10px_40px_rgba(255,0,0,0.12)] bg-white/70 backdrop-blur border border-white/70"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.05 }}
-            >
-              <div className="relative">
-                <motion.img
-                  src={blog.imageUrl}
-                  alt={blog.title}
-                  width="800"
-                  height="450"
-                  className="w-full h-72 md:h-[28rem] object-cover"
-                  whileHover={{ scale: 1.03 }}
-                  transition={{ duration: 0.4 }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/0 to-transparent pointer-events-none" />
-              </div>
-            </motion.div>
-          )}
-
-          <Paragraph
-            style={{
-              color: '#374151',
-              fontSize: 17,
-              lineHeight: 1.85,
-              whiteSpace: 'pre-line',
-            }}
-          >
-            {blog.content}
-          </Paragraph>
-
-          {/* Tags */}
-          {blog.tags && blog.tags.length > 0 && (
-            <div className="mt-8 pt-6 border-t border-gray-100">
-              <p className="text-sm font-semibold text-gray-600 mb-3">Tags:</p>
-              <div className="flex flex-wrap gap-2">
-                {blog.tags.map((tag, i) => (
-                  <span
-                    key={i}
-                    className="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors cursor-default"
-                  >
-                    #{tag}
+      <div className="relative min-h-screen bg-gray-50 text-gray-900 pt-24 pb-16 px-4 sm:px-6 lg:px-8 font-sans">
+        {/* HEADER & COVER IMAGE (Full width top section) */}
+        <div className="max-w-7xl mx-auto mb-16">
+             {/* Header */}
+             <div className="text-center mb-8 flex flex-col items-center">
+                <div className="text-sm font-medium text-gray-900 mb-4">
+                  {blog.author || 'SocialSwap Team'} <span className="text-gray-500 font-normal">on {new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric'})}</span>
+                </div>
+                <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold text-[#111827] leading-[1.15] mb-6 tracking-tight">
+                  {blog.title}
+                </h1>
+                {blog.category && (
+                  <span className="px-4 py-1.5 bg-white border border-gray-100 text-[11px] font-bold uppercase tracking-widest text-gray-700 rounded-full shadow-sm">
+                    {blog.category}
                   </span>
-                ))}
-              </div>
+                )}
+             </div>
+
+             {/* Image */}
+             {blog.imageUrl && (
+               <div className="w-full rounded-[24px] overflow-hidden shadow-sm">
+                 <img src={blog.imageUrl} alt={blog.title} className="w-full h-auto max-h-[600px] object-cover" />
+               </div>
+             )}
+        </div>
+
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 relative">
+          
+          {/* LEFT SIDEBAR: Share & Read Time */}
+          <aside className="hidden lg:block lg:col-span-2">
+            <div className="sticky top-28 flex flex-col items-center gap-6">
+               <div 
+                 className="w-24 h-24 rounded-full flex items-center justify-center shadow-sm"
+                 style={{ background: `conic-gradient(#111827 ${scrollProgress}%, #f3f4f6 0)` }}
+               >
+                 <div className="w-[92px] h-[92px] bg-white rounded-full flex flex-col items-center justify-center text-center">
+                   <span className="text-xl font-bold text-gray-900 leading-none mb-1">{blog.readTime || '5'}</span>
+                   <span className="text-sm text-gray-500 font-medium leading-tight">min<br/>read</span>
+                 </div>
+               </div>
+               
+               <div className="flex flex-col items-center gap-5 mt-4">
+                  {/* Twitter / X */}
+                  <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(canonicalUrl)}&text=${encodeURIComponent(seoTitle)}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-black transition">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                  </a>
+                  {/* Facebook */}
+                  <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(canonicalUrl)}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-600 transition">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                  </a>
+                  {/* LinkedIn */}
+                  <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(canonicalUrl)}&title=${encodeURIComponent(seoTitle)}`} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-700 transition">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                  </a>
+                  {/* Copy Link */}
+                  <button onClick={copyToClipboard} className="text-gray-400 hover:text-gray-900 transition">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" /></svg>
+                  </button>
+               </div>
             </div>
-          )}
+          </aside>
+
+          {/* MAIN CONTENT */}
+          <main className="lg:col-span-7 pt-2">
+
+             {/* Content */}
+             <div className="prose prose-lg max-w-none text-[#374151] prose-headings:font-bold prose-headings:text-[#111827] prose-a:text-red-500 hover:prose-a:text-red-600 prose-img:rounded-xl">
+               <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+             </div>
+
+             {/* Tags */}
+             {blog.tags && blog.tags.length > 0 && (
+               <div className="mt-12 pt-8 border-t border-gray-100">
+                 <p className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wider">Tags</p>
+                 <div className="flex flex-wrap gap-2">
+                   {blog.tags.map((tag, i) => (
+                     <span
+                       key={i}
+                       className="px-4 py-1.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors cursor-default"
+                     >
+                       #{tag}
+                     </span>
+                   ))}
+                 </div>
+               </div>
+             )}
+
+             {/* FAQs */}
+             {blog.faq && blog.faq.length > 0 && (
+               <div className="mt-12 pt-8 border-t border-gray-100">
+                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+                 <div className="space-y-4">
+                   {blog.faq.map((item, i) => (
+                     <details key={i} className="group bg-white border border-gray-200 rounded-xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                       <summary className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                         <span className="font-semibold text-gray-900">{item.question}</span>
+                         <span className="transition group-open:rotate-180">
+                           <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                         </span>
+                       </summary>
+                       <div className="px-4 pb-4 text-gray-600 bg-gray-50/50 pt-2 border-t border-gray-100">
+                         {item.answer}
+                       </div>
+                     </details>
+                   ))}
+                 </div>
+               </div>
+             )}
+          </main>
+
+          {/* RIGHT SIDEBAR */}
+          <aside className="lg:col-span-3">
+             <div className="sticky top-28 flex flex-col gap-6">
+                {/* Search Widget */}
+                <div className="bg-white p-6 rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.03)] border border-gray-100">
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Search</h3>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      placeholder="Search..." 
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:border-gray-400 transition-colors"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => {
+                         if(e.key === 'Enter' && searchQuery.trim()) {
+                            navigate(`/blogs?search=${encodeURIComponent(searchQuery)}`);
+                         }
+                      }}
+                    />
+                    <button 
+                      onClick={() => {
+                         if(searchQuery.trim()) navigate(`/blogs?search=${encodeURIComponent(searchQuery)}`);
+                      }}
+                      className="px-4 py-2.5 bg-[#262626] hover:bg-black text-white rounded-lg text-sm font-semibold transition"
+                    >
+                      Search
+                    </button>
+                  </div>
+                </div>
+
+                {/* Recent Posts Widget */}
+                {recentBlogs.length > 0 && (
+                  <div className="bg-white p-6 rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.03)] border border-gray-100">
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-5">Recent Posts</h3>
+                    <div className="flex flex-col gap-6">
+                      {recentBlogs.map(rb => (
+                        <Link key={rb._id} to={`/blogs/${rb.slug || rb._id}`} className="group flex flex-col gap-1.5">
+                          <h4 className="text-[15px] font-bold text-[#111827] leading-snug group-hover:text-blue-600 transition-colors line-clamp-3">
+                            {rb.title}
+                          </h4>
+                          {rb.category && (
+                            <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wide mt-1">
+                              {rb.category}
+                            </span>
+                          )}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+             </div>
+          </aside>
         </div>
       </div>
     </>

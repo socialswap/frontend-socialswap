@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { 
   Play, 
   Users, 
-  DollarSign, 
+  IndianRupee, 
   ChevronDown, 
   ChevronUp,
   Eye,
@@ -87,10 +87,10 @@ const ChannelDetails = ({ channel }) => {
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                <DollarSign className="w-4 h-4" />
+                <IndianRupee className="w-4 h-4" />
                 <span>Est. Earnings</span>
               </div>
-              <p className="text-sm text-gray-900">${channel.estimatedEarnings.toLocaleString()}</p>
+              <p className="text-sm text-gray-900">₹{channel.estimatedEarnings.toLocaleString()}</p>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm text-gray-500">
