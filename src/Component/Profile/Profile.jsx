@@ -23,18 +23,22 @@ import imageCompression from 'browser-image-compression';
 // Previous styled components remain the same...
 const StyledCard = styled(Card)`
   width: 100%;
-  max-width: 100%;
-  margin: 0;
-  border-radius: 20px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-card, 0 8px 32px rgba(124,58,237,0.1));
-  backdrop-filter: blur(10px);
-  transition: transform 220ms ease, box-shadow 220ms ease;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 20px 50px rgba(124, 58, 237, 0.1);
+  overflow: hidden;
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-purple, 0 12px 40px rgba(124,58,237,0.15));
+  .dark & {
+    background: rgba(17, 12, 31, 0.45);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 50px rgba(124, 58, 237, 0.2);
+  }
+
+  .ant-card-body {
+    padding: 2rem !important;
   }
 `;
 
@@ -42,8 +46,33 @@ const ProfileHeader = styled.div`
   text-align: center;
   padding: 1.75rem 0 1.25rem;
   position: relative;
-  border-bottom: 1px dashed rgba(0,0,0,0.06);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
   margin-bottom: 1rem;
+  
+  .dark & {
+    border-bottom-color: rgba(255,255,255,0.06);
+    
+    .back-button {
+      color: #9ca3af;
+      &:hover {
+        background: rgba(168, 85, 247, 0.15);
+        color: #a855f7;
+      }
+    }
+    
+    .avatar-container img {
+      border-color: rgba(17,12,31,0.9);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3), 0 0 0 6px rgba(168, 85, 247, 0.15);
+    }
+    
+    .username {
+      color: #f9fafb;
+    }
+    
+    .user-handle {
+      color: #9ca3af;
+    }
+  }
 
   .back-button {
     position: absolute;
@@ -55,19 +84,20 @@ const ProfileHeader = styled.div`
     cursor: pointer;
     color: #6b7280;
     border-radius: 12px;
-    transition: background 180ms ease, transform 180ms ease, color 180ms ease;
-  }
-  .back-button:hover {
-    background: rgba(124, 58, 237, 0.08);
-    color: #7c3aed;
-    transform: translateX(-1px);
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: rgba(124, 58, 237, 0.08);
+      color: #7c3aed;
+      transform: translateX(-1px);
+    }
   }
 
   .header-text {
     font-size: 1.1rem;
     font-weight: 700;
     letter-spacing: .3px;
-    background: linear-gradient(120deg, #7c3aed, #06b6d4);
+    background: linear-gradient(120deg, #7c3aed, #ec4899);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -75,93 +105,124 @@ const ProfileHeader = styled.div`
 
   .avatar-container {
     margin: 1rem 0 0.75rem;
-  }
-  .avatar-container img {
-    height: 88px;
-    width: 88px;
-    border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.9);
-    box-shadow: 0 10px 24px rgba(17, 12, 46, 0.12), 0 0 0 6px rgba(124, 58, 237, 0.08);
-    object-fit: cover;
+    display: inline-block;
+    position: relative;
+    
+    img {
+      height: 100px;
+      width: 100px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.9);
+      box-shadow: 0 10px 24px rgba(17, 12, 46, 0.12), 0 0 0 6px rgba(124, 58, 237, 0.08);
+      object-fit: cover;
+    }
   }
   
   .avatar-overlay {
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: 4px;
+    right: 4px;
     background: #7c3aed;
     color: white;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(124,58,237,0.4);
     transition: all 0.2s ease;
-  }
-  
-  .avatar-overlay:hover {
-    transform: scale(1.1);
-    background: #6d28d9;
+    
+    &:hover {
+      transform: scale(1.1) rotate(5deg);
+      background: #6d28d9;
+    }
   }
 
   .username {
-    font-size: 1.2rem;
-    font-weight: 700;
-    margin: 0.6rem 0 0.15rem;
-    color: var(--text-primary);
-    letter-spacing: 0.2px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 1rem 0 0.15rem;
+    color: #111827;
+    letter-spacing: -0.02em;
   }
 
   .user-handle {
-    color: var(--text-secondary);
+    color: #6b7280;
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 500;
   }
 `;
 
 const EditButton = styled(Button)`
-  background-image: linear-gradient(120deg, #7c3aed, #06b6d4);
+  background-image: linear-gradient(120deg, #7c3aed, #ec4899);
   color: #fff;
   border-radius: 999px;
   border: none;
-  padding: 6px 18px;
-  margin-top: 0.75rem;
-  box-shadow: 0 10px 20px rgba(124, 58, 237, 0.18);
-  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
-  font-weight: 600;
+  padding: 6px 20px;
+  margin-top: 1rem;
+  box-shadow: 0 10px 20px rgba(124, 58, 237, 0.2);
+  transition: all 0.2s ease;
+  font-weight: 700;
 
   &:hover {
-    filter: brightness(1.03);
     color: #fff;
-    transform: translateY(-1px);
-    box-shadow: 0 14px 28px rgba(124, 58, 237, 0.22);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(124, 58, 237, 0.3);
   }
 `;
 
 const StyledList = styled(List)`
   .ant-list-item {
-    padding: 14px 18px;
+    padding: 18px 24px;
     cursor: pointer;
-    border-radius: 14px;
-    margin: 6px 8px;
-    border: 1px solid var(--border);
-    background: var(--bg-secondary);
-    transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    border-radius: 16px;
+    margin: 12px 0;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
     
+    .dark & {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.06);
+      
+      &:hover {
+        background: rgba(168, 85, 247, 0.1);
+        box-shadow: 0 8px 20px rgba(168, 85, 247, 0.2);
+        border-color: rgba(168, 85, 247, 0.3);
+      }
+
+      .ant-list-item-meta-title {
+        color: #f3f4f6;
+      }
+      
+      .ant-list-item-meta-description {
+        color: #9ca3af;
+      }
+    }
+
     &:hover {
-      background-color: rgba(124, 58, 237, 0.08);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background: rgba(124, 58, 237, 0.08);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.15);
       border-color: rgba(124, 58, 237, 0.3);
     }
 
     .ant-list-item-meta-title {
       margin: 0;
       font-weight: 600;
-      color: var(--text-primary);
+      color: #1f2937;
+    }
+    
+    .ant-list-item-meta-description {
+      color: #6b7280;
+    }
+    
+    .ant-list-item-action {
+      margin-left: 16px;
     }
   }
 `;

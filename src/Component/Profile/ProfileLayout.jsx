@@ -27,12 +27,25 @@ const LayoutContainer = styled.div`
 `;
 
 const Sidebar = styled.div`
-  width: 250px;
+  width: 260px;
   flex-shrink: 0;
   position: sticky;
-  top: 6rem;
+  top: 7rem;
   align-self: flex-start;
   height: max-content;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 24px;
+  padding: 1.25rem;
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
+
+  .dark & {
+    background: rgba(17, 12, 31, 0.45);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.3);
+  }
 
   @media (max-width: 768px) {
     display: none;
@@ -91,56 +104,68 @@ const NavList = styled.nav`
 const NavItem = styled(NavLink)`
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 10px;
-  color: var(--text-secondary);
-  font-weight: 500;
-  transition: all 0.2s ease;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  color: #64748b;
+  font-weight: 600;
+  transition: all 0.3s ease;
   text-decoration: none;
+  font-size: 0.95rem;
+
+  .dark & {
+    color: #94a3b8;
+  }
 
   &:hover {
     background: rgba(124, 58, 237, 0.08);
-    color: var(--purple-primary);
+    color: #7c3aed;
+    transform: translateX(4px);
+  }
+
+  .dark &:hover {
+    background: rgba(168, 85, 247, 0.15);
+    color: #a855f7;
   }
 
   &.active {
-    background: rgba(124, 58, 237, 0.12);
-    color: var(--primary, #a855f7);
-    font-weight: 600;
-    position: relative;
+    background: linear-gradient(to right, rgba(124, 58, 237, 0.15), rgba(124, 58, 237, 0.02));
+    color: #7c3aed;
+    box-shadow: inset 3px 0 0 0 #7c3aed;
   }
   
-  &.active::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: var(--primary, #a855f7);
-    border-radius: 8px 0 0 8px;
+  .dark &.active {
+    background: linear-gradient(to right, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.02));
+    color: #a855f7;
+    box-shadow: inset 3px 0 0 0 #a855f7;
   }
 `;
 
 const LogoutButton = styled.button`
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 8px;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 14px;
   color: #ef4444;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 0.95rem;
   background: none;
   border: none;
   width: 100%;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   text-align: left;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid rgba(0,0,0,0.05);
+
+  .dark & {
+    border-top-color: rgba(255,255,255,0.05);
+  }
 
   &:hover {
     background: rgba(239, 68, 68, 0.1);
+    transform: translateX(4px);
   }
 `;
 

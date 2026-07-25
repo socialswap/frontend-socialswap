@@ -16,7 +16,7 @@ const CATEGORY_OPTIONS = [
   'Gaming', 'Tech', 'Finance', 'Artificial intelligence',
   'Business & Entrepreneurship', 'Education', 'Health & Fitness',
   'Food', 'Infotainment', 'Vlogging', 'Sports', 'Commentary',
-  'Entertainment', 'Music', 'Motivation & Self-Improvement'
+  'Entertainment', 'Music', 'Motivation & Self-Improvement', 'Other'
 ];
 
 const formatCompact = (num) => {
@@ -44,7 +44,7 @@ const steps = [
 ];
 
 const initialForm = {
-  name: '', channelLink: '', customUrl: '', category: '',
+  name: '', channelLink: '', customUrl: '', category: '', customCategory: '',
   channelType: '', description: '', price: '',
   subscriberCount: '', viewCount: '', videoCount: '',
   estimatedEarnings: '', averageViewsPerVideo: '', recentViews: '',
@@ -91,7 +91,8 @@ export default function UploadChannel() {
         name: data.name || '',
         channelLink: data.channelLink || '',
         customUrl: data.customUrl || '',
-        category: data.category || '',
+        category: CATEGORY_OPTIONS.includes(data.category) ? data.category : (data.category ? 'Other' : ''),
+        customCategory: !CATEGORY_OPTIONS.includes(data.category) && data.category ? data.category : '',
         channelType: data.channelType || '',
         description: data.description || '',
         price: data.price || '',
@@ -247,6 +248,7 @@ export default function UploadChannel() {
     if (step === 1) {
       if (!form.price.trim()) errors.price = 'Price is required';
       if (!form.category) errors.category = 'Category is required';
+      if (form.category === 'Other' && !form.customCategory.trim()) errors.customCategory = 'Custom category is required';
       if (!form.channelType) errors.channelType = 'Channel type is required';
       if (!form.country) errors.country = 'Country is required';
       if (!form.my_language) errors.my_language = 'Language is required';
@@ -276,7 +278,14 @@ export default function UploadChannel() {
     setLoading(true);
     setError('');
     const formData = new FormData();
-    Object.entries(form).forEach(([k, v]) => formData.append(k, typeof v === 'boolean' ? String(v) : v));
+    Object.entries(form).forEach(([k, v]) => {
+      if (k === 'customCategory') return;
+      if (k === 'category' && form.category === 'Other') {
+        formData.append(k, form.customCategory);
+        return;
+      }
+      formData.append(k, typeof v === 'boolean' ? String(v) : v);
+    });
     
     // Banner removed
     images.forEach(img => {
@@ -427,18 +436,18 @@ export default function UploadChannel() {
                 </p>
 
                 {/* Input Row */}
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     value={fetchInput}
                     onChange={e => { setFetchInput(e.target.value); setFetchError(''); }}
                     onKeyDown={e => e.key === 'Enter' && fetchChannelInfo()}
-                    placeholder="https://youtube.com/@channel  ·  UCxxxxxx  ·  @handle"
-                    className="flex-1 bg-white/60 dark:bg-white/[0.06] border border-white/40 dark:border-white/10 rounded-input px-3.5 py-2.5 text-sm text-text-primary placeholder-text-secondary outline-none focus:border-purple-500 transition-all"
+                    placeholder="YouTube Link, ID, or @handle"
+                    className="flex-1 min-w-0 bg-white/60 dark:bg-white/[0.06] border border-white/40 dark:border-white/10 rounded-input px-3.5 py-2.5 text-sm text-text-primary placeholder-text-secondary outline-none focus:border-purple-500 transition-all"
                   />
                   <button
                     onClick={fetchChannelInfo}
                     disabled={fetchLoading}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-btn-gradient text-white font-semibold rounded-button text-sm hover:shadow-purple-glow-soft hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all shrink-0"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-btn-gradient text-white font-semibold rounded-button text-sm hover:shadow-purple-glow-soft hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all shrink-0 w-full sm:w-auto"
                   >
                     {fetchLoading
                       ? <><Loader2 size={14} className="animate-spin" /> Fetching…</>
@@ -584,6 +593,11 @@ export default function UploadChannel() {
                     {CATEGORY_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </Field>
+                {form.category === 'Other' && (
+                  <Field label="Custom Category" icon={<Tag size={13} />} error={fieldErrors.customCategory}>
+                    <input name="customCategory" placeholder="e.g. Photography, Animals" value={form.customCategory} onChange={handleChange} />
+                  </Field>
+                )}
                 <Field label="Channel Type" icon={<Video size={13} />} error={fieldErrors.channelType}>
                   <select name="channelType" value={form.channelType} onChange={handleChange}>
                     <option value="">Select type</option>

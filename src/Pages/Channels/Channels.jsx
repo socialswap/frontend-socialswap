@@ -66,7 +66,7 @@ const Pill = ({ label, active, onClick }) => (
 
 const FilterSection = ({ title, icon, children }) => (
   <div>
-    <p className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-2.5 flex items-center gap-1.5">
+    <p className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2.5 flex items-center gap-1.5">
       <span>{icon}</span> {title}
     </p>
     <div className="flex flex-wrap gap-2">{children}</div>
@@ -355,6 +355,10 @@ const Channels = () => {
 
       {/* ── Sliders (Scrolls with page) ── */}
       <style>{`
+        .ant-slider {
+          margin-top: 8px !important;
+          margin-bottom: 6px !important;
+        }
         .ant-slider .ant-slider-handle::after {
           background-color: #4C28D9 !important;
           box-shadow: 0 0 0 2px #4C28D9 !important;
@@ -364,11 +368,11 @@ const Channels = () => {
           box-shadow: 0 0 0 2px #3D1B99 !important;
         }
       `}</style>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 lg:w-2/3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-2">
+        <div className="flex flex-col sm:flex-row gap-1 sm:gap-6 lg:w-2/3">
           <div className="flex-1">
             <FilterSection title="Subscribers" icon="👥">
-              <div className="px-2 w-full pt-1">
+              <div className="px-2 w-full pt-0">
                 <ConfigProvider theme={{ 
                   token: { colorPrimary: '#4C28D9', colorPrimaryBorderHover: '#3D1B99', colorFillTertiary: 'rgba(76, 40, 217, 0.2)' },
                   components: { Slider: { railSize: 8, handleSize: 20, handleSizeHover: 22 } }
@@ -387,7 +391,7 @@ const Channels = () => {
                     }}}
                   />
                 </ConfigProvider>
-                <div className="flex justify-between text-sm font-bold text-[#4C28D9] mt-1.5">
+                <div className="flex justify-between text-sm font-bold text-[#4C28D9] mt-1">
                   <span>{formatSubs((filters.subscribersRange[0] || [0, 2000000])[0])}</span>
                   <span>{(filters.subscribersRange[0] || [0, 2000000])[1] === 2000000 ? '2M+' : formatSubs((filters.subscribersRange[0] || [0, 2000000])[1])}</span>
                 </div>
@@ -397,7 +401,7 @@ const Channels = () => {
           
           <div className="flex-1">
             <FilterSection title="Price" icon="💸">
-              <div className="px-2 w-full pt-1">
+              <div className="px-2 w-full pt-0">
                 <ConfigProvider theme={{ 
                   token: { colorPrimary: '#4C28D9', colorPrimaryBorderHover: '#3D1B99', colorFillTertiary: 'rgba(76, 40, 217, 0.2)' },
                   components: { Slider: { railSize: 8, handleSize: 20, handleSizeHover: 22 } }
@@ -416,7 +420,7 @@ const Channels = () => {
                     }}}
                   />
                 </ConfigProvider>
-                <div className="flex justify-between text-sm font-bold text-[#4C28D9] mt-1.5">
+                <div className="flex justify-between text-sm font-bold text-[#4C28D9] mt-1">
                   <span>{formatPrice((filters.priceRange[0] || [0, 1000000])[0])}</span>
                   <span>{(filters.priceRange[0] || [0, 1000000])[1] === 1000000 ? '₹10L+' : formatPrice((filters.priceRange[0] || [0, 1000000])[1])}</span>
                 </div>

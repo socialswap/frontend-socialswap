@@ -32,31 +32,26 @@ const Footer = () => {
   return (
     <footer className="bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[20px] text-text-secondary py-16 text-[13px] md:text-sm font-sans border-t border-white/40 dark:border-white/10 shadow-card relative overflow-hidden">
       <div className="container mx-auto px-6 max-w-6xl relative z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 mb-16 text-center sm:text-left">
           
           {/* Column 1: COMPANY */}
           <div>
             <h4 className="text-text-primary font-extrabold tracking-wider uppercase mb-6 text-[15px]">Company</h4>
-            <ul className="space-y-2.5">
-              <li className="flex justify-between items-center max-w-[200px]">
+            <ul className="space-y-3">
+              <li>
                 <Link to="/about" className="hover:text-purple-primary transition-colors font-medium">About Us</Link>
-                <span className="text-text-secondary/40 font-mono text-xs">......</span>
               </li>
-              <li className="flex justify-between items-center max-w-[200px]">
-                <button onClick={handleMakeOffer} className="hover:text-purple-primary transition-colors uppercase text-left font-medium cursor-pointer">Contact</button>
-                <span className="text-text-secondary/40 font-mono text-xs">......</span>
+              <li>
+                <button onClick={handleMakeOffer} className="hover:text-purple-primary transition-colors uppercase font-medium cursor-pointer">Contact</button>
               </li>
-              <li className="flex justify-between items-center max-w-[200px]">
+              <li>
                 <Link to="/privacy-policy" className="hover:text-purple-primary transition-colors font-medium">Privacy Policy</Link>
-                <span className="text-text-secondary/40 font-mono text-xs">......</span>
               </li>
-              <li className="flex justify-between items-center max-w-[200px]">
+              <li>
                 <Link to="/terms-and-conditions" className="hover:text-purple-primary transition-colors font-medium">Terms</Link>
-                <span className="text-text-secondary/40 font-mono text-xs">......</span>
               </li>
-              <li className="flex justify-between items-center max-w-[200px]">
+              <li>
                 <Link to="/refund-policy" className="hover:text-purple-primary transition-colors font-medium">Refund Policy</Link>
-                <span className="text-text-secondary/40 font-mono text-xs">......</span>
               </li>
             </ul>
           </div>
@@ -99,7 +94,7 @@ const Footer = () => {
               
               <div className="pt-3">
                 <p className="font-bold text-text-primary uppercase tracking-wider mb-3">On Social Media:</p>
-                <div className="flex gap-2.5">
+                <div className="flex gap-2.5 justify-center sm:justify-start">
                   {socialLinks.map(({ href, Icon, label }) => (
                     <a
                       key={label}

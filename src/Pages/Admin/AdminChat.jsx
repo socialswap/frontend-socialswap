@@ -438,7 +438,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
           className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
             mobileTab === 'chat' 
               ? 'bg-[#7C3AED] text-white shadow-md' 
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#231542]'
+              : 'text-gray-600 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-[#231542]'
           }`}
         >
           Chats
@@ -448,7 +448,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
           className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
             mobileTab === 'deals' 
               ? 'bg-[#7C3AED] text-white shadow-md' 
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#231542]'
+              : 'text-gray-600 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-[#231542]'
           }`}
         >
           Escrow Deals
@@ -486,9 +486,9 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                     placeholder="Search chats..." 
                     value={searchChat}
                     onChange={(e) => setSearchChat(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-[#231542] border border-gray-200 dark:border-purple-900/40 rounded-xl focus:border-[#7C3AED] dark:focus:border-[#A855F7] focus:bg-white dark:focus:bg-[#1A1035] outline-none transition-all text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500" 
+                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-[#231542] border border-gray-200 dark:border-purple-900/40 rounded-xl focus:border-[#7C3AED] dark:focus:border-[#A855F7] focus:bg-white dark:focus:bg-[#1A1035] outline-none transition-all text-sm text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-500" 
                   />
-                  <svg className="absolute left-3.5 top-3 text-gray-400 dark:text-gray-500 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                  <svg className="absolute left-3.5 top-3 text-gray-500 dark:text-gray-500 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
               </div>
               <div className="flex-1 overflow-y-auto p-2 bg-white dark:bg-[#18112e]">
@@ -513,11 +513,11 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-baseline mb-1">
                         <h3 className="font-semibold text-gray-900 dark:text-white truncate">{participant?.name || 'User'}</h3>
-                        <span className="text-[11px] text-gray-400 dark:text-gray-500 shrink-0 ml-2">
+                        <span className="text-[11px] text-gray-500 dark:text-gray-500 shrink-0 ml-2">
                           {new Date(thread.updatedAt).toLocaleDateString()}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate pr-6">{participant?.email}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 truncate pr-6">{participant?.email}</p>
                     </div>
                     {unreadCount > 0 && (
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-[#F83758] text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-md">
@@ -569,7 +569,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                             <img src={msg.channelId.imageUrls?.[0] || 'https://via.placeholder.com/80'} className="w-16 h-16 rounded-lg object-cover" alt="channel" />
                             <div className="flex-1 overflow-hidden">
                               <h4 className="font-bold text-xs md:text-sm text-gray-900 dark:text-white truncate">{msg.channelId.name || 'Unknown Channel'}</h4>
-                              <p className="text-[10px] md:text-[11px] text-gray-500 dark:text-gray-400 mt-1">{msg.channelId.category} • {msg.channelId.subscriberCount?.toLocaleString()} subs</p>
+                              <p className="text-[10px] md:text-[11px] text-gray-600 dark:text-gray-300 mt-1">{msg.channelId.category} • {msg.channelId.subscriberCount?.toLocaleString()} subs</p>
                               <p className="text-xs md:text-sm font-bold text-purple-600 dark:text-purple-400 mt-1">${msg.channelId.price}</p>
                             </div>
                           </div>
@@ -580,14 +580,14 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                             <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#7C3AED] to-[#A855F7]"></div>
                             <h4 className="font-bold text-sm md:text-base text-gray-900 dark:text-white mb-2 pl-2">Escrow Deal Issued</h4>
                         <div className="space-y-1 mb-2 bg-gray-50 dark:bg-[#231542] p-3 rounded-lg border border-gray-100 dark:border-purple-900/20 text-xs md:text-[13px]">
-                              <p className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Status:</span> <span className={`font-semibold uppercase ${msg.dealId.status === 'accepted' ? 'text-green-600 dark:text-green-400' : msg.dealId.status === 'rejected' ? 'text-red-500 dark:text-red-400' : 'text-yellow-600 dark:text-yellow-400'}`}>{msg.dealId.status}</span></p>
-                              {msg.dealId.payment && <p className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Payment:</span> <span className={`font-semibold uppercase ${msg.dealId.payment === 'paid' ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>{msg.dealId.payment}</span></p>}
-                              <p className="flex justify-between"><span className="text-gray-500 dark:text-gray-400">Price:</span> <span className="font-bold text-[#7C3AED] dark:text-[#A855F7]">${msg.dealId.dealPrice || msg.dealId.price}</span></p>
+                              <p className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Status:</span> <span className={`font-semibold uppercase ${msg.dealId.status === 'accepted' ? 'text-green-600 dark:text-green-400' : msg.dealId.status === 'rejected' ? 'text-red-500 dark:text-red-400' : 'text-yellow-600 dark:text-yellow-400'}`}>{msg.dealId.status}</span></p>
+                              {msg.dealId.payment && <p className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Payment:</span> <span className={`font-semibold uppercase ${msg.dealId.payment === 'paid' ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-300'}`}>{msg.dealId.payment}</span></p>}
+                              <p className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Price:</span> <span className="font-bold text-[#7C3AED] dark:text-[#A855F7]">${msg.dealId.dealPrice || msg.dealId.price}</span></p>
                             </div>
                           </div>
                         )}
 
-                        <div className={`flex items-center justify-end mt-1 space-x-1 ${isAdmin ? 'text-purple-200' : 'text-gray-400 dark:text-gray-500'} text-[10px]`}>
+                        <div className={`flex items-center justify-end mt-1 space-x-1 ${isAdmin ? 'text-purple-200' : 'text-gray-500 dark:text-gray-500'} text-[10px]`}>
                           <span>{new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                           {isAdmin && <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>}
                         </div>
@@ -640,7 +640,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                               </button>
                             ))}
                             <button 
-                              className="hover:scale-110 transition-transform text-lg text-gray-400 font-bold ml-1 flex items-center justify-center w-7 h-7 rounded-full bg-white/10 flex-shrink-0"
+                              className="hover:scale-110 transition-transform text-lg text-gray-500 font-bold ml-1 flex items-center justify-center w-7 h-7 rounded-full bg-white/10 flex-shrink-0"
                               onClick={() => {
                                 setShowFullPickerId(msg._id);
                                 setActiveEmojiId(null);
@@ -689,23 +689,23 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
               <div className="p-3 bg-white dark:bg-[#18112e] border-t border-gray-100 dark:border-purple-900/30 flex flex-col">
                 {replyingTo && (
                   <div className="flex items-center justify-between bg-gray-50 dark:bg-[#231542] p-2 mb-2 rounded border border-gray-200 dark:border-purple-900/40">
-                    <div className="text-xs text-gray-500 dark:text-gray-400 truncate flex-1 pr-4">
+                    <div className="text-xs text-gray-600 dark:text-gray-300 truncate flex-1 pr-4">
                       <span className="font-bold mr-2 text-purple-600 dark:text-purple-400">Replying to {replyingTo.sender?.name || 'User'}:</span>
                       {replyingTo.text || 'Attachment/Card'}
                     </div>
-                    <button onClick={() => setReplyingTo(null)} className="text-gray-400 hover:text-red-500">
+                    <button onClick={() => setReplyingTo(null)} className="text-gray-500 hover:text-red-500">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                   </div>
                 )}
                 <div className="flex items-center space-x-2 bg-gray-50 dark:bg-[#231542] p-1.5 rounded-full border border-gray-200 dark:border-purple-900/40 focus-within:border-purple-400 dark:focus-within:border-purple-600 focus-within:ring-2 focus-within:ring-purple-50 dark:focus-within:ring-purple-900/20 transition-all">
                   <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" />
-                  <button onClick={() => fileInputRef.current.click()} className="w-10 h-10 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-[#7C3AED] dark:hover:text-[#A855F7] hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-full transition-colors">
+                  <button onClick={() => fileInputRef.current.click()} className="w-10 h-10 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-[#7C3AED] dark:hover:text-[#A855F7] hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-full transition-colors">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                   </button>
                   <input 
                     type="text"
-                    className="flex-1 bg-transparent border-none focus:ring-0 text-gray-800 dark:text-white text-[14.5px] px-2 outline-none placeholder-gray-400 dark:placeholder-gray-500"
+                    className="flex-1 bg-transparent border-none focus:ring-0 text-gray-800 dark:text-white text-[14.5px] px-2 outline-none placeholder-gray-500 dark:placeholder-gray-500"
                     placeholder="Type to user..."
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
@@ -748,16 +748,16 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                     placeholder="Search deals..." 
                     value={searchDeal}
                     onChange={(e) => setSearchDeal(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-[#231542] border border-gray-200 dark:border-purple-900/40 rounded-xl focus:border-[#7C3AED] dark:focus:border-[#A855F7] focus:bg-white dark:focus:bg-[#1A1035] outline-none transition-all text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500" 
+                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-[#231542] border border-gray-200 dark:border-purple-900/40 rounded-xl focus:border-[#7C3AED] dark:focus:border-[#A855F7] focus:bg-white dark:focus:bg-[#1A1035] outline-none transition-all text-sm text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-500" 
                   />
-                  <svg className="absolute left-3.5 top-3 text-gray-400 dark:text-gray-500 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                  <svg className="absolute left-3.5 top-3 text-gray-500 dark:text-gray-500 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
               </div>
 
               {/* Deals List */}
               <div className="flex-1 overflow-y-auto p-4 bg-gray-50/50 dark:bg-transparent space-y-4">
             {filteredDeals.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 mt-10">
+              <div className="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-500 mt-10">
                 <svg className="w-12 h-12 mb-2 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                 <p>No deals found</p>
               </div>
@@ -778,7 +778,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                   </div>
                   
                   <div className="flex justify-between items-end">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="text-sm text-gray-600 dark:text-gray-300">
                       <p className="mb-1">Buyer: <span className="font-medium text-gray-700 dark:text-gray-300">{deal.buyer?.name || 'Unknown'}</span></p>
                       <p className="mb-1">Payment: <span className={`font-semibold uppercase ${deal.payment === 'paid' ? 'text-green-500' : 'text-gray-500'}`}>{deal.payment || 'NOT PAID'}</span></p>
                       <p>Date: {new Date(deal.createdAt).toLocaleDateString()}</p>
@@ -819,16 +819,16 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
           <div className="space-y-4 pt-2">
             <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
               <h4 className="font-bold text-gray-900 dark:text-white mb-3">Channel Details</h4>
-              <p className="flex justify-between mb-1 text-sm"><span className="text-gray-500 dark:text-gray-400">Name:</span> <span className="font-medium text-gray-800 dark:text-gray-200">{selectedDeal.channel?.name || 'N/A'}</span></p>
-              <p className="flex justify-between mb-1 text-sm"><span className="text-gray-500 dark:text-gray-400">Deal Price:</span> <span className="font-bold text-[#7C3AED] dark:text-[#A855F7]">${selectedDeal.dealPrice || selectedDeal.price}</span></p>
-              <p className="flex justify-between mb-1 text-sm"><span className="text-gray-500 dark:text-gray-400">Buyer:</span> <span className="text-gray-800 dark:text-gray-200">{selectedDeal.buyer?.name} ({selectedDeal.buyer?.email})</span></p>
+              <p className="flex justify-between mb-1 text-sm"><span className="text-gray-600 dark:text-gray-300">Name:</span> <span className="font-medium text-gray-800 dark:text-gray-200">{selectedDeal.channel?.name || 'N/A'}</span></p>
+              <p className="flex justify-between mb-1 text-sm"><span className="text-gray-600 dark:text-gray-300">Deal Price:</span> <span className="font-bold text-[#7C3AED] dark:text-[#A855F7]">${selectedDeal.dealPrice || selectedDeal.price}</span></p>
+              <p className="flex justify-between mb-1 text-sm"><span className="text-gray-600 dark:text-gray-300">Buyer:</span> <span className="text-gray-800 dark:text-gray-200">{selectedDeal.buyer?.name} ({selectedDeal.buyer?.email})</span></p>
             </div>
 
             <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
               <h4 className="font-bold text-gray-900 dark:text-white mb-3">Status</h4>
-              <p className="flex justify-between mb-1 text-sm"><span className="text-gray-500 dark:text-gray-400">Deal Status:</span> <span className={`font-semibold uppercase ${selectedDeal.status === 'accepted' ? 'text-green-500' : selectedDeal.status === 'rejected' ? 'text-red-500' : 'text-yellow-600'}`}>{selectedDeal.status}</span></p>
-              <p className="flex justify-between mb-1 text-sm"><span className="text-gray-500 dark:text-gray-400">Payment Status:</span> <span className={`font-semibold uppercase ${selectedDeal.payment === 'paid' ? 'text-green-500' : 'text-gray-500'}`}>{selectedDeal.payment || 'NOT PAID'}</span></p>
-              <p className="flex justify-between text-sm"><span className="text-gray-500 dark:text-gray-400">Created:</span> <span className="text-gray-800 dark:text-gray-200">{new Date(selectedDeal.createdAt).toLocaleString()}</span></p>
+              <p className="flex justify-between mb-1 text-sm"><span className="text-gray-600 dark:text-gray-300">Deal Status:</span> <span className={`font-semibold uppercase ${selectedDeal.status === 'accepted' ? 'text-green-500' : selectedDeal.status === 'rejected' ? 'text-red-500' : 'text-yellow-600'}`}>{selectedDeal.status}</span></p>
+              <p className="flex justify-between mb-1 text-sm"><span className="text-gray-600 dark:text-gray-300">Payment Status:</span> <span className={`font-semibold uppercase ${selectedDeal.payment === 'paid' ? 'text-green-500' : 'text-gray-500'}`}>{selectedDeal.payment || 'NOT PAID'}</span></p>
+              <p className="flex justify-between text-sm"><span className="text-gray-600 dark:text-gray-300">Created:</span> <span className="text-gray-800 dark:text-gray-200">{new Date(selectedDeal.createdAt).toLocaleString()}</span></p>
             </div>
 
             <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-xl border border-purple-100 dark:border-purple-900/40 mt-4">

@@ -136,17 +136,17 @@ const MyChannels = () => {
                 <motion.div
                   key={ch._id}
                   onClick={() => navigate(`/channel/${ch._id}`)}
-                  className="group relative bg-[#0f0a1c] border border-white/5 rounded-2xl overflow-hidden hover:border-purple-500/20 transition-all flex flex-col h-full shadow-[0_4px_24px_-4px_rgba(0,0,0,0.5)] cursor-pointer"
+                  className="group relative bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/60 dark:border-white/10 rounded-[24px] overflow-hidden hover:border-purple-500/40 dark:hover:border-purple-500/30 transition-all duration-300 flex flex-col h-full shadow-card hover:shadow-[0_20px_50px_rgba(124,58,237,0.12)] cursor-pointer"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.06, duration: 0.4 }}
-                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                  whileHover={{ y: -6, transition: { duration: 0.2 } }}
                 >
                   {/* Banner */}
-                  <div className="relative h-28 bg-gradient-to-br from-[#1a0f2e] to-[#2d1b5e] overflow-hidden">
+                  <div className="relative h-28 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-[#1a0f2e] dark:to-[#2d1b5e] overflow-hidden border-b border-white/40 dark:border-white/5">
                     {ch.bannerUrl
-                      ? <img src={ch.bannerUrl} alt="Banner" className="w-full h-full object-cover" />
-                      : <div className="w-full h-full flex items-center justify-center text-white/10"><Youtube size={28} /></div>
+                      ? <img src={ch.bannerUrl} alt="Banner" className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500" />
+                      : <div className="w-full h-full flex items-center justify-center text-purple-300 dark:text-white/10"><Youtube size={32} /></div>
                     }
                     {/* Status Badge */}
                     <div className={`absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.65rem] font-semibold border backdrop-blur-sm ${status.color} ${status.bg} ${status.border}`}>
@@ -163,38 +163,38 @@ const MyChannels = () => {
                   {/* Body */}
                   <div className="p-4 flex flex-col gap-3.5">
                     {/* Title row */}
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-10 h-10 rounded-full bg-purple-500/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-purple-400 shrink-0 overflow-hidden">
-                        {ch.avatar ? <img src={ch.avatar} alt={ch.name} className="w-full h-full object-cover" /> : <Youtube size={16} />}
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-white dark:bg-[#110C1F] border-2 border-white dark:border-white/10 shadow-md flex items-center justify-center text-purple-500 shrink-0 overflow-hidden">
+                        {ch.avatar ? <img src={ch.avatar} alt={ch.name} className="w-full h-full object-cover" /> : <Youtube size={20} />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-bold text-slate-900 dark:text-white m-0 truncate">{ch.name}</h4>
-                        <span className="text-[0.7rem] text-slate-500 dark:text-white/35">{ch.customUrl}</span>
+                        <h4 className="text-[15px] font-extrabold text-gray-900 dark:text-white m-0 truncate leading-tight group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">{ch.name}</h4>
+                        <span className="text-[0.7rem] text-gray-500 dark:text-gray-400">{ch.customUrl}</span>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5">
                         {ch.channelLink && (
                           <a
                             href={ch.channelLink} target="_blank" rel="noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/[0.06] flex items-center justify-center text-slate-500 dark:text-white/35 hover:bg-purple-500/20 hover:text-purple-400 transition-all shrink-0"
+                            className="w-8 h-8 rounded-lg bg-white/80 dark:bg-white/[0.06] shadow-sm border border-gray-100 dark:border-white/5 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-purple-500/20 dark:hover:text-purple-400 transition-all shrink-0"
                             title="Visit Channel"
                           >
-                            <ExternalLink size={13} />
+                            <ExternalLink size={14} />
                           </a>
                         )}
                         <button
                           onClick={(e) => { e.stopPropagation(); navigate(`/edit-channel/${ch._id}`); }}
-                          className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/[0.06] flex items-center justify-center text-slate-500 dark:text-white/35 hover:bg-blue-500/20 hover:text-blue-400 transition-all shrink-0"
+                          className="w-8 h-8 rounded-lg bg-white/80 dark:bg-white/[0.06] shadow-sm border border-gray-100 dark:border-white/5 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-500/20 dark:hover:text-blue-400 transition-all shrink-0"
                           title="Edit Channel"
                         >
-                          <Edit size={13} />
+                          <Edit size={14} />
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); handleDelete(ch._id, ch.name); }}
-                          className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/[0.06] flex items-center justify-center text-slate-500 dark:text-white/35 hover:bg-red-500/20 hover:text-red-400 transition-all shrink-0"
+                          className="w-8 h-8 rounded-lg bg-white/80 dark:bg-white/[0.06] shadow-sm border border-gray-100 dark:border-white/5 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/20 dark:hover:text-red-400 transition-all shrink-0"
                           title="Delete Channel"
                         >
-                          <Trash2 size={13} />
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </div>
@@ -215,13 +215,13 @@ const MyChannels = () => {
                     </div>
 
                     {/* Stats grid */}
-                    <div className="grid grid-cols-3 gap-2 bg-slate-50 dark:bg-white/[0.03] rounded-xl p-2.5 border border-slate-100 dark:border-white/[0.06]">
-                      <StatCell icon={<Users size={11} />} label="Subs" value={fmt(ch.subscriberCount)} />
-                      <StatCell icon={<Eye size={11} />} label="Views" value={fmt(ch.viewCount)} />
-                      <StatCell icon={<Video size={11} />} label="Videos" value={fmt(ch.videoCount)} />
-                      <StatCell icon={<IndianRupee size={11} />} label="Earnings" value={ch.estimatedEarnings ? `₹${fmt(ch.estimatedEarnings)}` : '—'} />
-                      <StatCell icon={<TrendingUp size={11} />} label="Recent" value={fmt(ch.recentViews)} />
-                      <StatCell icon={<Clock size={11} />} label="Hrs" value={fmt(ch.watchTimeHours)} />
+                    <div className="grid grid-cols-3 gap-2 bg-white/60 dark:bg-white/[0.03] rounded-xl p-3 border border-white/60 dark:border-white/[0.06] shadow-sm">
+                      <StatCell icon={<Users size={12} />} label="Subs" value={fmt(ch.subscriberCount)} />
+                      <StatCell icon={<Eye size={12} />} label="Views" value={fmt(ch.viewCount)} />
+                      <StatCell icon={<Video size={12} />} label="Videos" value={fmt(ch.videoCount)} />
+                      <StatCell icon={<IndianRupee size={12} />} label="Earnings" value={ch.estimatedEarnings ? `₹${fmt(ch.estimatedEarnings)}` : '—'} />
+                      <StatCell icon={<TrendingUp size={12} />} label="Recent" value={fmt(ch.recentViews)} />
+                      <StatCell icon={<Clock size={12} />} label="Hrs" value={fmt(ch.watchTimeHours)} />
                     </div>
 
                     {/* Footer */}
@@ -248,12 +248,11 @@ const MyChannels = () => {
 
 function StatCell({ icon, label, value }) {
   return (
-    <div className="flex items-center gap-1.5">
-      <span className="text-slate-400 dark:text-white/30 shrink-0">{icon}</span>
-      <div>
-        <span className="block text-[0.75rem] font-bold text-slate-800 dark:text-white leading-tight">{value}</span>
-        <span className="block text-[0.6rem] text-slate-400 dark:text-white/30 leading-tight">{label}</span>
+    <div className="flex flex-col gap-0.5 items-center justify-center py-1">
+      <div className="flex items-center gap-1 text-[0.65rem] text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wider">
+        {icon} <span className="hidden sm:inline">{label}</span>
       </div>
+      <div className="text-sm font-extrabold text-gray-800 dark:text-gray-200">{value}</div>
     </div>
   );
 }

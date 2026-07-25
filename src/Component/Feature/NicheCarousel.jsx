@@ -89,7 +89,7 @@ const NicheCarousel = () => {
 
     const tween = gsap.to(progressObj.current, {
       value: 1,
-      duration: 9, // ← speed: lower = faster
+      duration: 14, // ← speed: lower = faster
       repeat: -1,
       ease: 'none',
       onUpdate: () => {
@@ -234,7 +234,7 @@ const NicheCarousel = () => {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: `url('/homelogos/backgroundLogo (1).png')`,
+          backgroundImage: `url('${isMobile ? '/homelogos/mobileBG (1).png' : '/homelogos/backgroundLogo (1).png'}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
