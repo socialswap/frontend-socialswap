@@ -53,11 +53,11 @@ const ServicesSlider = () => {
   const settings = {
     dots: true,
     infinite: true,
-    speed: 500,
+    speed: 400,
     slidesToShow: 3,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 4000,
+    autoplaySpeed: 2000,
     prevArrow: <SlickArrowLeft />,
     nextArrow: <SlickArrowRight />,
     responsive: [
@@ -124,9 +124,9 @@ const ServicesSlider = () => {
             viewport={{ once: true }}
           >
             <Link to="/services">
-              <Button type="default" size="large" className="rounded-full flex items-center gap-2 border-border-color text-text-primary hover:border-purple-primary hover:text-purple-primary">
+              <button className="flex items-center gap-2 px-6 py-2.5 bg-white/60 dark:bg-white/[0.06] border border-white/40 dark:border-white/10 rounded-full text-sm font-bold text-gray-800 dark:text-gray-100 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-white/90 dark:hover:bg-white/10 hover:shadow-[0_4px_16px_rgba(124,58,237,0.15)] transition-all">
                 View All Services <ArrowRightOutlined />
-              </Button>
+              </button>
             </Link>
           </motion.div>
         </div>
