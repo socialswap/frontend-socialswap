@@ -5,6 +5,7 @@ import ChannelCard from "../../Component/ChannelCard.jsx";
 import { useLocation } from "react-router-dom";
 import SEOHead from "../../Component/SEO/SEOHead";
 import { SearchOutlined, CloseOutlined, SlidersOutlined, CheckOutlined } from "@ant-design/icons";
+import { Slider, ConfigProvider } from "antd";
 
 const CATEGORY_OPTIONS = [
   { label: "🎮 Gaming", value: "Gaming" },
@@ -24,29 +25,26 @@ const CATEGORY_OPTIONS = [
   { label: "🚀 Motivation", value: "Motivation & Self-Improvement" },
 ];
 
-const SUBSCRIBER_OPTIONS = [
-  { label: "0 – 10K", value: [0, 10000] },
-  { label: "10K – 50K", value: [10000, 50000] },
-  { label: "50K – 100K", value: [50000, 100000] },
-  { label: "100K – 500K", value: [100000, 500000] },
-  { label: "500K – 1M", value: [500000, 1000000] },
-  { label: "1M+", value: [1000000, 99999999] },
-];
 
-const PRICE_OPTIONS = [
-  { label: "Under ₹10K", value: [0, 10000] },
-  { label: "₹10K – ₹1L", value: [10000, 100000] },
-  { label: "Above ₹1L", value: [100000, 99999999] },
-];
 
 const SORT_OPTIONS = [
   { label: "🔥 Popular", value: "popularity" },
   { label: "💸 Price ↑", value: "price-low" },
   { label: "💸 Price ↓", value: "price-high" },
-  { label: "👥 Subscribers", value: "subscribers" },
-  { label: "👁️ Most Views", value: "views" },
   { label: "🆕 Newest", value: "recent" },
 ];
+
+const formatSubs = (val) => {
+  if (val >= 1000000) return `${(val / 1000000).toFixed(1)}M`;
+  if (val >= 1000) return `${(val / 1000).toFixed(0)}K`;
+  return val;
+};
+
+const formatPrice = (val) => {
+  if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
+  if (val >= 1000) return `₹${(val / 1000).toFixed(0)}K`;
+  return `₹${val}`;
+};
 
 // Reusable Pill Toggle component
 const Pill = ({ label, active, onClick }) => (
@@ -68,7 +66,7 @@ const Pill = ({ label, active, onClick }) => (
 
 const FilterSection = ({ title, icon, children }) => (
   <div>
-    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2.5 flex items-center gap-1.5">
+    <p className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-2.5 flex items-center gap-1.5">
       <span>{icon}</span> {title}
     </p>
     <div className="flex flex-wrap gap-2">{children}</div>
@@ -150,9 +148,10 @@ const Channels = () => {
     }
     if (filters.subscribersRange.length > 0) {
       filtered = filtered.filter(ch =>
-        filters.subscribersRange.some(range =>
-          (ch.subscriberCount || 0) >= range[0] && (ch.subscriberCount || 0) <= range[1]
-        )
+        filters.subscribersRange.some(range => {
+          const maxVal = range[1] === 2000000 ? Infinity : range[1];
+          return (ch.subscriberCount || 0) >= range[0] && (ch.subscriberCount || 0) <= maxVal;
+        })
       );
     }
     if (filters.viewsRange.length > 0) {
@@ -172,7 +171,10 @@ const Channels = () => {
     if (filters.priceRange.length > 0) {
       filtered = filtered.filter(ch => {
         const price = parseFloat(ch.price) || 0;
-        return filters.priceRange.some(range => price >= range[0] && price <= range[1]);
+        return filters.priceRange.some(range => {
+          const maxVal = range[1] === 1000000 ? Infinity : range[1];
+          return price >= range[0] && price <= maxVal;
+        });
       });
     }
     if (filters.monetization.length > 0) {
@@ -293,6 +295,29 @@ const Channels = () => {
                   {opt.label}
                 </button>
               ))}
+
+              <div className="w-[1px] h-6 bg-gray-300 dark:bg-gray-600 my-auto mx-1" />
+
+              <button
+                onClick={() => toggleFilter("channelType", "shorts")}
+                className={`whitespace-nowrap px-3 py-2 rounded-xl text-sm font-medium border transition-all duration-200
+                  ${filters.channelType.includes("shorts")
+                    ? "bg-[#6E4BFF] border-[#6E4BFF] text-white shadow-purple-glow-soft"
+                    : "bg-white/45 dark:bg-[#110C1F]/45 border-white/40 dark:border-white/10 text-text-secondary hover:border-[#8A6CFF] hover:text-text-primary"
+                  }`}
+              >
+                ⚡ Shorts
+              </button>
+              <button
+                onClick={() => toggleFilter("channelType", "long-form")}
+                className={`whitespace-nowrap px-3 py-2 rounded-xl text-sm font-medium border transition-all duration-200
+                  ${filters.channelType.includes("long-form")
+                    ? "bg-[#6E4BFF] border-[#6E4BFF] text-white shadow-purple-glow-soft"
+                    : "bg-white/45 dark:bg-[#110C1F]/45 border-white/40 dark:border-white/10 text-text-secondary hover:border-[#8A6CFF] hover:text-text-primary"
+                  }`}
+              >
+                🎞️ Long Form
+              </button>
             </div>
 
             {/* Filters toggle */}
@@ -322,6 +347,81 @@ const Channels = () => {
                 <CloseOutlined className="text-xs" /> Clear
               </button>
             )}
+          </div>
+
+
+        </div>
+      </div>
+
+      {/* ── Sliders (Scrolls with page) ── */}
+      <style>{`
+        .ant-slider .ant-slider-handle::after {
+          background-color: #4C28D9 !important;
+          box-shadow: 0 0 0 2px #4C28D9 !important;
+        }
+        .ant-slider .ant-slider-handle:hover::after {
+          background-color: #3D1B99 !important;
+          box-shadow: 0 0 0 2px #3D1B99 !important;
+        }
+      `}</style>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 lg:w-2/3">
+          <div className="flex-1">
+            <FilterSection title="Subscribers" icon="👥">
+              <div className="px-2 w-full pt-1">
+                <ConfigProvider theme={{ 
+                  token: { colorPrimary: '#4C28D9', colorPrimaryBorderHover: '#3D1B99', colorFillTertiary: 'rgba(76, 40, 217, 0.2)' },
+                  components: { Slider: { railSize: 8, handleSize: 20, handleSizeHover: 22 } }
+                }}>
+                  <Slider
+                    range
+                    min={0}
+                    max={2000000}
+                    step={10000}
+                    value={filters.subscribersRange[0] || [0, 2000000]}
+                    onChange={(val) => setFilters(prev => ({ ...prev, subscribersRange: [val] }))}
+                    tooltip={{ formatter: (val) => {
+                        if (val >= 1000000) return `${(val / 1000000).toFixed(1)}M`;
+                        if (val >= 1000) return `${(val / 1000).toFixed(0)}K`;
+                        return val;
+                    }}}
+                  />
+                </ConfigProvider>
+                <div className="flex justify-between text-sm font-bold text-[#4C28D9] mt-1.5">
+                  <span>{formatSubs((filters.subscribersRange[0] || [0, 2000000])[0])}</span>
+                  <span>{(filters.subscribersRange[0] || [0, 2000000])[1] === 2000000 ? '2M+' : formatSubs((filters.subscribersRange[0] || [0, 2000000])[1])}</span>
+                </div>
+              </div>
+            </FilterSection>
+          </div>
+          
+          <div className="flex-1">
+            <FilterSection title="Price" icon="💸">
+              <div className="px-2 w-full pt-1">
+                <ConfigProvider theme={{ 
+                  token: { colorPrimary: '#4C28D9', colorPrimaryBorderHover: '#3D1B99', colorFillTertiary: 'rgba(76, 40, 217, 0.2)' },
+                  components: { Slider: { railSize: 8, handleSize: 20, handleSizeHover: 22 } }
+                }}>
+                  <Slider
+                    range
+                    min={0}
+                    max={1000000}
+                    step={10000}
+                    value={filters.priceRange[0] || [0, 1000000]}
+                    onChange={(val) => setFilters(prev => ({ ...prev, priceRange: [val] }))}
+                    tooltip={{ formatter: (val) => {
+                        if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
+                        if (val >= 1000) return `₹${(val / 1000).toFixed(0)}K`;
+                        return `₹${val}`;
+                    }}}
+                  />
+                </ConfigProvider>
+                <div className="flex justify-between text-sm font-bold text-[#4C28D9] mt-1.5">
+                  <span>{formatPrice((filters.priceRange[0] || [0, 1000000])[0])}</span>
+                  <span>{(filters.priceRange[0] || [0, 1000000])[1] === 1000000 ? '₹10L+' : formatPrice((filters.priceRange[0] || [0, 1000000])[1])}</span>
+                </div>
+              </div>
+            </FilterSection>
           </div>
         </div>
       </div>
@@ -353,40 +453,16 @@ const Channels = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 pt-1">
 
-                {/* Subscribers */}
-                <FilterSection title="Subscribers" icon="👥">
-                  {SUBSCRIBER_OPTIONS.map(opt => (
-                    <Pill
-                      key={opt.label}
-                      label={opt.label}
-                      active={isRangeActive("subscribersRange", opt.value)}
-                      onClick={() => toggleRangeFilter("subscribersRange", opt.value)}
-                    />
-                  ))}
-                </FilterSection>
-
-                {/* Price */}
-                <FilterSection title="Price" icon="💸">
-                  {PRICE_OPTIONS.map(opt => (
-                    <Pill
-                      key={opt.label}
-                      label={opt.label}
-                      active={isRangeActive("priceRange", opt.value)}
-                      onClick={() => toggleRangeFilter("priceRange", opt.value)}
-                    />
-                  ))}
-                </FilterSection>
-
                 {/* Monetization */}
                 <FilterSection title="Monetization" icon="💰">
                   <Pill label="✅ Monetized" active={filters.monetization.includes("monetized")} onClick={() => toggleFilter("monetization", "monetized")} />
                   <Pill label="❌ Non-Monetized" active={filters.monetization.includes("non-monetized")} onClick={() => toggleFilter("monetization", "non-monetized")} />
                 </FilterSection>
 
-                {/* Channel Type */}
-                <FilterSection title="Channel Type" icon="📹">
-                  <Pill label="⚡ Shorts" active={filters.channelType.includes("shorts")} onClick={() => toggleFilter("channelType", "shorts")} />
-                  <Pill label="🎞️ Long Form" active={filters.channelType.includes("long-form")} onClick={() => toggleFilter("channelType", "long-form")} />
+                {/* Sort By Growth */}
+                <FilterSection title="Sort By" icon="📊">
+                  <Pill label="👥 Subscribers" active={sortBy === "subscribers"} onClick={() => setSortBy("subscribers")} />
+                  <Pill label="👁️ Most Views" active={sortBy === "views"} onClick={() => setSortBy("views")} />
                 </FilterSection>
 
               </div>

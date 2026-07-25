@@ -18,8 +18,8 @@ const fadeSlide = {
 };
 
 const glowBreath = {
-  rest: { boxShadow: '0 10px 30px rgba(248,55,88,0.12)', transition: { duration: 2, repeat: Infinity, repeatType: 'reverse' } },
-  hover: { boxShadow: '0 18px 50px rgba(248,55,88,0.25)' }
+  rest: { boxShadow: '0 10px 30px rgba(110,75,255,0.12)', transition: { duration: 2, repeat: Infinity, repeatType: 'reverse' } },
+  hover: { boxShadow: '0 18px 50px rgba(110,75,255,0.25)' }
 };
 
 const MagneticButton = ({ active, onClick, children }) => {
@@ -51,13 +51,13 @@ const BuySellToggle = ({ value, onChange, dark }) => {
           style={{ left: isBuy ? 4 : '50%', right: isBuy ? '50%' : 4 }}
         />
         <MagneticButton active={isBuy} onClick={() => onChange('buy')}>
-          <span className={`inline-flex h-7 w-7 items-center justify-center rounded-xl ${isBuy ? 'bg-gradient-to-br from-rose-500 to-orange-400 text-white' : 'bg-rose-50 text-rose-500'}`}>
+          <span className={`inline-flex h-7 w-7 items-center justify-center rounded-xl ${isBuy ? 'bg-gradient-to-br from-[#7B61FF] to-[#B88DFF] text-white' : 'bg-[#F2ECFF] text-[#6E4BFF]'}`}>
             <ShoppingCartOutlined />
           </span>
           <span className={`${isBuy ? 'text-gray-900' : 'text-gray-600'}`}>Buy Channel</span>
         </MagneticButton>
         <MagneticButton active={!isBuy} onClick={() => onChange('sell')}>
-          <span className={`inline-flex h-7 w-7 items-center justify-center rounded-xl ${!isBuy ? 'bg-gradient-to-br from-rose-500 to-orange-400 text-white' : 'bg-rose-50 text-rose-500'}`}>
+          <span className={`inline-flex h-7 w-7 items-center justify-center rounded-xl ${!isBuy ? 'bg-gradient-to-br from-[#7B61FF] to-[#B88DFF] text-white' : 'bg-[#F2ECFF] text-[#6E4BFF]'}`}>
             <DollarOutlined />
           </span>
           <span className={`${!isBuy ? 'text-gray-900' : 'text-gray-600'}`}>Sell Channel</span>
@@ -89,7 +89,7 @@ const ViewModeSwitch = ({ mode, onChange, dark }) => {
           const active = mode === it.key;
           return (
             <MagneticButton key={it.key} active={active} onClick={() => onChange(it.key)}>
-              <span className={`inline-flex h-7 w-7 items-center justify-center rounded-xl ${active ? 'bg-gradient-to-br from-rose-500 to-orange-400 text-white' : 'bg-rose-50 text-rose-500'}`}>
+              <span className={`inline-flex h-7 w-7 items-center justify-center rounded-xl ${active ? 'bg-gradient-to-br from-[#7B61FF] to-[#B88DFF] text-white' : 'bg-[#F2ECFF] text-[#6E4BFF]'}`}>
                 {it.icon}
               </span>
               <span className={`${active ? 'text-gray-900' : 'text-gray-600'}`}>{it.label}</span>
@@ -102,7 +102,7 @@ const ViewModeSwitch = ({ mode, onChange, dark }) => {
         className="mt-2 h-1 w-full rounded-full overflow-hidden"
       >
         <motion.div
-          className="h-full bg-gradient-to-r from-rose-500 via-orange-400 to-amber-300"
+          className="h-full bg-gradient-to-r from-[#6E4BFF] via-[#8A6CFF] to-[#C6B4FF]"
           animate={{ width: mode === 'list' ? '33.3%' : mode === 'timeline' ? '66.6%' : '100%' }}
           transition={{ duration: 0.5 }}
         />
@@ -117,7 +117,7 @@ const AnimatedIcon = ({ index }) => {
       initial={{ rotate: 0 }}
       whileHover={{ rotate: 8 }}
       transition={{ type: 'spring', stiffness: 200, damping: 12 }}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-rose-500 to-orange-400 text-white font-extrabold shadow-md"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#7B61FF] to-[#B88DFF] text-white font-extrabold shadow-md"
     >
       {index}
     </motion.span>
@@ -150,7 +150,7 @@ const StepCard = ({ index, title, desc, details, dark }) => {
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-3xl"
           style={{ border: '1px solid transparent' }}
-          whileHover={{ boxShadow: 'inset 0 0 0 1px rgba(248,55,88,0.35)' }}
+          whileHover={{ boxShadow: 'inset 0 0 0 1px rgba(110,75,255,0.35)' }}
         />
       </motion.div>
     </Tooltip>
@@ -169,7 +169,7 @@ const TimelineItem = ({ index, title, desc, details, side = 'left', dark }) => {
     >
       <div className="flex items-start gap-3 w-full md:w-1/2 pl-10 md:pl-0">
         <motion.div
-          className="absolute left-4 md:left-1/2 md:-translate-x-1/2 mt-2 w-4 h-4 rounded-full bg-gradient-to-br from-rose-500 to-orange-400 shadow-[0_0_0_4px_rgba(248,55,88,0.15)]"
+          className="absolute left-4 md:left-1/2 md:-translate-x-1/2 mt-2 w-4 h-4 rounded-full bg-gradient-to-br from-[#7B61FF] to-[#B88DFF] shadow-[0_0_0_4px_rgba(110,75,255,0.15)]"
           animate={{ scale: [1, 1.2, 1], opacity: [0.9, 1, 0.9] }}
           transition={{ repeat: Infinity, duration: 2.2 }}
         />
@@ -177,7 +177,7 @@ const TimelineItem = ({ index, title, desc, details, side = 'left', dark }) => {
           <div className={`rounded-3xl p-5 border shadow-sm w-full ${dark ? 'bg-white/5 border-white/10 text-white' : 'bg-white/70 backdrop-blur border-white/70'}`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-rose-500 to-orange-400 text-white text-xs font-extrabold">{index}</span>
+                <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-[#7B61FF] to-[#B88DFF] text-white text-xs font-extrabold">{index}</span>
                 <div className="text-base font-bold">{title}</div>
               </div>
               <motion.div
@@ -185,7 +185,7 @@ const TimelineItem = ({ index, title, desc, details, side = 'left', dark }) => {
                 whileInView={{ width: 72 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="h-1 rounded-full bg-gradient-to-r from-rose-500 via-orange-400 to-amber-300"
+                className="h-1 rounded-full bg-gradient-to-r from-[#6E4BFF] via-[#8A6CFF] to-[#C6B4FF]"
               />
             </div>
             <div className={`mt-2 text-sm ${dark ? 'text-gray-300' : 'text-gray-600'}`}>{desc}</div>
@@ -205,7 +205,7 @@ const FlowVisualizerNode = ({ index, title, desc, details, dark }) => {
         className={`rounded-3xl p-5 border shadow-sm ${dark ? 'bg-white/5 border-white/10 text-white' : 'bg-white/70 backdrop-blur border-white/70'}`}
       >
         <div className="flex items-center gap-2 mb-1">
-          <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-rose-500 to-orange-400 text-white text-xs font-extrabold">
+          <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-[#7B61FF] to-[#B88DFF] text-white text-xs font-extrabold">
             {index}
           </span>
           <div className="font-bold">{title}</div>
@@ -233,7 +233,7 @@ const TimelineView = ({ dark, steps }) => {
         <motion.div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(180deg, rgba(248,55,88,0.0), rgba(248,55,88,0.25), rgba(255,160,64,0.25), rgba(248,55,88,0.0))'
+            background: 'linear-gradient(180deg, rgba(110,75,255,0.0), rgba(110,75,255,0.25), rgba(198,180,255,0.25), rgba(110,75,255,0.0))'
           }}
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 3, repeat: Infinity }}
@@ -284,18 +284,18 @@ const VisualizerView = ({ dark, steps }) => {
         <svg className="absolute inset-0 w-full h-full" style={{ filter: 'blur(0.25px)' }}>
           <defs>
             <linearGradient id="glow" x1="0" x2="1" y1="0" y2="0">
-              <stop offset="0%" stopColor="#F83758" />
-              <stop offset="100%" stopColor="#ff9f40" />
+              <stop offset="0%" stopColor="#6E4BFF" />
+              <stop offset="100%" stopColor="#C6B4FF" />
             </linearGradient>
           </defs>
           <motion.line x1="10%" y1="18%" x2="45%" y2="32%" stroke="url(#glow)" strokeWidth="2" initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} transition={{ duration: 1.2 }} />
           <motion.line x1="45%" y1="32%" x2="78%" y2="22%" stroke="url(#glow)" strokeWidth="2" initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} transition={{ duration: 1.2, delay: 0.2 }} />
           <motion.line x1="20%" y1="58%" x2="50%" y2="72%" stroke="url(#glow)" strokeWidth="2" initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} transition={{ duration: 1.2, delay: 0.4 }} />
-          <motion.circle cx="10%" cy="18%" r="4" fill="#F83758" />
-          <motion.circle cx="45%" cy="32%" r="4" fill="#ff6b6b" />
-          <motion.circle cx="78%" cy="22%" r="4" fill="#ff9f40" />
-          <motion.circle cx="20%" cy="58%" r="4" fill="#F83758" />
-          <motion.circle cx="50%" cy="72%" r="4" fill="#ff9f40" />
+          <motion.circle cx="10%" cy="18%" r="4" fill="#6E4BFF" />
+          <motion.circle cx="45%" cy="32%" r="4" fill="#8A6CFF" />
+          <motion.circle cx="78%" cy="22%" r="4" fill="#C6B4FF" />
+          <motion.circle cx="20%" cy="58%" r="4" fill="#6E4BFF" />
+          <motion.circle cx="50%" cy="72%" r="4" fill="#C6B4FF" />
         </svg>
       </motion.div>
     </div>
@@ -321,17 +321,17 @@ const BackgroundShapes = ({ dark }) => {
   return (
     <div className="pointer-events-none absolute inset-0">
       <motion.div
-        className={`absolute -top-24 -right-24 w-72 h-72 ${dark ? 'bg-rose-400/10' : 'bg-rose-100/60'} blur-3xl rounded-full`}
+        className={`absolute -top-24 -right-24 w-72 h-72 ${dark ? 'bg-purple-400/10' : 'bg-purple-100/60'} blur-3xl rounded-full`}
         animate={{ y: [0, -10, 0], x: [0, 10, 0] }}
         transition={{ duration: 10, repeat: Infinity }}
       />
       <motion.div
-        className={`absolute -bottom-24 -left-24 w-72 h-72 ${dark ? 'bg-orange-400/10' : 'bg-orange-100/60'} blur-3xl rounded-full`}
+        className={`absolute -bottom-24 -left-24 w-72 h-72 ${dark ? 'bg-indigo-400/10' : 'bg-indigo-100/60'} blur-3xl rounded-full`}
         animate={{ y: [0, 12, 0], x: [0, -12, 0] }}
         transition={{ duration: 12, repeat: Infinity }}
       />
       <motion.div
-        className={`absolute left-1/3 top-1/3 w-40 h-40 ${dark ? 'bg-amber-400/10' : 'bg-amber-100/70'} rotate-45 blur-2xl rounded-3xl`}
+        className={`absolute left-1/3 top-1/3 w-40 h-40 ${dark ? 'bg-fuchsia-400/10' : 'bg-fuchsia-100/70'} rotate-45 blur-2xl rounded-3xl`}
         animate={{ rotate: [40, 50, 40] }}
         transition={{ duration: 14, repeat: Infinity }}
       />
@@ -342,7 +342,15 @@ const BackgroundShapes = ({ dark }) => {
 const ChannelTransactionSteps = () => {
   const [transactionType, setTransactionType] = useState('buy');
   const [mode, setMode] = useState('list'); // default: list
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
+
+  React.useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setDark(document.documentElement.classList.contains('dark'));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
   const whatsappLink = 'https://wa.me/919423523291';
 
   const buySteps = useMemo(() => ([
@@ -450,16 +458,6 @@ const ChannelTransactionSteps = () => {
           <div className="flex flex-col items-center gap-5">
             <div className="flex items-center justify-center gap-3">
               <BuySellToggle value={transactionType} onChange={setTransactionType} dark={dark} />
-              <Tooltip title={dark ? 'Pro Mode: Neon Dark' : 'Light Mode'}>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setDark((d) => !d)}
-                  className={`ml-2 flex items-center gap-2 rounded-2xl px-3 py-2 ${dark ? 'bg-white/10 border border-white/10 text-white' : 'bg-white/70 border border-white/70'} backdrop-blur`}
-                >
-                  <BulbOutlined className={`${dark ? 'text-yellow-300' : 'text-rose-500'}`} />
-                </motion.button>
-              </Tooltip>
             </div>
             <ViewModeSwitch mode={mode} onChange={setMode} dark={dark} />
           </div>

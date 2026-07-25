@@ -84,7 +84,7 @@ const CategoryMarquee = () => {
             hidden: { opacity: 0, scale: 0.8 },
             visible: { opacity: 1, scale: 1, transition: { type: 'spring', bounce: 0.5 } }
           }}
-          className="inline-block py-1 px-3 rounded-full bg-accent-pink/10 text-accent-pink font-semibold text-sm mb-4 border border-accent-pink/20"
+          className="inline-block py-1 px-4 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-bold text-sm mb-4 border border-purple-200 dark:border-purple-500/30 shadow-sm"
         >
           Find Your Niche
         </motion.span>
@@ -93,7 +93,7 @@ const CategoryMarquee = () => {
             hidden: { opacity: 0, y: 20 },
             visible: { opacity: 1, y: 0, transition: { type: 'spring', bounce: 0.4 } }
           }}
-          className="text-3xl sm:text-4xl font-bold text-text-primary mb-3"
+          className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-3 tracking-tight"
         >
           Explore Categories
         </motion.h2>
@@ -102,7 +102,7 @@ const CategoryMarquee = () => {
             hidden: { opacity: 0, y: 20 },
             visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
           }}
-          className="text-text-secondary text-lg max-w-2xl mx-auto"
+          className="text-gray-600 dark:text-gray-300 text-lg md:text-xl max-w-2xl mx-auto"
         >
           From gaming and tech to lifestyle and finance, we have thousands of verified YouTube channels categorized just for you.
         </motion.p>
