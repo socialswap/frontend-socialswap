@@ -56,8 +56,8 @@ const Pill = ({ label, active, onClick }) => (
       inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium
       border transition-all duration-200 whitespace-nowrap select-none
       ${active
-        ? "bg-purple-600 border-purple-600 text-white shadow-md shadow-purple-500/30"
-        : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-purple-400 hover:text-purple-600 dark:hover:text-purple-400"
+        ? "bg-[#6E4BFF] border-[#6E4BFF] text-white shadow-purple-glow-soft"
+        : "bg-white/45 dark:bg-[#110C1F]/45 border-white/40 dark:border-white/10 text-text-secondary hover:border-[#8A6CFF] hover:text-text-primary"
       }
     `}
   >
@@ -247,7 +247,7 @@ const Channels = () => {
   const totalActive = Object.values(filters).reduce((sum, arr) => sum + arr.length, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 mt-[4rem] transition-colors duration-200">
+    <div className="min-h-screen bg-transparent mt-[5rem] transition-colors duration-200">
       <SEOHead
         title="Browse YouTube Channels for Sale in India"
         description="Explore verified YouTube channels for sale. Filter by category, subscribers, earnings. Buy monetized channels in Gaming, Tech, Finance, Education & more."
@@ -257,7 +257,7 @@ const Channels = () => {
       />
 
       {/* ── Sticky Top Bar ── */}
-      <div className="sticky top-16 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
+      <div className="sticky top-20 z-40 bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border-b border-white/40 dark:border-white/10 shadow-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex items-center gap-3 flex-wrap">
 
@@ -269,7 +269,7 @@ const Channels = () => {
                 placeholder="Search channels by name..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                className="w-full pl-10 pr-4 py-2.5 rounded-input border border-white/40 dark:border-white/10 bg-white/55 dark:bg-[#2A2045]/55 text-text-primary placeholder-text-secondary text-sm focus:outline-none focus:ring-2 focus:ring-[#8A6CFF] transition"
               />
               {searchTerm && (
                 <button onClick={() => setSearchTerm("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
@@ -286,8 +286,8 @@ const Channels = () => {
                   onClick={() => setSortBy(opt.value)}
                   className={`whitespace-nowrap px-3 py-2 rounded-xl text-sm font-medium border transition-all duration-200
                     ${sortBy === opt.value
-                      ? "bg-purple-600 border-purple-600 text-white shadow-md shadow-purple-500/30"
-                      : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-purple-400 hover:text-purple-500"
+                      ? "bg-[#6E4BFF] border-[#6E4BFF] text-white shadow-purple-glow-soft"
+                      : "bg-white/45 dark:bg-[#110C1F]/45 border-white/40 dark:border-white/10 text-text-secondary hover:border-[#8A6CFF] hover:text-text-primary"
                     }`}
                 >
                   {opt.label}
@@ -300,15 +300,15 @@ const Channels = () => {
               onClick={() => setShowFilters(v => !v)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-200
                 ${showFilters
-                  ? "bg-purple-600 border-purple-600 text-white shadow-md shadow-purple-500/30"
-                  : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-purple-400"
+                  ? "bg-[#6E4BFF] border-[#6E4BFF] text-white shadow-purple-glow-soft"
+                  : "bg-white/45 dark:bg-[#110C1F]/45 border-white/40 dark:border-white/10 text-text-primary hover:border-[#8A6CFF]"
                 }`}
             >
               <SlidersOutlined />
               Filters
               {totalActive > 0 && (
                 <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold
-                  ${showFilters ? "bg-white text-purple-600" : "bg-purple-600 text-white"}`}>
+                  ${showFilters ? "bg-white text-[#6E4BFF]" : "bg-[#6E4BFF] text-white"}`}>
                   {totalActive}
                 </span>
               )}
@@ -335,7 +335,7 @@ const Channels = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+            className="bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border-b border-white/40 dark:border-white/10"
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
 
@@ -405,7 +405,7 @@ const Channels = () => {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="animate-pulse bg-white dark:bg-gray-800 rounded-2xl h-96 shadow-sm border border-transparent dark:border-gray-700" />
+              <div key={i} className="animate-pulse bg-white/30 dark:bg-[#110C1F]/30 rounded-card h-96 shadow-sm border border-white/20 dark:border-white/10" />
             ))}
           </div>
         ) : filteredChannels.length > 0 ? (
@@ -438,7 +438,7 @@ const Channels = () => {
             <div className="text-6xl mb-4">🔍</div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">No channels found</h1>
             <p className="text-gray-600 dark:text-gray-400 mb-6">Try adjusting your filters or search term</p>
-            <button onClick={resetFilters} className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold transition shadow-md shadow-purple-500/30">
+            <button onClick={resetFilters} className="px-6 py-3 bg-btn-gradient hover:shadow-purple-glow-soft hover:translate-y-[-3px] hover:scale-[1.03] transition-all text-white rounded-button font-semibold shadow-md">
               Clear All Filters
             </button>
           </motion.div>

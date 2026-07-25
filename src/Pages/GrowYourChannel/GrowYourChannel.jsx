@@ -34,20 +34,20 @@ const Container = styled.div`
 
 const StepContent = styled(Card)`
   margin-bottom: 16px;
-  background: var(--bg-card, rgba(255,255,255,0.7));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--border, rgba(255,255,255,0.3));
-  border-radius: 16px;
+  background: var(--bg-glass, rgba(255,255,255,0.45));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 24px;
   transition: transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease, background 280ms ease;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  box-shadow: 0 15px 40px rgba(120,90,255,0.15);
   position: relative;
   overflow: hidden;
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+    box-shadow: 0 20px 45px rgba(120,90,255,0.22);
     border-color: ${props => props.accent || 'var(--primary)'};
-    background: var(--bg-secondary, rgba(255,255,255,0.85));
+    background: var(--bg-glass, rgba(255,255,255,0.55));
   }
   .ant-typography {
     color: var(--text-primary, rgba(0, 0, 0, 0.88)) !important;

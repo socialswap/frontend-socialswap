@@ -64,7 +64,7 @@ const LazyWrapper = ({ children, minHeight = '50vh' }) => {
 
 const HomePage = () => {
   return (
-    <div className="bg-light-primary dark:bg-bg-primary text-text-light-primary dark:text-text-primary min-h-screen transition-colors duration-300 overflow-hidden">
+    <div className="bg-transparent text-text-primary min-h-screen transition-colors duration-300 overflow-hidden">
       <SEOHead
         title="Buy & Sell YouTube Channels - India's #1 Channel Marketplace"
         description="SocialSwap is India's most trusted marketplace to buy and sell verified YouTube channels. Browse 100+ monetized channels across Gaming, Tech, Finance & more with full escrow protection."

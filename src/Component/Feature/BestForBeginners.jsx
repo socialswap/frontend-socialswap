@@ -43,7 +43,7 @@ const BestForBeginners = () => {
   }, []);
 
   return (
-    <section className="relative py-16 px-4 sm:px-6 lg:px-8 overflow-hidden bg-bg-primary text-text-primary transition-all duration-300">
+    <section className="relative py-8 md:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden bg-transparent text-text-primary transition-all duration-300">
       <div className="relative z-10 mx-auto">
         <motion.div
           initial="hidden"

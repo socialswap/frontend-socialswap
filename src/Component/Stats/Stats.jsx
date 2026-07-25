@@ -88,7 +88,7 @@ const StatItem = ({
 
   return (
     <div
-      className={`relative flex flex-col gap-7 px-8 py-9 rounded-[24px] bg-gradient-to-b from-[rgba(255,255,255,0.9)] to-[rgba(250,252,255,0.96)] dark:from-[rgba(24,17,46,0.9)] dark:to-[rgba(13,7,28,0.96)] border border-transparent bg-origin-border bg-clip-padding transition-all duration-600 ease-[cubic-bezier(0.22,1,0.36,1)] ${active ? 'opacity-100 animate-fade-in-rise' : 'opacity-0'}`}
+      className={`relative flex flex-col gap-7 px-8 py-9 rounded-card bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/40 dark:border-white/10 transition-all duration-600 ease-[cubic-bezier(0.22,1,0.36,1)] ${active ? 'opacity-100 animate-fade-in-rise' : 'opacity-0'}`}
       style={blockStyle}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -173,11 +173,11 @@ const Stats = () => {
   }, [hasAnimated]);
 
   return (
-    <section className="relative py-16 bg-gradient-to-b from-white via-[#f7faff] to-[#eef5ff] dark:from-[#070312] dark:via-[#0d071c] dark:to-[#110824] overflow-hidden" ref={sectionRef}>
-      <div className="w-[min(280px,40vw)] sm:w-[min(220px,60vw)] h-1 mx-auto mt-0 mb-10 rounded-full bg-gradient-to-r from-[rgba(229,9,20,0.9)] to-[rgba(0,184,255,0.9)] opacity-80 shadow-[0_0_22px_rgba(229,9,20,0.32)]" />
-      <Card className="stats-card-custom-bg relative max-w-[1100px] mx-auto px-6 py-10 sm:px-12 sm:py-14 rounded-[28px] shadow-[0_40px_70px_-60px_rgba(4,17,46,0.4)] dark:shadow-[0_40px_70px_-60px_rgba(0,0,0,0.7)] overflow-hidden backdrop-blur-md" variant="borderless">
+    <section className="relative py-8 md:py-16 bg-transparent overflow-hidden" ref={sectionRef}>
+      <div className="w-[min(280px,40vw)] sm:w-[min(220px,60vw)] h-1 mx-auto mt-0 mb-10 rounded-full bg-gradient-to-r from-[rgba(110,75,255,0.9)] to-[rgba(244,182,210,0.9)] opacity-80 shadow-[0_0_22px_rgba(110,75,255,0.32)]" />
+      <Card className="stats-card-custom-bg relative max-w-[1100px] mx-auto px-6 py-10 sm:px-12 sm:py-14 rounded-card shadow-card overflow-hidden bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/40 dark:border-white/10" variant="borderless">
         <div className="text-center mb-12">
-          <Title level={2} className="!m-0 font-sans !font-bold text-[clamp(1.75rem,4vw,2.6rem)] tracking-[0.04em] bg-gradient-to-r from-[rgba(229,9,20,0.92)] to-[rgba(0,184,255,0.95)] bg-clip-text !text-transparent">
+          <Title level={2} className="!m-0 font-sans !font-bold text-[clamp(1.75rem,4vw,2.6rem)] tracking-[0.04em] bg-gradient-to-r from-[#6E4BFF] to-[#F4B6D2] bg-clip-text !text-transparent">
             Our Impact In Numbers
           </Title>
           <Text className="inline-block mt-3 text-[rgba(22,31,55,0.72)] dark:text-[#C9C4DD] text-[0.95rem] tracking-[0.01em]">
@@ -190,7 +190,7 @@ const Stats = () => {
           ))}
         </div>
       </Card>
-      <div className="w-[min(280px,40vw)] sm:w-[min(220px,60vw)] h-1 mx-auto mt-12 rounded-full bg-gradient-to-r from-[rgba(229,9,20,0.9)] to-[rgba(0,184,255,0.9)] opacity-65 shadow-[0_0_22px_rgba(0,184,255,0.28)]" />
+      <div className="w-[min(280px,40vw)] sm:w-[min(220px,60vw)] h-1 mx-auto mt-12 rounded-full bg-gradient-to-r from-[#6E4BFF] to-[#F4B6D2] opacity-65 shadow-[0_0_22px_rgba(110,75,255,0.28)]" />
     </section>
   );
 };

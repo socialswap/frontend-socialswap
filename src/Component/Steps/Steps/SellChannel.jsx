@@ -71,17 +71,17 @@ const SellChannelSteps = () => {
   // ... rest of the component remains the same
 
   return (
-    <Card style={{ maxWidth: 800, margin: '0 auto', marginTop: 20 }} className="rounded-3xl bg-white/70 backdrop-blur border border-white/70 shadow-xl relative overflow-hidden">
+    <Card style={{ maxWidth: 800, margin: '0 auto', marginTop: 20 }} className="rounded-card bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/40 dark:border-white/10 shadow-card relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 -right-24 w-72 h-72 bg-rose-100/60 blur-3xl rounded-full" />
-        <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-orange-100/60 blur-3xl rounded-full" />
+        <div className="absolute -top-24 -right-24 w-72 h-72 bg-purple-100/40 blur-3xl rounded-full" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-pink-100/40 blur-3xl rounded-full" />
       </div>
       <Title
         level={2}
         style={{
           textAlign: 'center',
           marginBottom: 24,
-          backgroundImage: 'linear-gradient(90deg, rgb(248,55,88), rgb(255,159,64))',
+          backgroundImage: 'var(--btn-gradient)',
           WebkitBackgroundClip: 'text',
           backgroundClip: 'text',
           color: 'transparent',
@@ -91,7 +91,7 @@ const SellChannelSteps = () => {
       >
         Sell Your YouTube Channel
       </Title>
-      <Paragraph style={{ fontSize: 16, marginBottom: 24, textAlign: 'center', color: '#374151' }}>
+      <Paragraph style={{ fontSize: 16, marginBottom: 24, textAlign: 'center', color: 'var(--text-secondary)' }}>
         Follow these simple steps to sell your YouTube channel on our platform.
       </Paragraph>
       <Steps

@@ -3,15 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { 
-  Gamepad2, 
-  GraduationCap, 
-  Shirt, 
-  Monitor, 
-  Baby, 
-  Tractor, 
-  Atom, 
-  BookOpen, 
-  Clapperboard,
   Heart,
   ThumbsUp,
   MessageSquare,
@@ -20,8 +11,6 @@ import {
   Star,
   Play as PlayIcon,
   Share2,
-  ChevronLeft,
-  ChevronRight,
   Smile,
   Zap,
   Music,
@@ -33,15 +22,21 @@ import {
 } from 'lucide-react';
 
 const niches = [
-  { id: 0, title: 'Gaming', icon: Gamepad2, color: '#8B5CF6' },
-  { id: 1, title: 'Education', icon: GraduationCap, color: '#10B981' },
-  { id: 2, title: 'Fashion', icon: Shirt, color: '#EC4899' },
-  { id: 3, title: 'Tech', icon: Monitor, color: '#3B82F6' },
-  { id: 4, title: 'Kids Content', icon: Baby, color: '#F59E0B' },
-  { id: 5, title: 'Agriculture', icon: Tractor, color: '#84CC16' },
-  { id: 6, title: 'Science', icon: Atom, color: '#06B6D4' },
-  { id: 7, title: 'Storytelling', icon: BookOpen, color: '#6366F1' },
-  { id: 8, title: 'Movies & Web', icon: Clapperboard, color: '#F43F5E' },
+  { id: 0, title: 'Gaming', icon: '/homelogos/gaming (1).png', color: '#8B5CF6' },
+  { id: 1, title: 'Education', icon: '/homelogos/education (1).png', color: '#10B981' },
+  { id: 2, title: 'Fashion & Beauty', icon: '/homelogos/fashion & beauty (1).png', color: '#EC4899' },
+  { id: 3, title: 'Tech', icon: '/homelogos/tech (1).png', color: '#3B82F6' },
+  { id: 4, title: 'Entertainment', icon: '/homelogos/entertainment (1).png', color: '#F59E0B' },
+  { id: 5, title: 'Business', icon: '/homelogos/business (1).png', color: '#84CC16' },
+  { id: 6, title: 'Finance', icon: '/homelogos/finance (1).png', color: '#06B6D4' },
+  { id: 7, title: 'Music', icon: '/homelogos/music (1).png', color: '#6366F1' },
+  { id: 8, title: 'Vlogging', icon: '/homelogos/Vlogging (1).png', color: '#F43F5E' },
+  { id: 9, title: 'Cooking', icon: '/homelogos/cooking (1).png', color: '#F97316' },
+  { id: 10, title: 'News', icon: '/homelogos/news (1).png', color: '#0EA5E9' },
+  { id: 11, title: 'Facts', icon: '/homelogos/facts (1).png', color: '#A855F7' },
+  { id: 12, title: 'Animation', icon: '/homelogos/animation (1).png', color: '#14B8A6' },
+  { id: 13, title: 'Podcast', icon: '/homelogos/podcast (1).png', color: '#EF4444' },
+  { id: 14, title: 'Real Estate', icon: '/homelogos/real estate (1).png', color: '#22C55E' },
 ];
 
 const N = niches.length;
@@ -75,43 +70,6 @@ const NicheCarousel = () => {
   const tweenRef = useRef(null);
   const progressObj = useRef({ value: 0 });
 
-  // Theme tracking for play button plaque
-  const [isLightMode, setIsLightMode] = useState(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved) return saved === 'light';
-    return document.documentElement.classList.contains('light') ||
-           document.documentElement.getAttribute('data-theme') === 'light';
-  });
-
-  useEffect(() => {
-    // Sync theme state on initial mount
-    const saved = localStorage.getItem('theme');
-    if (saved) {
-      setIsLightMode(saved === 'light');
-    } else {
-      setIsLightMode(
-        document.documentElement.classList.contains('light') ||
-        document.documentElement.getAttribute('data-theme') === 'light'
-      );
-    }
-
-    const observe = () => {
-      const root = document.documentElement;
-      setIsLightMode(
-        root.classList.contains('light') ||
-        root.getAttribute('data-theme') === 'light'
-      );
-    };
-
-    const observer = new MutationObserver(observe);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class', 'data-theme'],
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
@@ -120,27 +78,6 @@ const NicheCarousel = () => {
   }, []);
 
   const activeNiche = niches[activeIndex] || niches[0];
-
-  // Dynamic theme colors for the play button facets
-  const colors = isLightMode 
-    ? {
-        base: "#CBD5E1",
-        f1: "#E2E8F0",
-        f2: "#F1F5F9",
-        f3: "#94A3B8",
-        f4: "#CBD5E1",
-        f5: "#F8FAFC",
-        f6: "#FFFFFF"
-      }
-    : {
-        base: "#0F172A",
-        f1: "#1E293B",
-        f2: "#334155",
-        f3: "#0F172A",
-        f4: "#475569",
-        f5: "#1E293B",
-        f6: "#64748B"
-      };
 
   useGSAP(() => {
     const cards = cardsRef.current;
@@ -222,91 +159,7 @@ const NicheCarousel = () => {
     };
   }, { dependencies: [], scope: containerRef });
 
-  // Cinematic entrance animation on mount
-  useGSAP(() => {
-    gsap.fromTo('.play-plaque', 
-      {
-        y: isMobile ? -1000 : -2000,
-        x: isMobile ? -1000 : -2000,
-        scale: isMobile ? 4.0 : 8.0,
-        rotation: 2160,
-        autoAlpha: 0,
-      },
-      {
-        y: 0,
-        x: 0,
-        scale: 1,
-        rotation: 0,
-        autoAlpha: 1,
-        duration: 1.0,
-        delay: 0.5,
-        ease: 'power2.out',
-        onComplete: () => {
-          // Screen Shake on impact
-          gsap.fromTo(containerRef.current, 
-            { y: 15 }, 
-            { y: 0, duration: 0.5, ease: "elastic.out(1, 0.2)" }
-          );
-          // Dust Rings Expanding
-          gsap.fromTo('.dust-ring-1', 
-            { scale: 0.8, opacity: 0.8, autoAlpha: 1 }, 
-            { scale: 2.5, opacity: 0, duration: 0.6, ease: "power2.out" }
-          );
-          gsap.fromTo('.dust-ring-2', 
-            { scale: 0.8, opacity: 0.6, autoAlpha: 1 }, 
-            { scale: 3.5, opacity: 0, duration: 0.8, ease: "power2.out" }
-          );
-          // Dust Particles Exploding Outward
-          for(let i = 0; i < 8; i++) {
-            const angle = (i * 45) * (Math.PI / 180);
-            const dist = 120 + Math.random() * 80;
-            gsap.fromTo(`.dust-particle-${i}`,
-              { x: "-50%", y: "-50%", opacity: 0.8, scale: Math.random() * 0.5 + 0.8, autoAlpha: 1 },
-              { 
-                x: `calc(-50% + ${Math.cos(angle) * dist}px)`, 
-                y: `calc(-50% + ${Math.sin(angle) * dist}px)`, 
-                opacity: 0, 
-                scale: 0,
-                duration: 0.5 + Math.random() * 0.4,
-                ease: "power2.out"
-              }
-            );
-          }
-        }
-      }
-    );
-  }, { dependencies: [], scope: containerRef });
 
-  // Handle play button and crystal shimmer theme animations separately to prevent memory leaks
-  useGSAP(() => {
-    // Pulse animation for the red play icon
-    const pulse = gsap.to('.play-icon', {
-      scale: 1.15,
-      duration: 1.2,
-      repeat: -1,
-      yoyo: true,
-      ease: 'sine.inOut',
-      transformOrigin: '121px 80px'
-    });
-
-    // Shimmer/Glitter animation for the diamond cuts (sparkle every 300ms)
-    const shimmer = gsap.to('.shimmer-highlight', {
-      opacity: isLightMode ? 0.45 : 0.3,
-      duration: 0.3,
-      repeat: -1,
-      yoyo: true,
-      ease: 'power1.inOut',
-      stagger: {
-        amount: 0.2,
-        from: "random"
-      }
-    });
-
-    return () => {
-      pulse.kill();
-      shimmer.kill();
-    };
-  }, { dependencies: [isLightMode], scope: containerRef });
 
   // Separate effect to handle play/pause on hover to prevent recreation
   useEffect(() => {
@@ -324,6 +177,17 @@ const NicheCarousel = () => {
       className="relative w-full h-[550px] md:h-[700px] flex items-center justify-center overflow-hidden bg-transparent pt-12"
       ref={containerRef}
     >
+      {/* Background Image (desktop only) */}
+      <div 
+        className="absolute inset-0 hidden md:block pointer-events-none"
+        style={{
+          backgroundImage: `url('/homelogos/backgroundLogo (1).png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.15,
+        }}
+      />
       {/* Background Decor */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-500/10 dark:bg-purple-500/20 rounded-full blur-[100px] pointer-events-none" />
 
@@ -388,35 +252,33 @@ const NicheCarousel = () => {
       {/* Orbiting Cards */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-full h-full pointer-events-none">
         {niches.map((niche, i) => {
-          const Icon = niche.icon;
           return (
             <div
               key={niche.id}
               ref={el => cardsRef.current[i] = el}
-              className="absolute top-1/2 left-1/2 w-24 h-24 md:w-44 md:h-44 rounded-3xl backdrop-blur-xl border border-white/20 shadow-2xl flex flex-col items-center justify-center gap-1 md:gap-3 pointer-events-auto cursor-pointer transition-colors hover:border-white/40"
+              className="absolute top-1/2 left-1/2 w-24 h-24 md:w-44 md:h-44 rounded-[28px] backdrop-blur-[24px] bg-white/20 dark:bg-white/10 border border-white/40 dark:border-white/20 shadow-2xl flex flex-col items-center justify-center gap-1 md:gap-3 pointer-events-auto cursor-pointer hover:bg-white/30 dark:hover:bg-white/20 hover:scale-105 transition-all duration-300 group"
               style={{
-                backgroundColor: 'var(--bg-glass)',
-                boxShadow: `0 10px 30px -10px ${niche.color}40`,
+                boxShadow: `0 15px 35px -10px ${niche.color}50`,
                 marginTop: isMobile ? '-48px' : '-88px',
                 marginLeft: isMobile ? '-48px' : '-88px',
               }}
               onMouseEnter={() => !isMobile && setIsHovered(true)}
               onMouseLeave={() => !isMobile && setIsHovered(false)}
               onClick={() => {
-                // Instantly advance progress to make this card active
-                const currentP = progressObj.current.value;
-                const targetP = (N - i) / N;
-                // Animate smoothly to target position
-                gsap.to(progressObj.current, {
-                  value: targetP,
-                  duration: 0.5,
-                  ease: 'power2.out',
-                  onUpdate: () => tweenRef.current && tweenRef.current.vars.onUpdate()
-                });
+                navigate(`/channels?category=${encodeURIComponent(niche.title)}`);
               }}
             >
-              <Icon size={isMobile ? 28 : 44} color={niche.color} />
-              <span className="text-[10px] md:text-sm font-bold mt-1 md:mt-2 text-center px-2" style={{ color: 'var(--text-primary)' }}>
+              <img 
+                src={niche.icon} 
+                alt={niche.title} 
+                style={{ 
+                  width: isMobile ? 48 : 80, 
+                  height: isMobile ? 48 : 80, 
+                  objectFit: 'contain',
+                  filter: `drop-shadow(0px 8px 16px ${niche.color}80)`
+                }} 
+              />
+              <span className="text-[10px] md:text-sm font-extrabold mt-1 md:mt-2 text-center px-2 text-white drop-shadow-md tracking-wide">
                 {niche.title}
               </span>
             </div>
@@ -424,68 +286,39 @@ const NicheCarousel = () => {
         })}
       </div>
 
-      {/* Center Rectangular Play Button and Dust Impact */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none flex flex-col items-center mt-[-20px] md:mt-[-40px]">
-        {/* Dust Impact Elements (fired onComplete of landing animation) */}
-        <div className="absolute top-1/2 left-1/2 pointer-events-none z-0">
-          <div className="dust-ring-1 invisible opacity-0 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border-[4px] border-gray-400/50 dark:border-gray-200/40" />
-          <div className="dust-ring-2 invisible opacity-0 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border-[8px] border-gray-400/30 dark:border-gray-200/20" />
+      {/* Center Diamond Play Button */}
+      <div className="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none flex flex-col items-center">
+        {/* Dust Impact Elements (hidden) */}
+        <div className="absolute top-1/2 left-1/2 pointer-events-none z-0 hidden">
+          <div className="dust-ring-1 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border-[4px] border-gray-400/50 dark:border-gray-200/40" />
+          <div className="dust-ring-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border-[8px] border-gray-400/30 dark:border-gray-200/20" />
           {[...Array(8)].map((_, i) => (
-            <div key={i} className={`dust-particle-${i} invisible opacity-0 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 md:w-4 md:h-4 bg-gray-400/80 dark:bg-gray-200/80 rounded-full blur-[1px]`} />
+            <div key={i} className={`dust-particle-${i} absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 md:w-4 md:h-4 bg-gray-400/80 dark:bg-gray-200/80 rounded-full blur-[1px]`} />
           ))}
         </div>
 
-        {/* Rectangular Plaque */}
+        {/* Diamond Play Button Image */}
+        <style>{`
+          @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-14px); }
+          }
+          .play-plaque-float {
+            animation: floatUpDown 2.8s ease-in-out infinite;
+          }
+        `}</style>
         <div 
-          className="play-plaque invisible opacity-0 relative w-52 h-36 md:w-72 md:h-48 flex items-center justify-center group pointer-events-auto cursor-pointer transition-transform hover:scale-105 duration-500"
+          className="play-plaque play-plaque-float relative w-[340px] md:w-[630px] flex items-center justify-center pointer-events-auto cursor-pointer"
           onClick={() => navigate('/channels')}
         >
-          <svg viewBox="0 0 240 160" className="w-full h-full drop-shadow-2xl">
-            <defs>
-              <clipPath id="rounded-rect">
-                <rect x="0" y="0" width="240" height="160" rx="24" />
-              </clipPath>
-            </defs>
-            <g clipPath="url(#rounded-rect)">
-              {/* Base background */}
-              <rect width="240" height="160" fill={colors.base} />
-              {/* Facets */}
-              <polygon points="0,0 120,0 80,60" fill={colors.f1} />
-              <polygon points="120,0 240,0 150,50" fill={colors.f2} />
-              <polygon points="240,0 240,90 150,50" fill={colors.f3} />
-              <polygon points="240,90 240,160 170,110" fill={colors.f4} />
-              <polygon points="240,160 120,160 170,110" fill={colors.f5} />
-              <polygon points="120,160 0,160 80,110" fill={colors.f3} />
-              <polygon points="0,160 0,70 80,110" fill={colors.f1} />
-              <polygon points="0,70 0,0 80,60" fill={colors.f2} />
-              {/* Center crystal structures */}
-              <polygon points="80,60 120,0 150,50" fill={colors.f4} />
-              <polygon points="150,50 240,90 170,110" fill={colors.f5} />
-              <polygon points="170,110 120,160 80,110" fill={colors.f3} />
-              <polygon points="80,110 0,70 80,60" fill={colors.f1} />
-              {/* Inner core facets around the play triangle */}
-              <polygon points="80,60 150,50 120,80" fill={colors.f6} opacity={isLightMode ? 0.8 : 0.15} />
-              <polygon points="150,50 170,110 120,80" fill={colors.f4} />
-              <polygon points="170,110 80,110 120,80" fill={colors.f3} />
-              <polygon points="80,110 80,60 120,80" fill={colors.f2} />
-              
-              {/* Shimmer Highlight Overlays */}
-              <polygon points="120,0 240,0 150,50" fill="#FFFFFF" opacity="0" className="shimmer-highlight" />
-              <polygon points="80,60 120,0 150,50" fill="#FFFFFF" opacity="0" className="shimmer-highlight" />
-              <polygon points="150,50 240,90 170,110" fill="#FFFFFF" opacity="0" className="shimmer-highlight" />
-              <polygon points="240,160 120,160 170,110" fill="#FFFFFF" opacity="0" className="shimmer-highlight" />
-              <polygon points="80,60 150,50 120,80" fill="#FFFFFF" opacity="0" className="shimmer-highlight" />
-              
-              {/* Play Triangle (Red & Pulsing) */}
-              <polygon 
-                points="106,62 106,98 136,80" 
-                fill="#EF4444" 
-                className="play-icon transition-transform duration-300"
-              />
-            </g>
-            {/* Glossy border */}
-            <rect x="1" y="1" width="238" height="158" rx="23" fill="none" stroke={isLightMode ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.1)"} strokeWidth="2" />
-          </svg>
+          <img 
+            src="/homelogos/DiamandPlayButton.png" 
+            alt="Diamond Play Button"
+            className="w-full h-auto drop-shadow-2xl"
+            style={{ 
+              filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.4))'
+            }}
+          />
         </div>
       </div>
 

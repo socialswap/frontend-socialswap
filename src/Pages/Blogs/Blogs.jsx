@@ -58,7 +58,7 @@ const BlogSection = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-white text-gray-900 pt-24 pb-16 px-4 overflow-hidden">
+    <div className="relative min-h-screen bg-white dark:bg-[#120a27] text-gray-900 dark:text-white pt-24 pb-16 px-4 overflow-hidden transition-colors duration-300">
       <SEOHead
         title="YouTube Channel Tips, Guides & Insights"
         description="Read expert guides on how to buy, sell and grow YouTube channels. SocialSwap Blog covers monetization, channel valuation, and marketplace insights."
@@ -99,25 +99,6 @@ const BlogSection = () => {
       </motion.div>
 
       <div className="relative max-w-6xl mx-auto">
-        {searchQuery ? (
-          <div className="mb-12 text-left">
-            <h1 className="text-4xl font-bold text-gray-900 tracking-tight mb-6">
-              Search Results: <span className="text-gray-600 font-normal">{searchQuery}</span>
-            </h1>
-            <div className="max-w-xl flex items-center bg-white rounded-xl border border-gray-200 shadow-sm p-1.5 overflow-hidden transition-shadow focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-100 focus-within:shadow-md">
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2.5 text-gray-700 bg-transparent outline-none border-none placeholder-gray-400"
-              />
-              <button className="px-6 py-2.5 bg-[#262626] hover:bg-black text-white text-sm font-semibold rounded-lg transition-colors ml-2">
-                Search
-              </button>
-            </div>
-          </div>
-        ) : (
           <motion.div
             className="text-center mb-12"
             variants={fadeUp}
@@ -125,30 +106,35 @@ const BlogSection = () => {
             whileInView="show"
             viewport={{ once: true, amount: 0.6 }}
           >
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-50 text-red-600 text-sm font-semibold mb-4 border border-red-100">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-sm font-semibold mb-4 border border-red-100 dark:border-red-500/20">
               <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
               SocialSwap Blog
             </span>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight">
               YouTube Channel Insights
             </h1>
-            <p className="text-gray-500 mt-3 text-lg max-w-2xl mx-auto mb-8">
+            <p className="text-gray-500 dark:text-gray-400 mt-3 text-lg max-w-2xl mx-auto mb-8">
               Expert guides on buying, selling and growing YouTube channels
             </p>
-            <div className="max-w-xl mx-auto flex items-center bg-white rounded-xl border border-gray-200 shadow-sm p-1.5 overflow-hidden transition-shadow focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-100 focus-within:shadow-md">
+            <div className="max-w-xl mx-auto flex items-center bg-white dark:bg-[#1a113a] rounded-xl border border-gray-200 dark:border-gray-700/50 shadow-sm p-1.5 overflow-hidden transition-shadow focus-within:border-gray-400 dark:focus-within:border-gray-500 focus-within:ring-2 focus-within:ring-gray-100 dark:focus-within:ring-gray-800 focus-within:shadow-md">
               <input
                 type="text"
                 placeholder="Search blogs..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2.5 text-gray-700 bg-transparent outline-none border-none placeholder-gray-400"
+                className="w-full px-4 py-2.5 text-gray-700 dark:text-gray-200 bg-transparent outline-none border-none placeholder-gray-400 dark:placeholder-gray-500"
               />
-              <button className="px-6 py-2.5 bg-[#262626] hover:bg-black text-white text-sm font-semibold rounded-lg transition-colors ml-2">
+              <button className="px-6 py-2.5 bg-[#262626] dark:bg-purple-600 hover:bg-black dark:hover:bg-purple-500 text-white text-sm font-semibold rounded-lg transition-colors ml-2">
                 Search
               </button>
             </div>
+            
+            {searchQuery && (
+              <div className="mt-8 text-lg font-medium text-gray-700 dark:text-gray-300">
+                Search Results for: <span className="font-bold text-gray-900 dark:text-white">{searchQuery}</span>
+              </div>
+            )}
           </motion.div>
-        )}
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -165,51 +151,47 @@ const BlogSection = () => {
             {filteredBlogs.map((item) => (
               <motion.article
                 key={item._id}
+                className="group flex flex-col bg-white dark:bg-[#1a113a] rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
                 onClick={() => navigate(`/blogs/${item.slug || item._id}`)}
-                className="group cursor-pointer flex flex-col gap-4"
                 variants={fadeUp}
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: true, amount: 0.2 }}
               >
                 {/* Image Section */}
-                <div className="relative w-full aspect-[16/10] overflow-hidden rounded-2xl bg-gray-100 shadow-sm transition-transform duration-300 group-hover:shadow-md">
+                <div className="relative h-[220px] w-full overflow-hidden">
                   <img
-                    src={item.imageUrl || '/images/yt3.png'}
+                    src={item.imageUrl || 'https://via.placeholder.com/600x400?text=Blog+Image'}
                     alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  {/* Category Badge */}
+                  {/* Category Badge - Overlaid */}
                   {item.category && (
-                    <div className="absolute top-4 left-4 bg-white px-2.5 py-1 text-[10px] font-bold text-gray-900 tracking-widest uppercase rounded shadow-sm border border-gray-100/50">
+                    <span className="absolute top-4 left-4 px-3 py-1 bg-white/95 dark:bg-[#120a27]/95 backdrop-blur-sm text-[10px] font-bold uppercase tracking-widest text-gray-900 dark:text-gray-100 rounded-sm shadow-sm">
                       {item.category}
-                    </div>
+                    </span>
                   )}
-                  {/* Read Time Badge */}
-                  {item.readTime && (
-                    <div className="absolute top-4 right-4 bg-black/80 backdrop-blur text-white px-2.5 py-1 text-[11px] font-semibold rounded-full flex items-center gap-1.5 shadow-sm">
-                      <svg className="w-3.5 h-3.5 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                      {item.readTime} Min Read
-                    </div>
-                  )}
+                  {/* Read Time - Overlaid */}
+                  <span className="absolute top-4 right-4 px-3 py-1 bg-black/60 dark:bg-black/40 backdrop-blur-md text-white text-[11px] font-semibold rounded-full flex items-center gap-1.5 shadow-sm">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    {item.readTime || '5'} Min Read
+                  </span>
                 </div>
 
                 {/* Content Section */}
-                <div className="flex flex-col px-1">
-                  <div className="text-[13px] text-gray-500 mb-2 font-medium">
-                    <span className="text-gray-900">{item.author || 'SocialSwap'}</span> on{' '}
-                    {new Date(item.createdAt).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
+                <div className="p-6 flex flex-col flex-grow">
+                  <div className="text-[13px] font-medium text-gray-900 dark:text-gray-300 mb-3 flex items-center gap-1.5">
+                    {item.author || 'SocialSwap Team'} 
+                    <span className="text-gray-400 dark:text-gray-500 font-normal">on {new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                   </div>
-                  <h2 className="text-[20px] md:text-[22px] leading-snug font-bold text-[#1a1a1a] mb-2.5 transition-colors line-clamp-2 group-hover:text-gray-700">
+                  
+                  <h2 className="text-[20px] font-bold text-gray-900 dark:text-white leading-tight mb-3 group-hover:text-blue-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2">
                     {item.title}
                   </h2>
-                  <p className="text-[15px] leading-relaxed text-gray-500 line-clamp-2">
+                  
+                  <div className="text-gray-500 dark:text-gray-400 text-[15px] leading-relaxed line-clamp-2 mb-4 flex-grow">
                     {item.excerpt}
-                  </p>
+                  </div>
                 </div>
               </motion.article>
             ))}

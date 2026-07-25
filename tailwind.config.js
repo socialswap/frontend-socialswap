@@ -45,6 +45,10 @@ module.exports = {
         'btn-gradient':   'var(--btn-gradient)',
         'hero-gradient':  'var(--hero-gradient)',
         'card-gradient':  'var(--card-gradient)',
+        'primary-gradient': 'linear-gradient(135deg, #7B61FF, #B48CFF)',
+        'purple-pink': 'linear-gradient(135deg, #7B61FF, #F3B8D3)',
+        'purple-peach': 'linear-gradient(135deg, #7B61FF, #FFD4B4)',
+        'glass-gradient': 'linear-gradient(135deg, rgba(255,255,255,.6), rgba(255,255,255,.3))',
       },
       boxShadow: {
         'purple-glow':  'var(--shadow-purple)',
@@ -52,6 +56,9 @@ module.exports = {
         'blue-glow':    '0 0 30px var(--glow-blue)',
         'card-shadow':  'var(--shadow-card)',
         'border-glow':  'var(--border-glow)',
+        'purple-glow-soft': '0 15px 40px rgba(120,90,255,0.15)',
+        'purple-glow-large': '0 25px 60px rgba(120,90,255,0.2)',
+        'purple-glow-hover': '0 30px 70px rgba(120,90,255,0.25)',
       },
       fontFamily: {
         sans: ['"Inter"', 'sans-serif'],
@@ -172,6 +179,10 @@ module.exports = {
       borderRadius: {
         '4xl': '2rem',
         '5xl': '2.5rem',
+        'button': '16px',
+        'card': '24px',
+        'input': '16px',
+        'image': '20px',
       },
     },
   },

@@ -2,14 +2,10 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   FaInstagram,
-  FaTwitter,
-  FaPhone,
-  FaEnvelope,
-  FaMapMarkerAlt,
-  FaPlay,
   FaYoutube,
   FaWhatsapp,
 } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 
 const Footer = () => {
   const location = useLocation();
@@ -26,209 +22,109 @@ const Footer = () => {
     window.open(whatsappUrl, '_blank');
   };
 
-  const linkSections = [
-    {
-      title: 'COMPANY',
-      links: [
-        { label: 'About Us', to: '/about' },
-        { label: 'Contact', action: handleMakeOffer },
-      ],
-    },
-    {
-      title: 'POLICIES',
-      links: [
-        { label: 'Privacy Policy', to: '/privacy-policy' },
-        { label: 'Terms & Conditions', to: '/terms-and-conditions' },
-        { label: 'Refund Policy', to: '/refund-policy' },
-      ],
-    },
-    {
-      title: 'INFORMATION',
-      links: [
-        { label: 'My Account', to: '/profile' },
-        { label: 'Login', to: '/login' },
-        { label: 'My Cart', to: '/cart' },
-        { label: 'Wishlist', to: '/wishlist', disabled: true },
-      ],
-    },
-    {
-      title: 'Quick Links',
-      links: [
-        { label: 'All Channels', to: '/channels' },
-        { label: 'Sell Channel', to: '/user/upload-channel' },
-        { label: 'How To', to: '/how-to' },
-        { label: 'Grow Your Channels', to: '/grow' },
-      ],
-    },
-  ];
-
-  const contactDetails = [
-    {
-      Icon: FaMapMarkerAlt,
-      label: 'Baner, Pune',
-    },
-    {
-      Icon: FaPhone,
-      label: '+91 9423523291',
-    },
-    {
-      Icon: FaEnvelope,
-      label: (
-        <div className="space-y-1">
-          <p>4spalkarbusiness@gmail.com</p>
-          <p>shubham@socialswap.in</p>
-        </div>
-      ),
-    },
-  ];
-
   const socialLinks = [
-    {
-      href: 'https://youtube.com/@shubhzlord?si=BiP10uT0YN3Zm0nq',
-      Icon: FaYoutube,
-      label: 'YouTube',
-    },
-    {
-      href: 'https://www.instagram.com/socialswap.in?igsh=ZDhwNWtpczNjcDlp&utm_source=qr',
-      Icon: FaInstagram,
-      label: 'Instagram',
-    },
-    {
-      href: 'https://wa.me/919423523291',
-      Icon: FaWhatsapp,
-      label: 'WhatsApp',
-    },
-    {
-      href: 'https://twitter.com',
-      Icon: FaTwitter,
-      label: 'Twitter',
-    },
+    { href: 'https://youtube.com/@shubhzlord?si=BiP10uT0YN3Zm0nq', Icon: FaYoutube, label: 'YouTube' },
+    { href: 'https://www.instagram.com/socialswap.in?igsh=ZDhwNWtpczNjcDlp&utm_source=qr', Icon: FaInstagram, label: 'Instagram' },
+    { href: 'https://wa.me/919423523291', Icon: FaWhatsapp, label: 'WhatsApp' },
+    { href: 'https://twitter.com', Icon: FaXTwitter, label: 'X (Twitter)' },
   ];
-
-  const renderLink = (link) => {
-    const baseClasses =
-      'group relative inline-flex items-center text-sm font-semibold uppercase tracking-[0.16em] text-text-secondary transition-colors duration-300 hover:text-text-primary';
-
-    const underline = (
-      <span className="pointer-events-none absolute left-0 -bottom-2 h-[3px] w-0 rounded-full bg-purple-primary shadow-[0_0_0_rgba(124,58,237,0)] transition-all duration-300 ease-out group-hover:w-full group-hover:shadow-purple-glow" />
-    );
-
-    if (link.disabled) {
-      return (
-        <span
-          key={link.label}
-          className="inline-flex items-center text-sm uppercase tracking-[0.16em] text-text-disabled"
-        >
-          {link.label}
-        </span>
-      );
-    }
-
-    if (link.action) {
-      return (
-        <button
-          key={link.label}
-          type="button"
-          onClick={link.action}
-          className={`${baseClasses} focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary`}
-        >
-          <span>{link.label}</span>
-          {underline}
-        </button>
-      );
-    }
-
-    return (
-      <Link
-        key={link.label}
-        to={link.to}
-        className={`${baseClasses} focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary`}
-      >
-        <span>{link.label}</span>
-        {underline}
-      </Link>
-    );
-  };
 
   return (
-    <footer className="relative overflow-hidden bg-bg-secondary px-4 pt-16 pb-12 text-text-secondary border-t border-border-color/20 sm:px-6 lg:px-8 transition-all duration-300">
-      <FaPlay
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-32 top-1/2 -translate-y-1/2 text-[36rem] text-purple-primary/5 dark:text-purple-primary/10"
-      />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-bg-secondary via-transparent to-bg-secondary opacity-60" />
+    <footer className="bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[20px] text-text-secondary py-16 text-[13px] md:text-sm font-sans border-t border-white/40 dark:border-white/10 shadow-card relative overflow-hidden">
+      <div className="container mx-auto px-6 max-w-6xl relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 mb-16">
+          
+          {/* Column 1: COMPANY */}
+          <div>
+            <h4 className="text-text-primary font-extrabold tracking-wider uppercase mb-6 text-[15px]">Company</h4>
+            <ul className="space-y-2.5">
+              <li className="flex justify-between items-center max-w-[200px]">
+                <Link to="/about" className="hover:text-purple-primary transition-colors font-medium">About Us</Link>
+                <span className="text-text-secondary/40 font-mono text-xs">......</span>
+              </li>
+              <li className="flex justify-between items-center max-w-[200px]">
+                <button onClick={handleMakeOffer} className="hover:text-purple-primary transition-colors uppercase text-left font-medium cursor-pointer">Contact</button>
+                <span className="text-text-secondary/40 font-mono text-xs">......</span>
+              </li>
+              <li className="flex justify-between items-center max-w-[200px]">
+                <Link to="/privacy-policy" className="hover:text-purple-primary transition-colors font-medium">Privacy Policy</Link>
+                <span className="text-text-secondary/40 font-mono text-xs">......</span>
+              </li>
+              <li className="flex justify-between items-center max-w-[200px]">
+                <Link to="/terms-and-conditions" className="hover:text-purple-primary transition-colors font-medium">Terms</Link>
+                <span className="text-text-secondary/40 font-mono text-xs">......</span>
+              </li>
+              <li className="flex justify-between items-center max-w-[200px]">
+                <Link to="/refund-policy" className="hover:text-purple-primary transition-colors font-medium">Refund Policy</Link>
+                <span className="text-text-secondary/40 font-mono text-xs">......</span>
+              </li>
+            </ul>
+          </div>
 
-      <div className="relative mx-auto max-w-7xl">
-        <div className="mb-12 grid gap-12 lg:grid-cols-[1.3fr,1fr]">
-          <div className="relative">
-            <div className="pointer-events-none absolute -top-10 -left-10 h-32 w-32 rounded-full bg-purple-primary opacity-20 blur-3xl" />
-            <Link to="/" className="inline-block">
-              <span className="text-3xl font-extrabold tracking-tight text-text-primary">
-                Social<span className="text-purple-primary">Swap</span>
-              </span>
-            </Link>
-            <p className="mt-4 max-w-lg text-base text-text-secondary">
-              Empowering YouTube Creators to Grow, Sell, and Succeed.
-            </p>
-
-            <div className="mt-6 space-y-4 text-text-secondary">
-              {contactDetails.map(({ Icon, label }) => (
-                <div key={Icon.displayName || label} className="flex items-start gap-3">
-                  <Icon className="mt-1 h-5 w-5 flex-shrink-0 text-purple-primary" />
-                  <div className="text-sm md:text-base">{label}</div>
-                </div>
-              ))}
+          {/* Column 2: LOCATIONS */}
+          <div>
+            <h4 className="text-text-primary font-extrabold tracking-wider uppercase mb-6 text-[15px]">Locations</h4>
+            <div className="space-y-5">
+              <div>
+                <p className="text-text-primary font-bold mb-1">Head Office:</p>
+                <p className="text-text-secondary">Baner, Pune</p>
+                <p className="text-text-secondary">Maharashtra, India</p>
+              </div>
+              <div>
+                <p className="text-text-primary font-bold mb-1">Support:</p>
+                <p className="text-text-secondary">Available Online</p>
+                <p className="text-text-secondary">24/7 Assistance</p>
+              </div>
             </div>
           </div>
 
-          <div className="grid gap-8 sm:grid-cols-2">
-            {linkSections.map(({ title, links }) => (
-              <div key={title} className="space-y-4">
-                <h3 className="relative inline-block text-sm font-semibold uppercase tracking-[0.3em] text-text-primary">
-                  {title}
-                  <span className="absolute left-0 -bottom-2 h-[2px] w-full rounded-full bg-purple-primary shadow-purple-glow" />
-                </h3>
-                <ul className="space-y-3">
-                  {links.map((link) => (
-                    <li key={link.label}>{renderLink(link)}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+          {/* Column 3: MENU */}
+          <div>
+            <h4 className="text-text-primary font-extrabold tracking-wider uppercase mb-6 text-[15px]">Menu</h4>
+            <ul className="space-y-3 font-semibold">
+              <li><Link to="/" className="text-text-primary hover:text-purple-primary transition-colors underline decoration-purple-primary/40 underline-offset-4">Home</Link></li>
+              <li><Link to="/channels" className="text-text-primary hover:text-purple-primary transition-colors underline decoration-purple-primary/40 underline-offset-4">All Channels</Link></li>
+              <li><Link to="/user/upload-channel" className="text-text-primary hover:text-purple-primary transition-colors underline decoration-purple-primary/40 underline-offset-4">Sell Channel</Link></li>
+              <li><Link to="/how-to" className="text-text-primary hover:text-purple-primary transition-colors underline decoration-purple-primary/40 underline-offset-4">How To</Link></li>
+              <li><Link to="/grow" className="text-text-primary hover:text-purple-primary transition-colors underline decoration-purple-primary/40 underline-offset-4">Grow Channels</Link></li>
+            </ul>
           </div>
+
+          {/* Column 4: CONTACT */}
+          <div>
+            <h4 className="text-text-primary font-extrabold tracking-wider uppercase mb-6 text-[15px]">Contact</h4>
+            <div className="space-y-4">
+              <p><span className="font-bold text-text-primary">PHONE:</span> +91 9423523291</p>
+              <p><span className="font-bold text-text-primary">E-MAIL:</span> support@socialswap.in</p>
+              
+              <div className="pt-3">
+                <p className="font-bold text-text-primary uppercase tracking-wider mb-3">On Social Media:</p>
+                <div className="flex gap-2.5">
+                  {socialLinks.map(({ href, Icon, label }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white/60 dark:bg-white/10 border border-white/40 dark:border-white/10 text-text-primary hover:bg-btn-gradient hover:text-white transition-all rounded-xl w-9 h-9 flex items-center justify-center shadow-sm hover:scale-110"
+                      aria-label={label}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <div className="mb-10 flex flex-wrap items-center gap-3 text-sm font-medium text-text-primary sm:text-base">
-          <span>Baner, Pune</span>
-          <span className="h-2 w-2 rounded-full bg-purple-primary opacity-80" />
-          <span>+91 9423523291</span>
-          <span className="h-2 w-2 rounded-full bg-purple-primary opacity-80" />
-          <span>4spalkarbusiness@gmail.com</span>
-          <span className="h-2 w-2 rounded-full bg-purple-primary opacity-80" />
-          <span>shubham@socialswap.in</span>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-6 text-sm">
-          {socialLinks.map(({ href, Icon, label }) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={label}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-purple-primary/40 text-text-primary transition-all duration-300 hover:scale-105 hover:border-purple-primary hover:text-purple-primary hover:shadow-purple-glow focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary"
-            >
-              <Icon className="h-6 w-6" />
-            </a>
-          ))}
-        </div>
-
-        <div className="mt-16 text-center text-sm text-text-secondary">
-          <div className="mx-auto mb-6 h-1 w-24 rounded-full bg-purple-primary shadow-purple-glow" />
-          <p className="text-text-muted">
-            © 2025 SocialSwap. All rights reserved.
+        {/* Bottom Copyright */}
+        <div className="text-center pt-8 border-t border-white/20 dark:border-white/10">
+          <h2 className="text-xl md:text-2xl font-extrabold text-text-primary mb-2 tracking-tight">SocialSwap</h2>
+          <p className="text-text-secondary text-xs md:text-sm">
+            © 2026 SocialSwap. Built for creators, powered by trust.
           </p>
-          <p className="mt-2 text-text-muted">Built for creators, powered by trust.</p>
         </div>
       </div>
     </footer>

@@ -4,142 +4,35 @@ import { motion, AnimatePresence } from 'framer-motion';
 const faqs = [
   {
     key: '1',
-    question: 'Is it safe to buy a YouTube channel on SocialSwap?',
-    answer: "Absolutely. SocialSwap uses a strict Escrow process. Your payment is held securely until you receive the channel credentials and verify ownership. Only then is the payment released to the seller.",
+    question: 'How does the buying and selling process work?',
+    answer: "SocialSwap acts as a secure escrow. The buyer sends funds to us, the seller transfers the channel ownership, and once the buyer verifies access and control, we release the funds to the seller.",
   },
   {
     key: '2',
-    question: 'How long does the channel transfer take?',
-    answer: "Typically, a channel transfer takes between 24 to 72 hours. Our team guides you through the process of changing the primary owner securely, which requires a 7-day waiting period by YouTube, but you get manager access immediately.",
+    question: 'Are the channels genuine and monetized?',
+    answer: "Yes, every channel undergoes a rigorous verification process by our expert team to ensure organic growth, authentic engagement, and active monetization status before it is listed.",
   },
   {
     key: '3',
-    question: 'Are the channels organically grown?',
-    answer: "Yes, every channel listed on SocialSwap goes through a rigorous verification process. We check the analytics, subscriber growth history, and community strikes to ensure the channel's audience is organic and authentic.",
+    question: 'Is there a fee or commission?',
+    answer: "We charge a platform fee to cover the secure escrow service, channel verification, and dedicated support, ensuring a completely safe transaction for both parties.",
   },
   {
     key: '4',
-    question: 'What happens if a seller tries to scam me?',
-    answer: "With our Escrow protection, scams are practically impossible. If a seller fails to provide the channel or tries to recover it during the transfer, your payment is fully refunded.",
+    question: 'How do I transfer ownership of a YouTube channel?',
+    answer: "Once a deal is secured, the seller invites the buyer as a Primary Owner in YouTube Studio. After a 7-day wait period mandated by YouTube, the buyer can safely remove the seller from the channel.",
   },
   {
     key: '5',
-    question: 'Can I negotiate the price of a channel?',
-    answer: "Yes! If a channel supports negotiations, you can use our built-in chat feature to make an offer directly to the seller or through our admin mediators.",
+    question: 'Can I negotiate the price with the seller?',
+    answer: "Yes! Buyers can submit offers directly on listings. Sellers can choose to accept, reject, or counter your offer through our secure messaging system.",
+  },
+  {
+    key: '6',
+    question: 'What happens if a channel gets demonetized right after purchase?',
+    answer: "We guarantee that the channel meets all monetization policies at the time of transfer. Post-transfer, it is the buyer's responsibility to adhere to YouTube's guidelines, but our support team is available for guidance.",
   },
 ];
-
-const FAQItem = ({ faq, isOpen, onToggle, index }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.5, delay: index * 0.08, type: 'spring', stiffness: 260, damping: 24 }}
-      className="group"
-    >
-      <div
-        className="relative rounded-2xl overflow-hidden transition-all duration-500"
-        style={{
-          background: isOpen
-            ? 'linear-gradient(135deg, rgba(124,58,237,0.06) 0%, rgba(217,70,239,0.04) 100%)'
-            : 'var(--bg-card)',
-          border: isOpen
-            ? '1.5px solid rgba(124,58,237,0.35)'
-            : '1.5px solid var(--border)',
-          boxShadow: isOpen
-            ? '0 8px 32px rgba(124,58,237,0.12), 0 0 0 4px rgba(124,58,237,0.04)'
-            : '0 2px 12px rgba(0,0,0,0.04)',
-        }}
-      >
-        {/* Question Row */}
-        <button
-          onClick={onToggle}
-          className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left cursor-pointer select-none"
-          style={{ background: 'transparent', border: 'none' }}
-          aria-expanded={isOpen}
-        >
-          <span
-            className="font-semibold text-base md:text-lg transition-colors duration-300"
-            style={{ color: isOpen ? 'var(--purple-primary)' : 'var(--text-primary)' }}
-          >
-            {faq.question}
-          </span>
-
-          {/* Animated icon — morphs from + to × */}
-          <motion.div
-            animate={{ rotate: isOpen ? 45 : 0, backgroundColor: isOpen ? 'var(--purple-primary)' : 'var(--bg-secondary)' }}
-            transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-            className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
-          >
-            <motion.span
-              className="relative block"
-              style={{ width: '14px', height: '14px' }}
-            >
-              {/* Horizontal bar */}
-              <span
-                className="absolute block rounded-full transition-colors duration-300"
-                style={{
-                  top: '50%', left: 0,
-                  width: '100%', height: '2px',
-                  background: isOpen ? '#fff' : 'var(--text-primary)',
-                  transform: 'translateY(-50%)',
-                }}
-              />
-              {/* Vertical bar */}
-              <motion.span
-                animate={{ scaleY: isOpen ? 0 : 1, opacity: isOpen ? 0 : 1 }}
-                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-                className="absolute block rounded-full"
-                style={{
-                  top: 0, left: '50%',
-                  width: '2px', height: '100%',
-                  background: 'var(--text-primary)',
-                  transform: 'translateX(-50%)',
-                  transformOrigin: 'center',
-                }}
-              />
-            </motion.span>
-          </motion.div>
-        </button>
-
-        {/* Answer — smooth height animation via AnimatePresence */}
-        <AnimatePresence initial={false}>
-          {isOpen && (
-            <motion.div
-              key="answer"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{
-                height: { type: 'spring', stiffness: 300, damping: 32, mass: 0.8 },
-                opacity: { duration: 0.25, ease: 'easeInOut' },
-              }}
-              style={{ overflow: 'hidden' }}
-            >
-              <motion.div
-                initial={{ y: -8 }}
-                animate={{ y: 0 }}
-                exit={{ y: -8 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                className="px-6 pb-6 pt-0"
-              >
-                {/* Subtle divider */}
-                <div
-                  className="mb-4 h-px w-full"
-                  style={{ background: 'linear-gradient(90deg, rgba(124,58,237,0.3) 0%, transparent 100%)' }}
-                />
-                <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  {faq.answer}
-                </p>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </motion.div>
-  );
-};
 
 const FAQSection = () => {
   const [openKey, setOpenKey] = useState(null);
@@ -149,80 +42,67 @@ const FAQSection = () => {
   };
 
   return (
-    <section className="py-20 bg-bg-primary relative overflow-hidden">
-      {/* Background glow */}
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full pointer-events-none blur-[120px]"
-        style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.06) 0%, transparent 70%)' }}
-      />
+    <section className="py-12 md:py-24 bg-transparent flex justify-center w-full">
+      <div className="container mx-auto px-4 max-w-[1400px]">
+        <div className="flex flex-col md:flex-row border border-white/40 dark:border-white/10 rounded-card overflow-hidden bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[20px] shadow-card">
+          
+          {/* Left Column (Header) */}
+          <div className="md:w-[35%] p-8 md:p-12 border-b md:border-b-0 md:border-r border-white/30 dark:border-white/10 flex flex-col justify-start bg-white/20 dark:bg-white/[0.02]">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-text-primary leading-tight tracking-tight sticky top-8">
+              Frequently<br className="hidden md:block" />
+              <span className="md:hidden"> </span>Asked<br className="hidden md:block" />
+              <span className="md:hidden"> </span>Questions
+            </h2>
+          </div>
 
-      <div className="container mx-auto px-4 max-w-3xl relative z-10">
-        {/* Header */}
-        <motion.div
-          className="text-center mb-14"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={{
-            hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
-          }}
-        >
-          <motion.span
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } },
-            }}
-            className="inline-block py-1 px-4 rounded-full font-semibold text-sm mb-4 border tracking-widest uppercase"
-            style={{
-              background: 'rgba(124,58,237,0.08)',
-              color: 'var(--purple-primary)',
-              borderColor: 'rgba(124,58,237,0.2)',
-            }}
-          >
-            Got Questions?
-          </motion.span>
+          {/* Right Column (Questions) */}
+          <div className="md:w-[65%] flex flex-col bg-transparent">
+            {faqs.map((faq, index) => {
+              const isOpen = openKey === faq.key;
+              return (
+                <div 
+                  key={faq.key} 
+                  className={`border-white/30 dark:border-white/10 ${index !== faqs.length - 1 ? 'border-b' : ''}`}
+                >
+                  <button
+                    onClick={() => handleToggle(faq.key)}
+                    className="w-full flex items-center justify-between p-6 md:px-8 md:py-7 text-left hover:bg-white/40 dark:hover:bg-white/5 transition-colors group cursor-pointer"
+                  >
+                    <span className="text-[16px] md:text-[17px] font-semibold text-text-primary group-hover:text-purple-primary transition-colors pr-4">
+                      {faq.question}
+                    </span>
+                    <motion.svg 
+                      animate={{ rotate: isOpen ? 180 : 0 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      className={`w-5 h-5 transition-colors flex-shrink-0 ${isOpen ? 'text-purple-primary' : 'text-text-secondary group-hover:text-purple-primary'}`} 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </motion.svg>
+                  </button>
+                  
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-6 md:px-8 pb-6 md:pb-7 pt-0 text-[15px] md:text-[16px] text-text-secondary leading-relaxed max-w-[95%] font-normal">
+                          {faq.answer}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+          </div>
 
-          <motion.h2
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } },
-            }}
-            className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4"
-            style={{ color: 'var(--text-primary)' }}
-          >
-            Frequently Asked{' '}
-            <span
-              className="bg-clip-text text-transparent"
-              style={{ backgroundImage: 'var(--btn-gradient, linear-gradient(135deg,#7C3AED,#D946EF))' }}
-            >
-              Questions
-            </span>
-          </motion.h2>
-
-          <motion.p
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } },
-            }}
-            className="text-lg"
-            style={{ color: 'var(--text-secondary)' }}
-          >
-            Everything you need to know about buying and selling on SocialSwap.
-          </motion.p>
-        </motion.div>
-
-        {/* FAQ Items */}
-        <div className="flex flex-col gap-3">
-          {faqs.map((faq, index) => (
-            <FAQItem
-              key={faq.key}
-              faq={faq}
-              index={index}
-              isOpen={openKey === faq.key}
-              onToggle={() => handleToggle(faq.key)}
-            />
-          ))}
         </div>
       </div>
     </section>

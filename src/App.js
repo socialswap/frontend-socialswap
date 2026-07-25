@@ -150,71 +150,78 @@ const AppContent = () => {
   };
 
   return (
-    <>
-      <Header />
+    <div className="relative min-h-screen">
+      {/* 🟣 Global Floating Ambient Gradient Blobs for Glassmorphism Theme */}
+      <div className="fixed top-[-100px] left-[-100px] w-[600px] h-[600px] bg-[#B69BFF]/35 dark:bg-[#7B61FF]/20 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="fixed bottom-[-100px] right-[-100px] w-[650px] h-[650px] bg-[#FFD7B5]/35 dark:bg-[#F4B6D2]/15 rounded-full blur-[150px] pointer-events-none z-0" />
+      <div className="fixed top-[35%] left-[25%] w-[550px] h-[550px] bg-[#F4B6D2]/25 dark:bg-[#C6B4FF]/15 rounded-full blur-[160px] pointer-events-none z-0" />
 
-      {/* ── Notification Permission Banner ── */}
-      {showBanner && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 99999,
-          background: 'linear-gradient(135deg,#6d28d9,#4f46e5)',
-          color: '#fff', padding: '10px 16px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          gap: 12, flexWrap: 'wrap',
-          boxShadow: '0 3px 12px rgba(0,0,0,.35)'
-        }}>
-          <span style={{ fontSize: 14 }}>
-            🔔 <strong>Enable notifications</strong> to get instant alerts for new chat messages!
-          </span>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={handleEnableClick} style={{
-              background: '#fff', color: '#4f46e5',
-              border: 'none', borderRadius: 999, padding: '5px 16px',
-              fontWeight: 700, cursor: 'pointer', fontSize: 13
-            }}>Enable</button>
-            <button onClick={() => setShowBanner(false)} style={{
-              background: 'transparent', color: '#fff',
-              border: '1px solid rgba(255,255,255,.5)', borderRadius: 999,
-              padding: '5px 12px', cursor: 'pointer', fontSize: 13
-            }}>Not now</button>
-          </div>
-        </div>
-      )}
+      <div className="relative z-10">
+        <Header />
 
-      <Routes />
-      <MobileFooter />
-      {!isBlogPage && (
-        <>
-          <div
-            onClick={() => navigate('/user/chat')}
-            style={{
-              position: 'fixed',
-              bottom: '5.2rem',
-              right: '2rem',
-              cursor: 'pointer',
-              width: '40px',
-              height: '40px',
-              backgroundColor: '#7C3AED',
-              borderRadius: '50%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              color: 'white',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-              zIndex: 9999
-            }}
-            title="Open Chat"
-          >
-            <MessageOutlined style={{ fontSize: '20px' }} />
+        {/* ── Notification Permission Banner ── */}
+        {showBanner && (
+          <div style={{
+            position: 'fixed', top: 0, left: 0, right: 0, zIndex: 99999,
+            background: 'linear-gradient(135deg,#6d28d9,#4f46e5)',
+            color: '#fff', padding: '10px 16px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 12, flexWrap: 'wrap',
+            boxShadow: '0 3px 12px rgba(0,0,0,.35)'
+          }}>
+            <span style={{ fontSize: 14 }}>
+              🔔 <strong>Enable notifications</strong> to get instant alerts for new chat messages!
+            </span>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={handleEnableClick} style={{
+                background: '#fff', color: '#4f46e5',
+                border: 'none', borderRadius: 999, padding: '5px 16px',
+                fontWeight: 700, cursor: 'pointer', fontSize: 13
+              }}>Enable</button>
+              <button onClick={() => setShowBanner(false)} style={{
+                background: 'transparent', color: '#fff',
+                border: '1px solid rgba(255,255,255,.5)', borderRadius: 999,
+                padding: '5px 12px', cursor: 'pointer', fontSize: 13
+              }}>Not now</button>
+            </div>
           </div>
-          <WhatsappIcon
-            onClick={handleMakeOffer} size={40} round
-            style={{ position: 'fixed', bottom: '2rem', right: '2rem', cursor: 'pointer', zIndex: 9999 }}
-          />
-        </>
-      )}
-      {!isBlogPage && <Footer />}
-    </>
+        )}
+
+        <Routes />
+        <MobileFooter />
+        {!isBlogPage && (
+          <>
+            <div
+              onClick={() => navigate('/user/chat')}
+              style={{
+                position: 'fixed',
+                bottom: '5.2rem',
+                right: '2rem',
+                cursor: 'pointer',
+                width: '40px',
+                height: '40px',
+                backgroundColor: '#7C3AED',
+                borderRadius: '50%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'white',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                zIndex: 9999
+              }}
+              title="Open Chat"
+            >
+              <MessageOutlined style={{ fontSize: '20px' }} />
+            </div>
+            <WhatsappIcon
+              onClick={handleMakeOffer} size={40} round
+              style={{ position: 'fixed', bottom: '2rem', right: '2rem', cursor: 'pointer', zIndex: 9999 }}
+            />
+          </>
+        )}
+        {!isBlogPage && <Footer />}
+      </div>
+    </div>
   );
 };
 

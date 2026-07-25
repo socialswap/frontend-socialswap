@@ -85,7 +85,7 @@ const Process = () => {
   };
 
   return (
-    <div className="bg-bg-primary text-text-primary transition-all duration-300 py-16 px-4 sm:px-6 lg:px-8">
+    <div className="bg-transparent text-text-primary transition-all duration-300 py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-center gap-3 mb-6">
           <h2 className="text-3xl font-extrabold tracking-tight text-text-primary">
@@ -98,8 +98,8 @@ const Process = () => {
           <button
             className={`px-6 py-2 rounded-l-full font-medium border transition-colors duration-300 shadow-sm ${
               selectedCategory === 'buyers'
-                ? 'bg-gradient-to-r from-purple-primary to-purple-secondary text-white border-transparent'
-                : 'bg-bg-card text-text-secondary border-border-color/30 hover:bg-bg-secondary'
+                ? 'bg-btn-gradient text-white border-transparent'
+                : 'bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] text-text-secondary border-white/40 dark:border-white/10 hover:bg-white/60'
             }`}
             onClick={() => handleCategoryChange('buyers')}
           >
@@ -108,8 +108,8 @@ const Process = () => {
           <button
             className={`px-6 py-2 rounded-r-full font-medium border transition-colors duration-300 shadow-sm ${
               selectedCategory === 'sellers'
-                ? 'bg-gradient-to-r from-purple-primary to-purple-secondary text-white border-transparent'
-                : 'bg-bg-card text-text-secondary border-border-color/30 hover:bg-bg-secondary'
+                ? 'bg-btn-gradient text-white border-transparent'
+                : 'bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] text-text-secondary border-white/40 dark:border-white/10 hover:bg-white/60'
             }`}
             onClick={() => handleCategoryChange('sellers')}
           >
@@ -134,10 +134,10 @@ const Process = () => {
                 <motion.div
                   key={index}
                   variants={itemVariants}
-                  className={`group relative pl-10 bg-bg-card rounded-xl border overflow-hidden transition-all ${
+                  className={`group relative pl-10 bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] rounded-card border border-white/40 dark:border-white/10 overflow-hidden transition-all ${
                     open
-                      ? 'shadow-lg border-purple-primary/30 translate-x-0.5 ring-1 ring-purple-primary/30'
-                      : 'shadow-sm border-border-color/30 hover:shadow-md'
+                      ? 'shadow-purple-glow-soft border-purple-primary/50 translate-x-0.5 ring-1 ring-purple-primary/30'
+                      : 'shadow-card hover:shadow-purple-glow-soft'
                   }`}
                 >
                   {/* Timeline dot */}

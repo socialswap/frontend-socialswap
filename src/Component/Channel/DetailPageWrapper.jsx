@@ -94,15 +94,15 @@ const DetailPageWrapper = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white">
-        <Spin indicator={<LoadingOutlined style={{ fontSize: 48, color: '#FF4D4D' }} />} />
+      <div className="min-h-screen flex items-center justify-center bg-transparent">
+        <Spin indicator={<LoadingOutlined style={{ fontSize: 48, color: '#6E4BFF' }} />} />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
         <Result
           status="error"
           title="Failed to Load Channel"
@@ -111,14 +111,14 @@ const DetailPageWrapper = () => {
             <button
               key="retry"
               onClick={fetchChannelDetails}
-              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg mr-4 transition-colors"
+              className="bg-btn-gradient hover:shadow-purple-glow-soft text-white font-semibold py-2 px-6 rounded-button mr-4 transition-all"
             >
               Try Again
             </button>,
             <button
               key="back"
               onClick={() => navigate(-1)}
-              className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+              className="bg-white/45 dark:bg-[#110C1F]/45 text-text-primary border border-white/40 font-semibold py-2 px-6 rounded-button transition-all"
             >
               Go Back
             </button>,
@@ -130,7 +130,7 @@ const DetailPageWrapper = () => {
 
   if (!channel) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
         <Result
           status="404"
           title="Channel Not Found"
@@ -138,7 +138,7 @@ const DetailPageWrapper = () => {
           extra={
             <button
               onClick={() => navigate('/channels')}
-              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+              className="bg-btn-gradient hover:shadow-purple-glow-soft text-white font-semibold py-2 px-6 rounded-button transition-all"
             >
               Back to Channels
             </button>
@@ -151,7 +151,7 @@ const DetailPageWrapper = () => {
   const { title, description, ogImage, canonicalPageUrl, channelSchema } = buildChannelSEO(channel);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-transparent">
       <SEOHead
         title={title}
         description={description}

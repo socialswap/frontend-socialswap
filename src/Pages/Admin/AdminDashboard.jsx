@@ -34,6 +34,7 @@ import AdminBlogs from './AdminBlogs';
 import AdminDeals from './AdminDeals';
 import AdminServices from './AdminServices';
 import AdminUserChannels from './AdminUserChannels';
+import AdminTestimonials from './AdminTestimonials';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -361,6 +362,11 @@ const AdminDashboard = () => {
       key: 'user_channels',
       label: "User's Channel",
       children: <AdminUserChannels />,
+    },
+    {
+      key: 'testimonials',
+      label: 'Testimonials',
+      children: <AdminTestimonials isEmbedded={true} />,
     },
   ];
 

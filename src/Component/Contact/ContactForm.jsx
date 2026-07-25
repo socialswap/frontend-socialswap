@@ -29,10 +29,10 @@ const ContactForm = () => {
   };
 
   return (
-    <section className="py-20 bg-bg-secondary relative overflow-hidden">
+    <section className="py-10 md:py-20 bg-transparent relative overflow-hidden">
       {/* Background elements */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-primary/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent-pink/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#B79DFF]/15 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#F7B8D5]/15 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-4 max-w-6xl relative z-10">
         <motion.div 
@@ -61,7 +61,7 @@ const ContactForm = () => {
             }}
             className="text-4xl md:text-5xl font-extrabold text-text-primary mb-4"
           >
-            Request a <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-primary to-accent-pink">Custom Service</span>
+            Request a <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'var(--btn-gradient)' }}>Custom Service</span>
           </motion.h2>
           <motion.p 
             variants={{
@@ -74,7 +74,7 @@ const ContactForm = () => {
           </motion.p>
         </motion.div>
 
-        <div className="flex flex-col lg:flex-row gap-12 bg-bg-card rounded-3xl p-6 md:p-12 shadow-2xl border border-border-color">
+        <div className="flex flex-col lg:flex-row gap-12 bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] rounded-card p-6 md:p-12 shadow-card border border-white/40 dark:border-white/10">
           
           {/* Contact Info Side */}
           <motion.div 
@@ -85,39 +85,39 @@ const ContactForm = () => {
             className="lg:w-1/3 flex flex-col justify-between"
           >
             <div>
-              <h3 className="text-2xl font-bold text-text-primary mb-6">Contact Information</h3>
-              <p className="text-text-secondary mb-8">
+              <h3 className="text-xl md:text-2xl font-bold text-text-primary mb-3 md:mb-6">Contact Information</h3>
+              <p className="text-sm md:text-base text-text-secondary mb-5 md:mb-8">
                 Fill up the form and our team will get back to you within 24 hours.
               </p>
               
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-purple-primary/10 flex items-center justify-center text-purple-primary shrink-0 text-xl">
+              <div className="space-y-4 md:space-y-6">
+                <div className="flex items-center md:items-start gap-3 md:gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-purple-primary/10 flex items-center justify-center text-purple-primary shrink-0 text-lg md:text-xl">
                     <PhoneOutlined />
                   </div>
                   <div>
-                    <h4 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-1">Phone</h4>
-                    <p className="text-text-primary font-medium">+91 9423523291</p>
+                    <h4 className="text-xs md:text-sm font-semibold text-text-muted uppercase tracking-wider mb-0 md:mb-1">Phone</h4>
+                    <p className="text-sm md:text-base text-text-primary font-medium">+91 9423523291</p>
                   </div>
                 </div>
                 
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-accent-pink/10 flex items-center justify-center text-accent-pink shrink-0 text-xl">
+                <div className="flex items-center md:items-start gap-3 md:gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-accent-pink/10 flex items-center justify-center text-accent-pink shrink-0 text-lg md:text-xl">
                     <MailOutlined />
                   </div>
                   <div>
-                    <h4 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-1">Email</h4>
-                    <p className="text-text-primary font-medium">support@socialswap.in</p>
+                    <h4 className="text-xs md:text-sm font-semibold text-text-muted uppercase tracking-wider mb-0 md:mb-1">Email</h4>
+                    <p className="text-sm md:text-base text-text-primary font-medium">support@socialswap.in</p>
                   </div>
                 </div>
                 
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0 text-xl">
+                <div className="flex items-center md:items-start gap-3 md:gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0 text-lg md:text-xl">
                     <EnvironmentOutlined />
                   </div>
                   <div>
-                    <h4 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-1">Location</h4>
-                    <p className="text-text-primary font-medium">India</p>
+                    <h4 className="text-xs md:text-sm font-semibold text-text-muted uppercase tracking-wider mb-0 md:mb-1">Location</h4>
+                    <p className="text-sm md:text-base text-text-primary font-medium">India</p>
                   </div>
                 </div>
               </div>
@@ -143,7 +143,7 @@ const ContactForm = () => {
                 label={<span className="text-text-primary font-medium">Full Name</span>}
                 rules={[{ required: true, message: 'Please enter your name' }]}
               >
-                <Input size="large" placeholder="John Doe" className="rounded-xl bg-bg-secondary border-border-color hover:border-purple-primary focus:border-purple-primary py-3" />
+                <Input size="large" placeholder="John Doe" className="rounded-input bg-white/55 dark:bg-[#2A2045]/55 border-white/40 dark:border-white/10 hover:border-[#8A6CFF] focus:border-[#8A6CFF] py-3" />
               </Form.Item>
 
               <Form.Item
@@ -154,7 +154,7 @@ const ContactForm = () => {
                   { type: 'email', message: 'Please enter a valid email' }
                 ]}
               >
-                <Input size="large" placeholder="john@example.com" className="rounded-xl bg-bg-secondary border-border-color hover:border-purple-primary focus:border-purple-primary py-3" />
+                <Input size="large" placeholder="john@example.com" className="rounded-input bg-white/55 dark:bg-[#2A2045]/55 border-white/40 dark:border-white/10 hover:border-[#8A6CFF] focus:border-[#8A6CFF] py-3" />
               </Form.Item>
 
               <Form.Item
@@ -163,7 +163,7 @@ const ContactForm = () => {
                 className="md:col-span-2"
                 rules={[{ required: true, message: 'Please specify the service you need' }]}
               >
-                <Input size="large" placeholder="e.g. Escrow Transaction, Channel Verification, Growth Marketing" className="rounded-xl bg-bg-secondary border-border-color hover:border-purple-primary focus:border-purple-primary py-3" />
+                <Input size="large" placeholder="e.g. Escrow Transaction, Channel Verification, Growth Marketing" className="rounded-input bg-white/55 dark:bg-[#2A2045]/55 border-white/40 dark:border-white/10 hover:border-[#8A6CFF] focus:border-[#8A6CFF] py-3" />
               </Form.Item>
 
               <Form.Item
@@ -175,7 +175,7 @@ const ContactForm = () => {
                 <TextArea 
                   rows={5} 
                   placeholder="Tell us exactly what you need..." 
-                  className="rounded-xl bg-bg-secondary border-border-color hover:border-purple-primary focus:border-purple-primary py-3 resize-none" 
+                  className="rounded-input bg-white/55 dark:bg-[#2A2045]/55 border-white/40 dark:border-white/10 hover:border-[#8A6CFF] focus:border-[#8A6CFF] py-3 resize-none" 
                 />
               </Form.Item>
 
@@ -185,7 +185,7 @@ const ContactForm = () => {
                   htmlType="submit" 
                   size="large" 
                   loading={loading}
-                  className="w-full h-14 rounded-xl text-lg font-bold border-none shadow-[0_4px_15px_rgba(124,58,237,0.4)] transition-transform hover:scale-[1.02]"
+                  className="w-full h-14 rounded-button text-lg font-bold border-none shadow-purple-glow-soft hover:shadow-purple-glow-hover hover:translate-y-[-3px] hover:scale-[1.02] transition-all"
                   style={{ background: 'var(--btn-gradient)' }}
                   icon={<SendOutlined />}
                 >

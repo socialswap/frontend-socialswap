@@ -85,13 +85,12 @@ const Categories = () => {
               <p className="text-gray-600 mb-4">
                 {channels[category]?.length || 0} channels available
               </p>
-              <Button 
-                type="primary" 
-                size="large"
+              <button 
                 onClick={() => navigate(`/channels?category=${category}`)}
+                className="px-6 py-3 bg-btn-gradient hover:shadow-purple-glow-soft hover:translate-y-[-3px] hover:scale-[1.03] transition-all text-white font-bold rounded-button text-sm"
               >
                 View All {category} Channels
-              </Button>
+              </button>
             </div>
           </TabPane>
         ))}

@@ -14,33 +14,31 @@
    CSS CUSTOM PROPERTIES
    ============================================================ */
 
-/* ── Dark Mode (default) ────────────────────────────────────── */
-:root,
-:root[data-theme="dark"] {
+:root {
   /* Backgrounds */
-  --bg-primary:       #07030F;
-  --bg-secondary:     #0F0A1D;
-  --bg-hero:          #110824;
-  --bg-card:          #171127;
-  --bg-glass:         rgba(24, 17, 46, 0.65);
+  --bg-primary:       #FAF8FF;
+  --bg-secondary:     #FFFFFF;
+  --bg-hero:          #F2ECFF;
+  --bg-card:          rgba(255, 255, 255, 0.45);
+  --bg-glass:         rgba(255, 255, 255, 0.45);
 
   /* Borders */
-  --border:           rgba(255,255,255,0.08);
-  --border-glow:      rgba(124, 58, 237, 0.18);
+  --border:           rgba(255, 255, 255, 0.4);
+  --border-glow:      rgba(110, 75, 255, 0.15);
 
   /* Brand */
-  --primary:          #7C3AED;
-  --primary-hover:    #8B5CF6;
-  --primary-active:   #6D28D9;
-  --purple-primary:   var(--primary);
-  --purple-hover:     var(--primary-hover);
+  --primary:          #6E4BFF;
+  --primary-hover:    #8A6CFF;
+  --primary-active:   #7B61FF;
+  --purple-primary:   #6E4BFF;
+  --purple-hover:     #8A6CFF;
   
   /* Accent */
-  --accent-purple:    #B983FF;
-  --purple-secondary: var(--accent-purple);
-  --accent-cyan:      #22D3EE;
-  --accent-pink:      var(--accent-cyan);
-  --accent-blue:      #4F46E5;
+  --accent-purple:    #C6B4FF;
+  --purple-secondary: #8A6CFF;
+  --accent-cyan:      #F4B6D2;
+  --accent-pink:      #F4B6D2;
+  --accent-blue:      #6E4BFF;
 
   /* Semantic */
   --success:          #22C55E;
@@ -48,35 +46,35 @@
   --error:            #EF4444;
 
   /* Text */
-  --text-primary:     #FFFFFF;
-  --text-secondary:   #C7C3D4;
-  --text-muted:       #8E8A9D;
-  --text-disabled:    #70698C;
+  --text-primary:     #312E4A;
+  --text-secondary:   #6F6B8A;
+  --text-muted:       #8A879F;
+  --text-disabled:    #B8B5C7;
 
   /* Shadows */
-  --shadow:           rgba(124,58,237,0.35);
-  --shadow-card:      0 8px 32px var(--shadow);
-  --shadow-purple:    0 0 40px var(--shadow);
-  --shadow-pink:      0 0 30px rgba(34, 211, 238, 0.35);
+  --shadow:           rgba(120, 90, 255, 0.15);
+  --shadow-card:      0 15px 40px rgba(120, 90, 255, 0.15);
+  --shadow-purple:    0 15px 40px rgba(120, 90, 255, 0.15);
+  --shadow-pink:      0 15px 40px rgba(120, 90, 255, 0.15);
 
   /* Gradients */
-  --btn-gradient:     linear-gradient(135deg, var(--primary) 0%, var(--accent-purple) 100%);
-  --hero-gradient:    linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-hero) 50%, var(--bg-secondary) 100%);
+  --btn-gradient:     linear-gradient(135deg, #7B61FF, #B88DFF);
+  --hero-gradient:    linear-gradient(135deg, #FAF8FF, #F2ECFF, #FFEAF2);
   --shimmer-gradient: linear-gradient(90deg,
-      rgba(124, 58, 237, 0) 0%,
-      rgba(168, 85, 247, 0.15) 50%,
-      rgba(124, 58, 237, 0) 100%);
+      rgba(123, 97, 255, 0) 0%,
+      rgba(184, 141, 255, 0.12) 50%,
+      rgba(123, 97, 255, 0) 100%);
 
   /* Glows */
-  --glow-hero:        rgba(124, 58, 237, 0.45);
-  --glow-pink:        rgba(34, 211, 238, 0.35);
-  --glow-blue:        rgba(79, 70, 229, 0.30);
+  --glow-hero:        rgba(110, 75, 255, 0.2);
+  --glow-pink:        rgba(244, 182, 210, 0.15);
+  --glow-blue:        rgba(120, 90, 255, 0.15);
 
   /* Star colours */
-  --star-white:       #FFFFFF;
-  --star-purple:      var(--accent-purple);
-  --star-blue:        var(--accent-blue);
-  --star-pink:        var(--accent-cyan);
+  --star-white:       #6E4BFF;
+  --star-purple:      #8A6CFF;
+  --star-blue:        #C6B4FF;
+  --star-pink:        #F4B6D2;
 
   /* Typography */
   --font-sans:        'Inter', sans-serif;
@@ -87,78 +85,83 @@
   --transition-slow:  400ms ease;
 
   /* Radius */
-  --radius-sm:        8px;
-  --radius-md:        12px;
-  --radius-lg:        16px;
+  --radius-sm:        12px;
+  --radius-md:        16px;
+  --radius-lg:        20px;
   --radius-xl:        24px;
   --radius-2xl:       32px;
   --radius-full:      9999px;
 }
 
-/* ── Light Mode ─────────────────────────────────────────────── */
-/* Premium Apple HIG · Soft Glass UI · Warm White + Lavender    */
+/* Light Theme (same as root for light-first design) */
 .light,
 [data-theme="light"] {
-  /* ── Backgrounds ─────────────────────────────── */
-  --bg-primary:       #FAFAFC;                       /* warm off-white with subtle lavender tint   */
-  --bg-secondary:     #FFFFFF;                       /* pure white for cards / panels              */
-  --bg-hero:          #F2EFFF;                       /* deeper lavender for hero backdrop          */
-  --bg-card:          rgba(255, 255, 255, 0.80);     /* frosted white glass surface                */
-  --bg-glass:         rgba(255, 255, 255, 0.62);     /* lighter frosted glass                      */
+  /* Values inherited from :root, kept for backward compatibility */
+}
 
-  /* ── Borders ─────────────────────────────────── */
-  --border:           #ECECF5;                       /* very soft lavender border — no harshness   */
-  --border-glow:      rgba(124, 77, 255, 0.18);
+/* ── Dark Mode ─────────────────────────────────────────────── */
+.dark,
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-primary:       #0D0B1A;
+  --bg-secondary:     #110C1F;
+  --bg-hero:          #160F2B;
+  --bg-card:          rgba(25, 20, 45, 0.60);
+  --bg-glass:         rgba(25, 20, 45, 0.60);
 
-  /* ── Brand ───────────────────────────────────── */
-  --primary:          #7C4DFF;                       /* soft purple accent — used sparingly        */
-  --primary-hover:    #6A3FE0;
-  --primary-active:   #5932CB;
-  --purple-primary:   var(--primary);
-  --purple-hover:     var(--primary-hover);
+  /* Borders */
+  --border:           rgba(255, 255, 255, 0.08);
+  --border-glow:      rgba(110, 75, 255, 0.25);
 
-  /* ── Accent ──────────────────────────────────── */
-  --accent-purple:    #9B72FF;                       /* lighter purple for gradients               */
-  --purple-secondary: var(--accent-purple);
-  --accent-cyan:      #48AEFF;                       /* sky-blue — replaces cyan in light mode     */
-  --accent-pink:      var(--accent-cyan);
-  --accent-blue:      #5B68FF;                       /* soft indigo                                */
+  /* Brand */
+  --primary:          #8A6CFF;
+  --primary-hover:    #A38CFF;
+  --primary-active:   #7B61FF;
+  --purple-primary:   #8A6CFF;
+  --purple-hover:     #A38CFF;
 
-  /* ── Semantic ────────────────────────────────── */
+  /* Accent */
+  --accent-purple:    #C6B4FF;
+  --purple-secondary: #C6B4FF;
+  --accent-cyan:      #F4B6D2;
+  --accent-pink:      #F4B6D2;
+  --accent-blue:      #8A6CFF;
+
+  /* Semantic */
   --success:          #22C55E;
   --warning:          #F59E0B;
   --error:            #EF4444;
 
-  /* ── Text ────────────────────────────────────── */
-  --text-primary:     #1A1830;                       /* deep navy — rich but not pure black        */
-  --text-secondary:   #5A556F;                       /* muted purple-grey                          */
-  --text-muted:       #9490A8;                       /* soft lavender-grey                         */
-  --text-disabled:    #C5C2D5;
+  /* Text */
+  --text-primary:     #FFFFFF;
+  --text-secondary:   #C6B4FF;
+  --text-muted:       #8A879F;
+  --text-disabled:    #5E5B74;
 
-  /* ── Shadows — very soft, no dark harshness ──── */
-  --shadow:           rgba(124, 77, 255, 0.10);
-  --shadow-card:      0 4px 24px rgba(124, 77, 255, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
-  --shadow-purple:    0 8px 40px rgba(124, 77, 255, 0.16);
-  --shadow-pink:      0 8px 32px rgba(72, 174, 255, 0.14);
+  /* Shadows */
+  --shadow:           rgba(0, 0, 0, 0.4);
+  --shadow-card:      0 15px 40px rgba(0, 0, 0, 0.4);
+  --shadow-purple:    0 15px 40px rgba(110, 75, 255, 0.25);
+  --shadow-pink:      0 15px 40px rgba(244, 182, 210, 0.20);
 
-  /* ── Gradients ───────────────────────────────── */
-  --btn-gradient:     linear-gradient(135deg, #7C4DFF 0%, #9B72FF 50%, #48AEFF 100%);
-  --hero-gradient:    linear-gradient(135deg, #F4F2FF 0%, #EEF0FF 50%, #F8FAFF 100%);
+  /* Gradients */
+  --btn-gradient:     linear-gradient(135deg, #7B61FF, #B88DFF);
+  --hero-gradient:    linear-gradient(135deg, #0D0B1A, #110B24, #1B0F24);
   --shimmer-gradient: linear-gradient(90deg,
-      rgba(124, 77, 255, 0) 0%,
-      rgba(155, 114, 255, 0.12) 50%,
-      rgba(124, 77, 255, 0) 100%);
+      rgba(124, 58, 237, 0) 0%,
+      rgba(168, 85, 247, 0.15) 50%,
+      rgba(124, 58, 237, 0) 100%);
 
-  /* ── Glows — gentle, not saturated ──────────── */
-  --glow-hero:        rgba(124, 77, 255, 0.12);
-  --glow-pink:        rgba(72, 174, 255, 0.10);
-  --glow-blue:        rgba(91, 104, 255, 0.10);
+  /* Glows */
+  --glow-hero:        rgba(110, 75, 255, 0.35);
+  --glow-pink:        rgba(244, 182, 210, 0.20);
+  --glow-blue:        rgba(110, 75, 255, 0.25);
 
-  /* ── Star colours (light-adapted) ────────────── */
-  --star-white:       #7C4DFF;
+  /* Star colours */
+  --star-white:       #FFFFFF;
   --star-purple:      var(--accent-purple);
-  --star-blue:        var(--accent-blue);
-  --star-pink:        var(--accent-cyan);
+  --star-blue:        #8A6CFF;
+  --star-pink:        #F4B6D2;
 
   /* Transitions & radius inherited from :root */
 }
@@ -184,12 +187,38 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-primary);
+  background:
+    radial-gradient(circle at 15% 15%, #C6B4FF 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, #FFD7B5 0%, transparent 45%),
+    radial-gradient(circle at 50% 40%, #F4B6D2 0%, transparent 50%),
+    linear-gradient(135deg, #FAF8FF 0%, #F2ECFF 50%, #FFEAF2 100%);
+  background-attachment: fixed;
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
-  transition: background-color var(--transition-base), color var(--transition-base);
+  transition: color var(--transition-base);
+}
+
+.light body,
+[data-theme="light"] body {
+  background:
+    radial-gradient(circle at 15% 15%, #C6B4FF 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, #FFD7B5 0%, transparent 45%),
+    radial-gradient(circle at 50% 40%, #F4B6D2 0%, transparent 50%),
+    linear-gradient(135deg, #FAF8FF 0%, #F2ECFF 50%, #FFEAF2 100%) !important;
+  background-attachment: fixed !important;
+  color: var(--text-primary) !important;
+}
+
+.dark body,
+[data-theme="dark"] body {
+  background:
+    radial-gradient(circle at 15% 15%, #38246E 0%, transparent 50%),
+    radial-gradient(circle at 85% 85%, #592B3E 0%, transparent 50%),
+    radial-gradient(circle at 50% 40%, #2A1948 0%, transparent 55%),
+    linear-gradient(135deg, #0A0814 0%, #110B24 50%, #1B0F24 100%);
+  background-attachment: fixed;
 }
 
 /* ── Typography ─────────────────────────────────────────────── */
@@ -216,8 +245,8 @@ a:hover {
 
 /* ── Selection ─────────────────────────────────────────────── */
 ::selection {
-  background: rgba(124, 58, 237, 0.35);
-  color: #fff;
+  background: rgba(110, 75, 255, 0.15);
+  color: var(--text-primary);
 }
 
 /* ── Scrollbar ─────────────────────────────────────────────── */
@@ -247,13 +276,15 @@ a:hover {
 .bg-ss-card        { background-color: var(--bg-card); }
 .bg-ss-glass {
   background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
 }
 
 /* ── Borders ─────────────────────────────────────────────── */
 .border-ss         { border: 1px solid var(--border); }
-.border-ss-glow    { border: 1px solid rgba(124, 58, 237, 0.35); }
+.border-ss-glow    { border: 1px solid rgba(110, 75, 255, 0.25); }
 
 /* ── Text ─────────────────────────────────────────────── */
 .text-ss-primary   { color: var(--text-primary); }
@@ -312,8 +343,8 @@ a:hover {
 
 .btn-ss-primary:hover::before { opacity: 1; }
 .btn-ss-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.55);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 20px 45px rgba(120, 90, 255, 0.25);
 }
 .btn-ss-primary:active { transform: translateY(0); }
 
@@ -328,52 +359,56 @@ a:hover {
   font-family: var(--font-sans);
   font-weight: 600;
   font-size: 0.95rem;
-  border: 1px solid var(--purple-primary);
-  border-radius: var(--radius-full);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-base);
   letter-spacing: 0.02em;
 }
 
 .btn-ss-outline:hover {
-  background: rgba(124, 58, 237, 0.12);
-  border-color: var(--purple-secondary);
-  color: var(--text-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.25);
+  background: rgba(110, 75, 255, 0.08);
+  border-color: var(--primary-hover);
+  color: var(--primary);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 15px 30px rgba(120, 90, 255, 0.18);
 }
 
 /* ── Cards ─────────────────────────────────────────────── */
 .card-ss {
-  background: var(--bg-card);
+  background: var(--bg-glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   padding: 24px;
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
 
 .card-ss:hover {
-  border-color: rgba(124, 58, 237, 0.4);
-  box-shadow: var(--shadow-card), 0 0 0 1px rgba(124, 58, 237, 0.15);
-  transform: translateY(-4px);
+  border-color: var(--primary-hover);
+  box-shadow: 0 30px 70px rgba(120, 90, 255, 0.25);
+  transform: translateY(-6px) scale(1.02);
 }
 
 .card-ss-glass {
   background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   padding: 24px;
   transition: all var(--transition-base);
+  box-shadow: var(--shadow-card);
 }
 
 .card-ss-glass:hover {
-  border-color: rgba(168, 85, 247, 0.4);
-  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.2);
-  transform: translateY(-4px);
+  border-color: var(--primary-hover);
+  box-shadow: 0 30px 70px rgba(120, 90, 255, 0.25);
+  transform: translateY(-6px) scale(1.02);
 }
 
 /* ── Glow Effects ─────────────────────────────────────── */
@@ -388,7 +423,7 @@ a:hover {
   background: linear-gradient(90deg,
     transparent 0%,
     var(--border) 20%,
-    rgba(124, 58, 237, 0.4) 50%,
+    rgba(110, 75, 255, 0.4) 50%,
     var(--border) 80%,
     transparent 100%);
   margin: 24px 0;
@@ -400,9 +435,9 @@ a:hover {
   align-items: center;
   gap: 4px;
   padding: 4px 12px;
-  background: rgba(124, 58, 237, 0.15);
-  color: var(--purple-secondary);
-  border: 1px solid rgba(124, 58, 237, 0.3);
+  background: rgba(110, 75, 255, 0.12);
+  color: var(--primary);
+  border: 1px solid rgba(110, 75, 255, 0.25);
   border-radius: var(--radius-full);
   font-size: 0.75rem;
   font-weight: 600;
@@ -411,22 +446,24 @@ a:hover {
 }
 
 .badge-ss-pink {
-  background: rgba(217, 70, 239, 0.15);
+  background: rgba(244, 182, 210, 0.15);
   color: var(--accent-pink);
-  border-color: rgba(217, 70, 239, 0.3);
+  border-color: rgba(244, 182, 210, 0.3);
 }
 
 .badge-ss-blue {
-  background: rgba(59, 130, 246, 0.15);
-  color: var(--accent-blue);
-  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(110, 75, 255, 0.12);
+  color: var(--primary-hover);
+  border-color: rgba(110, 75, 255, 0.2);
 }
 
 /* ── Input ───────────────────────────────────────────── */
 .input-ss {
   width: 100%;
   padding: 12px 16px;
-  background: var(--bg-card);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   color: var(--text-primary);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -436,11 +473,15 @@ a:hover {
   transition: all var(--transition-fast);
 }
 
+.dark .input-ss {
+  background: rgba(25, 20, 45, 0.55);
+}
+
 .input-ss::placeholder { color: var(--text-muted); }
 
 .input-ss:focus {
-  border-color: var(--purple-primary);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  border-color: var(--primary-hover);
+  box-shadow: 0 0 0 3px rgba(110, 75, 255, 0.15);
 }
 
 /* ============================================================

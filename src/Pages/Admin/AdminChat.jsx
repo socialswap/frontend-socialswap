@@ -63,7 +63,11 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
       try {
         const response = await axiosInstance.get(`${api}/admin/users/${selectedSellerId}/channels`);
         if (response.data?.success) {
-          setChannels(response.data.channels || []);
+          // Filter out channels that are already sold
+          const activeChannels = (response.data.channels || []).filter(c => 
+            !c.sold && (!c.status || c.status.toLowerCase() !== 'sold')
+          );
+          setChannels(activeChannels);
         }
       } catch (error) {
         console.error('Error fetching seller channels:', error);

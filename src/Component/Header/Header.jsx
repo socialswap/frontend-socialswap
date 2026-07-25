@@ -213,24 +213,27 @@ const Header = () => {
     return false;
   };
 
-  // Determine colors based on scroll and theme
-  // We want to force white text on top of the hero video (dark mode home) only when not scrolled
-  const isTransparentHero = !isScrolled && location.pathname === '/' && theme === 'dark';
-  const textColor = isTransparentHero ? '#FFFFFF' : 'var(--text-primary)';
-  const textMutedColor = isTransparentHero ? 'rgba(255,255,255,0.7)' : 'var(--text-secondary)';
+  const isOverDarkHero = !isScrolled && location.pathname === '/';
+
+  const logoColor = isOverDarkHero ? '#FFFFFF' : 'var(--text-primary)';
+  const navTextColor = isOverDarkHero ? 'rgba(255,255,255,0.9)' : (theme === 'dark' ? '#FFFFFF' : '#312E4A');
 
   return (
     <header 
-      className="fixed top-0 inset-x-0 z-50 transition-all duration-300 pt-2 pointer-events-none"
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 h-20 flex items-center pointer-events-auto ${
+        isScrolled 
+          ? 'bg-white/80 dark:bg-[#0B0713]/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-white/10 shadow-sm' 
+          : 'bg-transparent border-b border-transparent'
+      }`}
     >
-      <div className="max-w-screen-2xl mx-auto px-4 lg:px-8">
-        <div className="flex items-center justify-between py-4 relative">
+      <div className="max-w-screen-2xl mx-auto px-4 lg:px-8 w-full">
+        <div className="flex items-center justify-between relative">
           
           {/* ── Left: Logo ── */}
           <div className="flex-1 flex justify-start z-10 pointer-events-auto">
             <Link to="/" className="flex items-center gap-2 group" aria-label="SocialSwap Home">
               <img src="/images/logo.png" alt="SocialSwap logo" style={{ height: '2.25rem' }} className="transition-transform duration-300 group-hover:scale-105" />
-              <span className="text-xl md:text-2xl font-bold tracking-tight" style={{ color: textColor }}>
+              <span className="text-xl md:text-2xl font-bold tracking-tight" style={{ color: logoColor }}>
                 SocialSwap
               </span>
             </Link>
@@ -238,11 +241,11 @@ const Header = () => {
 
           {/* ── Center: Pill Navigation (Desktop) ── */}
           <nav 
-            className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 px-1.5 py-1.5 rounded-full backdrop-blur-md shadow-sm border transition-all duration-300 z-20 pointer-events-auto"
-            style={{
-              backgroundColor: isTransparentHero ? 'rgba(255, 255, 255, 0.1)' : 'var(--bg-secondary)',
-              borderColor: isTransparentHero ? 'rgba(255, 255, 255, 0.2)' : 'var(--border)'
-            }}
+            className={`hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 px-2 py-1.5 rounded-full backdrop-blur-xl border transition-all duration-300 z-20 pointer-events-auto shadow-sm ${
+              isOverDarkHero 
+                ? 'bg-white/10 border-white/20' 
+                : 'bg-white/80 dark:bg-white/10 border-gray-200/80 dark:border-white/15'
+            }`}
           >
             {menuItems.map((item) => {
               if (item.type === 'dropdown') {
@@ -256,8 +259,8 @@ const Header = () => {
                 return (
                   <div className="relative group" key={item.label}>
                     <div 
-                      className="relative px-3 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/10 flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                      style={{ color: textMutedColor }}
+                      className="relative px-3.5 py-1.5 rounded-full text-[13px] font-bold transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/10 flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                      style={{ color: navTextColor }}
                     >
                       {item.label}
                       <ChevronDown className="w-3.5 h-3.5 transition-transform duration-300 group-hover:-rotate-180" />
@@ -265,23 +268,17 @@ const Header = () => {
                     
                     {/* Dropdown Menu */}
                     <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 z-[100] transform origin-top group-hover:translate-y-0 translate-y-2">
-                      <div 
-                        className="flex flex-col w-48 py-2 rounded-2xl shadow-xl backdrop-blur-2xl border overflow-hidden bg-white/90 dark:bg-[#110C1D]/90"
-                        style={{
-                          borderColor: 'var(--border)',
-                          boxShadow: '0 10px 40px -10px rgba(0,0,0,0.3)'
-                        }}
-                      >
+                      <div className="flex flex-col w-52 p-1.5 rounded-2xl shadow-2xl backdrop-blur-2xl border border-gray-200/80 dark:border-white/10 overflow-hidden bg-white/95 dark:bg-[#120B24]/95">
                         {options.map((opt, idx) => (
                           <Link 
                             key={idx} 
                             to={`/channels?monetization=${item.monetized}&maxPrice=${opt.price}`} 
-                            className="px-5 py-2.5 text-sm font-medium transition-colors hover:bg-black/5 dark:hover:bg-white/10 flex items-center justify-between group/item"
-                            style={{ color: 'var(--text-secondary)' }}
-                            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-primary)' }}
-                            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-secondary)' }}
+                            className="px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 hover:bg-[#6E4BFF]/10 dark:hover:bg-white/10 text-[#2D2A4A] dark:text-gray-200 hover:text-[#6E4BFF] dark:hover:text-purple-300 flex items-center justify-between group/item"
                           >
-                            {opt.label}
+                            <span>{opt.label}</span>
+                            <span className="opacity-0 -translate-x-2 transition-all duration-200 group-hover/item:opacity-100 group-hover/item:translate-x-0 text-[#6E4BFF] dark:text-purple-300">
+                              →
+                            </span>
                           </Link>
                         ))}
                       </div>
@@ -295,17 +292,17 @@ const Header = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`relative px-3 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 whitespace-nowrap ${
+                  className={`relative px-3.5 py-1.5 rounded-full text-[13px] font-bold transition-all duration-200 whitespace-nowrap ${
                     !active ? 'hover:bg-black/5 dark:hover:bg-white/10' : ''
                   }`}
                   style={{ 
-                    color: active ? '#FFFFFF' : textMutedColor
+                    color: active ? '#FFFFFF' : navTextColor
                   }}
                 >
                   {active && (
                     <motion.div
                       layoutId="activeTabBackground"
-                      className="absolute inset-0 bg-gradient-to-r from-[#7C3AED] to-[#A855F7] rounded-full shadow-md shadow-purple-500/20"
+                      className="absolute inset-0 bg-btn-gradient rounded-full shadow-md shadow-purple-500/20"
                       initial={false}
                       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                     />
@@ -313,7 +310,7 @@ const Header = () => {
                   <span className="relative z-10 flex items-center gap-1.5">
                     {item.label}
                     {item.hot && (
-                      <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-sm">
+                      <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-extrabold bg-gradient-to-r from-[#6E4BFF] to-[#F4B6D2] text-white shadow-sm">
                         HOT
                       </span>
                     )}
@@ -325,8 +322,8 @@ const Header = () => {
             {/* More Options Dropdown */}
             <div className="relative group">
               <button 
-                className="relative px-3 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/10 flex items-center gap-1 cursor-pointer whitespace-nowrap"
-                style={{ color: textMutedColor }}
+                className="relative px-3.5 py-1.5 rounded-full text-[13px] font-bold transition-all duration-200 hover:bg-black/5 dark:hover:bg-white/10 flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                style={{ color: navTextColor }}
               >
                 More Option
                 <ChevronDown className="w-3.5 h-3.5 transition-transform duration-300 group-hover:-rotate-180" />
@@ -334,28 +331,26 @@ const Header = () => {
               
               {/* Dropdown Menu */}
               <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 z-[100] transform origin-top group-hover:translate-y-0 translate-y-2">
-                <div 
-                  className="flex flex-col w-56 py-2 rounded-2xl shadow-xl backdrop-blur-2xl border overflow-hidden bg-white/90 dark:bg-[#110C1D]/90"
-                  style={{
-                    borderColor: 'var(--border)',
-                    boxShadow: '0 10px 40px -10px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  {moreOptions.map((item, idx) => (
-                    <Link 
-                      key={item.path} 
-                      to={item.path} 
-                      className="px-5 py-2.5 text-sm font-medium transition-colors hover:bg-black/5 dark:hover:bg-white/10 flex items-center justify-between group/item"
-                      style={{ color: 'var(--text-secondary)' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-primary)' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-secondary)' }}
-                    >
-                      {item.label}
-                      <span className="opacity-0 -translate-x-2 transition-all duration-300 group-hover/item:opacity-100 group-hover/item:translate-x-0 text-purple-500">
-                        →
-                      </span>
-                    </Link>
-                  ))}
+                <div className="flex flex-col w-56 p-1.5 rounded-2xl shadow-2xl backdrop-blur-2xl border border-gray-200/80 dark:border-white/10 overflow-hidden bg-white/95 dark:bg-[#120B24]/95">
+                  {moreOptions.map((item, idx) => {
+                    const isItemActive = location.pathname === item.path;
+                    return (
+                      <Link 
+                        key={item.path} 
+                        to={item.path} 
+                        className={`px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 flex items-center justify-between group/item ${
+                          isItemActive 
+                            ? 'bg-[#6E4BFF]/15 text-[#6E4BFF] dark:text-purple-300' 
+                            : 'hover:bg-[#6E4BFF]/10 dark:hover:bg-white/10 text-[#2D2A4A] dark:text-gray-200 hover:text-[#6E4BFF] dark:hover:text-purple-300'
+                        }`}
+                      >
+                        <span>{item.label}</span>
+                        <span className="opacity-0 -translate-x-2 transition-all duration-200 group-hover/item:opacity-100 group-hover/item:translate-x-0 text-[#6E4BFF] dark:text-purple-300 font-bold">
+                          →
+                        </span>
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -367,29 +362,56 @@ const Header = () => {
             <button
               type="button"
               aria-label="Toggle theme"
-              className="inline-flex items-center justify-center h-10 w-10 rounded-full transition-all duration-300 hover:scale-110"
-              style={{ 
-                backgroundColor: isTransparentHero ? 'rgba(255,255,255,0.1)' : 'var(--bg-secondary)',
-                color: textColor 
-              }}
+              className={`relative inline-flex items-center justify-between w-[68px] h-[34px] rounded-full p-1 cursor-pointer transition-all duration-300 border ${
+                isOverDarkHero 
+                  ? 'bg-white/10 border-white/20' 
+                  : 'bg-white/80 dark:bg-white/10 border-gray-200/80 dark:border-white/15'
+              }`}
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             >
-              {theme === 'dark' ? (
-                <SunOutlined className="w-4 h-4 text-yellow-400 hover:rotate-45 transition-transform" />
-              ) : (
-                <MoonOutlined className="w-4 h-4 text-indigo-600" />
-              )}
+              {/* Sliding background thumb */}
+              <motion.div
+                className="absolute top-1 bottom-1 w-[26px] rounded-full shadow-sm"
+                style={{ 
+                  backgroundColor: isOverDarkHero ? 'rgba(255,255,255,0.25)' : (theme === 'dark' ? '#332b4d' : '#FFFFFF'),
+                }}
+                initial={false}
+                animate={{ x: theme === 'light' ? 0 : 34 }}
+                transition={{ type: "spring", stiffness: 600, damping: 30 }}
+              />
+              
+              {/* Sun Icon */}
+              <div className="relative z-10 w-[26px] h-full flex items-center justify-center pointer-events-none">
+                <SunOutlined 
+                  style={{ 
+                    fontSize: '14px',
+                    color: isOverDarkHero ? '#FFFFFF' : (theme === 'light' ? '#1F2937' : '#9CA3AF'),
+                    transition: 'color 0.3s'
+                  }} 
+                />
+              </div>
+              
+              {/* Moon Icon */}
+              <div className="relative z-10 w-[26px] h-full flex items-center justify-center pointer-events-none">
+                <MoonOutlined 
+                  style={{ 
+                    fontSize: '14px',
+                    color: isOverDarkHero ? '#FFFFFF' : (theme === 'dark' ? '#FFFFFF' : '#9CA3AF'),
+                    transition: 'color 0.3s'
+                  }} 
+                />
+              </div>
             </button>
 
             {/* Search */}
             <button
               type="button"
               aria-label="Search channels"
-              className="hidden md:inline-flex items-center justify-center h-10 w-10 rounded-full transition-all duration-300 hover:scale-110"
-              style={{ 
-                backgroundColor: isTransparentHero ? 'rgba(255,255,255,0.1)' : 'var(--bg-secondary)',
-                color: textColor 
-              }}
+              className={`hidden md:inline-flex items-center justify-center h-10 w-10 rounded-full transition-all duration-300 hover:scale-110 border backdrop-blur-md shadow-sm ${
+                isOverDarkHero 
+                  ? 'bg-white/10 border-white/20 text-white' 
+                  : 'bg-white/80 dark:bg-white/10 border-gray-200/80 dark:border-white/15 text-text-primary'
+              }`}
               onClick={() => navigate('/channels')}
             >
               <SearchOutlined className="w-4 h-4" />
@@ -401,11 +423,11 @@ const Header = () => {
                   <button
                     type="button"
                     aria-label="Open cart"
-                    className="inline-flex items-center justify-center h-10 w-10 rounded-full transition-all duration-300 hover:scale-110"
-                    style={{ 
-                      backgroundColor: isTransparentHero ? 'rgba(255,255,255,0.1)' : 'var(--bg-secondary)',
-                      color: textColor 
-                    }}
+                    className={`inline-flex items-center justify-center h-10 w-10 rounded-full transition-all duration-300 hover:scale-110 border backdrop-blur-md shadow-sm ${
+                      isOverDarkHero 
+                        ? 'bg-white/10 border-white/20 text-white' 
+                        : 'bg-white/80 dark:bg-white/10 border-gray-200/80 dark:border-white/15 text-text-primary'
+                    }`}
                     onClick={() => navigate('/user/cart')}
                   >
                     <ShoppingCartOutlined className="w-4 h-4" />
@@ -426,17 +448,13 @@ const Header = () => {
                 <Link
                   to="/login"
                   className="text-sm font-bold tracking-wide transition-all duration-200 px-3 hover:opacity-80"
-                  style={{ color: textColor }}
+                  style={{ color: logoColor }}
                 >
                   Login
                 </Link>
                 <Link
                   to="/signup"
-                  className="text-sm font-bold tracking-wide px-5 py-2.5 rounded-full transition-all duration-300 hover:scale-105 shadow-md flex items-center gap-1"
-                  style={{ 
-                    backgroundColor: theme === 'dark' ? '#FFFFFF' : '#1A1830',
-                    color: theme === 'dark' ? '#000000' : '#FFFFFF',
-                  }}
+                  className="text-sm font-bold tracking-wide px-5 py-2.5 rounded-full transition-all duration-300 hover:scale-105 shadow-md flex items-center gap-1 bg-btn-gradient text-white"
                 >
                   Sign up
                 </Link>
@@ -447,11 +465,11 @@ const Header = () => {
               <button
                 type="button"
                 aria-label="Open menu"
-                className="inline-flex lg:hidden items-center justify-center h-10 w-10 rounded-full transition-transform duration-200 active:scale-95 ml-2"
-                style={{ 
-                  backgroundColor: isTransparentHero ? 'rgba(255,255,255,0.1)' : 'var(--bg-secondary)',
-                  color: textColor 
-                }}
+                className={`inline-flex lg:hidden items-center justify-center h-10 w-10 rounded-full transition-transform duration-200 active:scale-95 ml-2 border ${
+                  isOverDarkHero 
+                    ? 'bg-white/10 border-white/20 text-white' 
+                    : 'bg-white/80 dark:bg-white/10 border-gray-200/80 dark:border-white/15 text-text-primary'
+                }`}
                 onClick={showDrawer}
               >
                 <MenuOutlined className="w-5 h-5" />

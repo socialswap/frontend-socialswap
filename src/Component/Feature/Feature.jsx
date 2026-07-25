@@ -74,7 +74,7 @@ export const ChannelCard = ({ channel }) => {
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       whileHover={{ y: -8 }}
-      className="relative rounded-2xl overflow-hidden cursor-pointer min-w-[300px] mx-3 group border border-border-color bg-bg-card text-text-primary backdrop-blur-md shadow-card-shadow transition-all duration-300"
+      className="relative rounded-card overflow-hidden cursor-pointer min-w-[300px] mx-3 group border border-white/40 dark:border-white/10 bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] shadow-card transition-all duration-300"
       style={{
         minHeight: '540px',
       }}
@@ -340,7 +340,7 @@ const FeaturedListings = () => {
 
   return (
     <section 
-      className="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-bg-primary text-text-primary transition-all duration-300"
+      className="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-transparent text-text-primary transition-all duration-300"
     >
       {/* Background Orbs */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-gradient-to-br from-purple-primary/10 to-transparent rounded-full blur-3xl" />
@@ -358,7 +358,7 @@ const FeaturedListings = () => {
           {/* Badge */}
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="inline-block mb-4 px-6 py-2 rounded-full bg-bg-card/80 border border-border-color/30 backdrop-blur-md"
+            className="inline-block mb-4 px-6 py-2 rounded-full bg-white/45 dark:bg-[#110C1F]/45 border border-white/40 dark:border-white/10 backdrop-blur-[18px]"
           >
             <span className="text-sm font-semibold bg-gradient-to-r from-purple-primary to-accent-pink bg-clip-text text-transparent">
               🔥 Trending Now
@@ -418,8 +418,8 @@ const FeaturedListings = () => {
                         boxShadow: 'var(--purple-glow)',
                       }
                     : {
-                        background: 'var(--bg-card)',
-                        border: '1px solid var(--border)',
+                        background: 'var(--bg-glass)',
+                        border: '1px solid rgba(255,255,255,0.3)',
                       }
                 }
               >
@@ -453,7 +453,7 @@ const FeaturedListings = () => {
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="animate-pulse rounded-2xl min-w-[300px] h-96 bg-bg-card border border-border-color/20"
+                  className="animate-pulse rounded-card min-w-[300px] h-96 bg-white/30 dark:bg-[#110C1F]/30 border border-white/20 dark:border-white/10"
                 />
               ))}
             </motion.div>

@@ -42,7 +42,7 @@ const CategoryMarquee = () => {
     return (
       <div className="flex overflow-hidden whitespace-nowrap mb-6 py-4">
         <motion.div
-          className="flex gap-8 px-4 items-center"
+          className="flex gap-8 px-4 items-center w-max"
           animate={{
             x: direction === 'left' ? ['0%', '-33.33%'] : ['-33.33%', '0%'],
           }}
@@ -56,7 +56,7 @@ const CategoryMarquee = () => {
             <div
               key={`${cat.name}-${idx}`}
               onClick={() => navigate(`/channels?category=${cat.name}`)}
-              className="flex items-center gap-4 bg-bg-card border border-border-color shadow-[0_4px_15px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.2)] px-6 py-3 rounded-full cursor-pointer hover:border-purple-primary hover:shadow-[0_0_15px_rgba(124,58,237,0.3)] transition-all duration-300 transform hover:-translate-y-1"
+              className="flex flex-shrink-0 w-max items-center gap-4 bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/40 dark:border-white/10 shadow-card px-6 py-3 rounded-full cursor-pointer hover:border-purple-primary hover:shadow-[0_0_15px_rgba(110,75,255,0.3)] transition-all duration-300 transform hover:-translate-y-1"
             >
               <img src={cat.icon} alt={cat.name} className="w-10 h-10 object-contain drop-shadow-md" />
               <span className="text-lg font-bold text-text-primary whitespace-nowrap">{cat.name}</span>
@@ -68,7 +68,7 @@ const CategoryMarquee = () => {
   };
 
   return (
-    <section className="py-16 bg-bg-secondary overflow-hidden">
+    <section className="py-8 md:py-16 bg-transparent overflow-hidden">
       <motion.div 
         className="text-center mb-10 px-4"
         initial="hidden"

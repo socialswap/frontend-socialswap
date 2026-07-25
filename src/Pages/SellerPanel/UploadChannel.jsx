@@ -345,7 +345,7 @@ export default function UploadChannel() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0d0b1a] flex items-start justify-center px-5 pt-24 pb-12">
+    <div className="min-h-screen bg-transparent flex items-start justify-center px-5 pt-24 pb-12">
       <div className="w-full max-w-3xl flex flex-col gap-7">
 
         {/* ── Page Header ── */}
@@ -394,7 +394,7 @@ export default function UploadChannel() {
         {/* ── Form Card ── */}
         <motion.div
           key={step}
-          className="bg-white dark:bg-white/[0.04] shadow-sm dark:shadow-none backdrop-blur-2xl border border-gray-200 dark:border-white/[0.08] rounded-2xl p-8"
+          className="bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/40 dark:border-white/10 rounded-card p-8 shadow-card"
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
@@ -416,13 +416,13 @@ export default function UploadChannel() {
               </h3>
 
               {/* ── Auto-fill from YouTube Widget ── */}
-              <div className="mb-6 rounded-2xl border border-purple-500/25 bg-gradient-to-br from-purple-500/[0.08] to-fuchsia-500/[0.04] p-5">
+              <div className="mb-6 rounded-card border border-purple-500/30 bg-white/40 dark:bg-purple-950/20 backdrop-blur-md p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Sparkles size={15} className="text-purple-400" />
-                  <span className="text-sm font-bold text-gray-900 dark:text-white">Auto-fill from YouTube</span>
-                  <span className="ml-auto text-[0.65rem] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/25 font-semibold">SMART FILL</span>
+                  <span className="text-sm font-bold text-text-primary">Auto-fill from YouTube</span>
+                  <span className="ml-auto text-[0.65rem] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/25 font-semibold">SMART FILL</span>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-white/40 mb-3 leading-relaxed">
+                <p className="text-xs text-text-secondary mb-3 leading-relaxed">
                   Paste your YouTube channel link, Channel ID, or @handle and we'll auto-fill the form for you.
                 </p>
 
@@ -433,12 +433,12 @@ export default function UploadChannel() {
                     onChange={e => { setFetchInput(e.target.value); setFetchError(''); }}
                     onKeyDown={e => e.key === 'Enter' && fetchChannelInfo()}
                     placeholder="https://youtube.com/@channel  ·  UCxxxxxx  ·  @handle"
-                    className="flex-1 bg-gray-50 dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/25 outline-none focus:border-purple-500 focus:bg-purple-500/[0.08] transition-all"
+                    className="flex-1 bg-white/60 dark:bg-white/[0.06] border border-white/40 dark:border-white/10 rounded-input px-3.5 py-2.5 text-sm text-text-primary placeholder-text-secondary outline-none focus:border-purple-500 transition-all"
                   />
                   <button
                     onClick={fetchChannelInfo}
                     disabled={fetchLoading}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white font-semibold rounded-xl text-sm hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity shrink-0"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-btn-gradient text-white font-semibold rounded-button text-sm hover:shadow-purple-glow-soft hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all shrink-0"
                   >
                     {fetchLoading
                       ? <><Loader2 size={14} className="animate-spin" /> Fetching…</>
@@ -741,25 +741,24 @@ export default function UploadChannel() {
 function Field({ label, icon, error, children }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="flex items-center gap-1.5 text-[0.72rem] font-semibold text-gray-500 dark:text-white/50 uppercase tracking-wide">
-        <span className="text-gray-400 dark:text-white/35">{icon}</span>{label}
+      <label className="flex items-center gap-1.5 text-[0.72rem] font-semibold text-text-secondary uppercase tracking-wide">
+        <span className="text-purple-400">{icon}</span>{label}
       </label>
       <div className={`[&_input]:w-full [&_select]:w-full [&_textarea]:w-full
-        [&_input]:bg-gray-50 dark:[&_input]:bg-white/[0.06] [&_select]:bg-gray-50 dark:[&_select]:bg-white/[0.06] [&_textarea]:bg-gray-50 dark:[&_textarea]:bg-white/[0.06]
+        [&_input]:bg-white/60 dark:[&_input]:bg-white/[0.06] [&_select]:bg-white/60 dark:[&_select]:bg-white/[0.06] [&_textarea]:bg-white/60 dark:[&_textarea]:bg-white/[0.06]
         [&_input]:border [&_select]:border [&_textarea]:border
         ${error
           ? '[&_input]:border-red-500/40 [&_select]:border-red-500/40 [&_textarea]:border-red-500/40'
-          : '[&_input]:border-gray-200 dark:[&_input]:border-white/10 [&_select]:border-gray-200 dark:[&_select]:border-white/10 [&_textarea]:border-gray-200 dark:[&_textarea]:border-white/10'
+          : '[&_input]:border-white/40 dark:[&_input]:border-white/10 [&_select]:border-white/40 dark:[&_select]:border-white/10 [&_textarea]:border-white/40 dark:[&_textarea]:border-white/10'
         }
-        [&_input]:rounded-xl [&_select]:rounded-xl [&_textarea]:rounded-xl
+        [&_input]:rounded-input [&_select]:rounded-input [&_textarea]:rounded-input
         [&_input]:px-3.5 [&_select]:px-3.5 [&_textarea]:px-3.5
         [&_input]:py-2.5 [&_select]:py-2.5 [&_textarea]:py-2.5
         [&_input]:text-sm [&_select]:text-sm [&_textarea]:text-sm
-        [&_input]:text-gray-900 dark:[&_input]:text-white [&_select]:text-gray-900 dark:[&_select]:text-white [&_textarea]:text-gray-900 dark:[&_textarea]:text-white
+        [&_input]:text-text-primary [&_select]:text-text-primary [&_textarea]:text-text-primary
         [&_input]:outline-none [&_select]:outline-none [&_textarea]:outline-none
         [&_input]:transition-all [&_select]:transition-all [&_textarea]:transition-all
-        [&_input:focus]:border-purple-500 [&_select:focus]:border-purple-500 [&_textarea:focus]:border-purple-500
-        [&_input:focus]:bg-purple-50/[0.5] dark:[&_input:focus]:bg-purple-500/[0.08] [&_select:focus]:bg-purple-50/[0.5] dark:[&_select:focus]:bg-purple-500/[0.08] [&_textarea:focus]:bg-purple-50/[0.5] dark:[&_textarea:focus]:bg-purple-500/[0.08]
+        [&_input:focus]:border-[#8A6CFF] [&_select:focus]:border-[#8A6CFF] [&_textarea:focus]:border-[#8A6CFF]
         [&_select_option]:bg-white dark:[&_select_option]:bg-[#1a1330] [&_textarea]:resize-y dark:[&_input[type=date]]:color-scheme-dark`}>
         {children}
       </div>

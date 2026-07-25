@@ -9,7 +9,7 @@ import axiosInstance, { api } from '../../API/api';
 const SlickArrowLeft = ({ currentSlide, slideCount, ...props }) => (
   <button
     {...props}
-    className={"slick-prev slick-arrow absolute top-1/2 -left-4 z-10 -translate-y-1/2 w-10 h-10 rounded-full bg-bg-card border border-border-color shadow-lg flex items-center justify-center text-text-primary hover:text-purple-primary hover:border-purple-primary transition-all " + (currentSlide === 0 ? " opacity-50 cursor-not-allowed" : "")}
+    className={"slick-prev slick-arrow absolute top-1/2 -left-4 z-10 -translate-y-1/2 w-10 h-10 rounded-full bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/40 dark:border-white/10 shadow-lg flex items-center justify-center text-text-primary hover:text-purple-primary hover:border-purple-primary transition-all " + (currentSlide === 0 ? " opacity-50 cursor-not-allowed" : "")}
     aria-hidden="true"
     aria-disabled={currentSlide === 0}
     type="button"
@@ -21,7 +21,7 @@ const SlickArrowLeft = ({ currentSlide, slideCount, ...props }) => (
 const SlickArrowRight = ({ currentSlide, slideCount, ...props }) => (
   <button
     {...props}
-    className={"slick-next slick-arrow absolute top-1/2 -right-4 z-10 -translate-y-1/2 w-10 h-10 rounded-full bg-bg-card border border-border-color shadow-lg flex items-center justify-center text-text-primary hover:text-purple-primary hover:border-purple-primary transition-all " + (currentSlide === slideCount - 1 ? " opacity-50 cursor-not-allowed" : "")}
+    className={"slick-next slick-arrow absolute top-1/2 -right-4 z-10 -translate-y-1/2 w-10 h-10 rounded-full bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/40 dark:border-white/10 shadow-lg flex items-center justify-center text-text-primary hover:text-purple-primary hover:border-purple-primary transition-all " + (currentSlide === slideCount - 1 ? " opacity-50 cursor-not-allowed" : "")}
     aria-hidden="true"
     aria-disabled={currentSlide === slideCount - 1}
     type="button"
@@ -77,7 +77,7 @@ const ServicesSlider = () => {
   };
 
   return (
-    <section className="py-16 bg-bg-primary overflow-hidden">
+    <section className="py-8 md:py-16 bg-transparent overflow-hidden">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
           <motion.div 
@@ -141,7 +141,7 @@ const ServicesSlider = () => {
           {loading ? (
             <div className="flex gap-6">
               {[1, 2, 3].map(i => (
-                <div key={i} className="flex-1 h-96 bg-bg-card rounded-2xl animate-pulse border border-border-color/20" />
+                <div key={i} className="flex-1 h-96 bg-white/30 dark:bg-[#110C1F]/30 rounded-card animate-pulse border border-white/20 dark:border-white/10" />
               ))}
             </div>
           ) : services.length === 0 ? (
@@ -174,9 +174,9 @@ const ServicesSlider = () => {
                   <div key={svc._id} className="h-full outline-none">
                     <Link
                       to={`/services/${svc.slug}`}
-                      className="block h-full group bg-bg-card rounded-2xl shadow-sm border border-border-color overflow-hidden hover:shadow-[0_10px_30px_rgba(124,58,237,0.15)] hover:border-purple-primary/50 transition-all duration-300 transform hover:-translate-y-2"
+                      className="block h-full group bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] rounded-card shadow-card border border-white/40 dark:border-white/10 overflow-hidden hover:shadow-purple-glow-soft hover:border-[#8A6CFF]/50 transition-all duration-300 transform hover:-translate-y-2"
                     >
-                      <div className="relative h-48 overflow-hidden bg-bg-secondary">
+                      <div className="relative h-48 overflow-hidden bg-white/20 dark:bg-black/20">
                         {svc.images?.[0] ? (
                           <img
                             src={svc.images[0]}

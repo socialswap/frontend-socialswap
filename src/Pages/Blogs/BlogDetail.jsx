@@ -150,19 +150,19 @@ const BlogDetail = () => {
         faqSchema={faqSchema}
       />
 
-      <div className="relative min-h-screen bg-gray-50 text-gray-900 pt-24 pb-16 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="relative min-h-screen bg-gray-50 dark:bg-[#120a27] text-gray-900 dark:text-white pt-24 pb-16 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-300">
         {/* HEADER & COVER IMAGE (Full width top section) */}
         <div className="max-w-7xl mx-auto mb-16">
              {/* Header */}
              <div className="text-center mb-8 flex flex-col items-center">
-                <div className="text-sm font-medium text-gray-900 mb-4">
-                  {blog.author || 'SocialSwap Team'} <span className="text-gray-500 font-normal">on {new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric'})}</span>
+                <div className="text-sm font-medium text-gray-900 dark:text-gray-300 mb-4">
+                  {blog.author || 'SocialSwap Team'} <span className="text-gray-500 dark:text-gray-500 font-normal">on {new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric'})}</span>
                 </div>
-                <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold text-[#111827] leading-[1.15] mb-6 tracking-tight">
+                <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold text-[#111827] dark:text-white leading-[1.15] mb-6 tracking-tight">
                   {blog.title}
                 </h1>
                 {blog.category && (
-                  <span className="px-4 py-1.5 bg-white border border-gray-100 text-[11px] font-bold uppercase tracking-widest text-gray-700 rounded-full shadow-sm">
+                  <span className="px-4 py-1.5 bg-white dark:bg-white/10 border border-gray-100 dark:border-white/20 text-[11px] font-bold uppercase tracking-widest text-gray-700 dark:text-gray-200 rounded-full shadow-sm backdrop-blur-sm">
                     {blog.category}
                   </span>
                 )}
@@ -185,9 +185,9 @@ const BlogDetail = () => {
                  className="w-24 h-24 rounded-full flex items-center justify-center shadow-sm"
                  style={{ background: `conic-gradient(#111827 ${scrollProgress}%, #f3f4f6 0)` }}
                >
-                 <div className="w-[92px] h-[92px] bg-white rounded-full flex flex-col items-center justify-center text-center">
-                   <span className="text-xl font-bold text-gray-900 leading-none mb-1">{blog.readTime || '5'}</span>
-                   <span className="text-sm text-gray-500 font-medium leading-tight">min<br/>read</span>
+                 <div className="w-[92px] h-[92px] bg-white dark:bg-[#18112e] rounded-full flex flex-col items-center justify-center text-center">
+                   <span className="text-xl font-bold text-gray-900 dark:text-white leading-none mb-1">{blog.readTime || '5'}</span>
+                   <span className="text-sm text-gray-500 dark:text-gray-400 font-medium leading-tight">min<br/>read</span>
                  </div>
                </div>
                
@@ -216,7 +216,7 @@ const BlogDetail = () => {
           <main className="lg:col-span-7 pt-2">
 
              {/* Content */}
-             <div className="prose prose-lg max-w-none text-[#374151] prose-headings:font-bold prose-headings:text-[#111827] prose-a:text-red-500 hover:prose-a:text-red-600 prose-img:rounded-xl">
+             <div className="prose prose-lg max-w-none text-[#374151] dark:text-gray-300 prose-headings:font-bold prose-headings:text-[#111827] dark:prose-headings:text-white prose-a:text-red-500 hover:prose-a:text-red-600 prose-img:rounded-xl dark:prose-strong:text-white">
                <div dangerouslySetInnerHTML={{ __html: blog.content }} />
              </div>
 

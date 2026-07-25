@@ -32,7 +32,7 @@ const TopChannelsCarousel = () => {
 
   return (
     <section
-      className="relative py-16 px-4 sm:px-6 lg:px-8 overflow-hidden bg-bg-secondary text-text-primary transition-all duration-300"
+      className="relative py-8 md:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden bg-transparent text-text-primary transition-all duration-300"
     >
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute -top-16 -right-10 w-72 h-72 bg-purple-primary/10 blur-3xl rounded-full" />

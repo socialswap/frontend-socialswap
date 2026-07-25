@@ -30,7 +30,7 @@ const ServicesPage = () => {
     : services.filter(s => s.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f8f5ff] via-white to-[#faf8ff] dark:from-[#070312] dark:via-[#110824] dark:to-[#0D071C] pt-28 pb-20 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-transparent pt-28 pb-20 px-4 sm:px-6 lg:px-8 font-sans">
       {/* Page Header */}
       <div className="max-w-6xl mx-auto mb-12 text-center">
         <span className="inline-block px-4 py-1.5 text-xs font-bold uppercase tracking-widest bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full mb-4">
@@ -53,8 +53,8 @@ const ServicesPage = () => {
               onClick={() => setActiveCategory(cat)}
               className={`px-4 py-1.5 rounded-full text-sm font-semibold capitalize transition-all duration-200 ${
                 activeCategory === cat
-                  ? 'bg-gradient-to-r from-[#7C3AED] to-[#9333EA] text-white shadow-lg shadow-purple-500/20'
-                  : 'bg-white dark:bg-[#18112e] border border-gray-200 dark:border-purple-900/30 text-gray-600 dark:text-gray-400 hover:border-purple-400 dark:hover:border-purple-600'
+                  ? 'bg-btn-gradient text-white shadow-purple-glow-soft'
+                  : 'bg-white/45 dark:bg-[#110C1F]/45 border border-white/40 dark:border-white/10 text-text-secondary hover:border-[#8A6CFF]'
               }`}
             >
               {cat === 'all' ? 'All Services' : cat}
@@ -67,7 +67,7 @@ const ServicesPage = () => {
       {loading ? (
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white dark:bg-[#18112e] rounded-2xl h-72 animate-pulse border border-gray-100 dark:border-purple-900/20" />
+            <div key={i} className="bg-white/30 dark:bg-[#110C1F]/30 rounded-card h-72 animate-pulse border border-white/20 dark:border-white/10" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -78,10 +78,10 @@ const ServicesPage = () => {
             <Link
               key={svc._id}
               to={`/services/${svc.slug}`}
-              className="group bg-white dark:bg-[#18112e] rounded-2xl shadow-sm border border-gray-100 dark:border-purple-900/20 overflow-hidden hover:shadow-xl hover:shadow-purple-500/10 hover:-translate-y-1 transition-all duration-300"
+              className="group bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] rounded-card shadow-card border border-white/40 dark:border-white/10 overflow-hidden hover:shadow-purple-glow-soft hover:-translate-y-1 transition-all duration-300"
             >
               {/* Image */}
-              <div className="relative h-44 overflow-hidden bg-purple-50 dark:bg-[#231542]">
+              <div className="relative h-44 overflow-hidden bg-white/20 dark:bg-black/20">
                 {svc.images?.[0] ? (
                   <img
                     src={svc.images[0]}
