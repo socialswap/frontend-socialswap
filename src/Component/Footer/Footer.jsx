@@ -10,9 +10,7 @@ import { FaXTwitter } from 'react-icons/fa6';
 const Footer = () => {
   const location = useLocation();
 
-  if (location.pathname === '/blogs' || location.pathname === '/blogs/') {
-    return null;
-  }
+  const isBlogPage = location.pathname.startsWith('/blog');
 
   const handleMakeOffer = () => {
     const message = encodeURIComponent(
@@ -30,9 +28,9 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[20px] text-text-secondary py-16 text-[13px] md:text-sm font-sans border-t border-white/40 dark:border-white/10 shadow-card relative overflow-hidden">
+    <footer className={`${isBlogPage ? 'bg-bg-primary border-t border-border' : 'bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[20px] border-t border-white/40 dark:border-white/10 shadow-card'} text-text-secondary py-16 text-[13px] md:text-sm font-sans relative overflow-hidden`}>
       <div className="container mx-auto px-6 max-w-6xl relative z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 mb-16 text-center sm:text-left">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 mb-16 text-left">
           
           {/* Column 1: COMPANY */}
           <div>
@@ -94,7 +92,7 @@ const Footer = () => {
               
               <div className="pt-3">
                 <p className="font-bold text-text-primary uppercase tracking-wider mb-3">On Social Media:</p>
-                <div className="flex gap-2.5 justify-center sm:justify-start">
+                <div className="flex gap-2.5 justify-start">
                   {socialLinks.map(({ href, Icon, label }) => (
                     <a
                       key={label}

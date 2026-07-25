@@ -184,8 +184,8 @@ const AdminBlogs = ({ isEmbedded = false }) => {
   const handleImageUpload = async (file, field) => {
     try {
       const options = {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1920,
+        maxSizeMB: 0.2, // Compress under 200KB
+        maxWidthOrHeight: 1280, // Max width for standard HD web viewing
         useWebWorker: true,
         fileType: 'image/webp',
       };

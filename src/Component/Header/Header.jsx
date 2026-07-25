@@ -511,8 +511,21 @@ const Header = () => {
         onClose={onClose}
         open={visible}
         width={280}
-        styles={{ body: { padding: 0 } }}
-        className="bg-bg-primary"
+        styles={{ 
+          body: { padding: 0 },
+          content: { 
+            borderRadius: '24px 0 0 24px', 
+            overflow: 'hidden',
+            background: theme === 'dark' ? 'rgba(17, 12, 31, 0.75)' : 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            borderLeft: theme === 'dark' ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.05)'
+          },
+          header: {
+            background: 'transparent',
+            borderBottom: theme === 'dark' ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)'
+          }
+        }}
         style={{ color: 'var(--text-primary)' }}
       >
         <div className="flex flex-col h-full">

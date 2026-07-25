@@ -562,7 +562,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                         {msg.mediaUrl && (
                           <img src={msg.mediaUrl} alt="Attachment" className="rounded-lg mb-2 w-full object-cover max-h-64 cursor-pointer" onClick={() => window.open(msg.mediaUrl, '_blank')} />
                         )}
-                        {msg.text && <p className="text-[13.5px] md:text-[14.5px] leading-relaxed pr-6 break-words whitespace-pre-wrap">{msg.text}</p>}
+                        {msg.text && <p className={`text-[13.5px] md:text-[14.5px] leading-relaxed pr-6 break-words whitespace-pre-wrap ${isAdmin ? 'text-white' : 'text-gray-800 dark:text-gray-200'}`}>{msg.text}</p>}
                         
                         {(msg.isChannelCard || msg.type === 'channel') && msg.channelId && (
                           <div className="mt-3 p-3 bg-white dark:bg-[#18112e] rounded-xl border border-purple-200 dark:border-purple-800/40 shadow-sm flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/channel/${msg.channelId._id || msg.channelId}`)}>

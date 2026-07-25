@@ -35,7 +35,23 @@ self.addEventListener('push', function(event) {
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title, options)
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(windowClients) {
+      let isAppFocused = false;
+
+      for (let i = 0; i < windowClients.length; i++) {
+        const client = windowClients[i];
+        // If the window is focused and visible, the app is actively being viewed
+        if (client.visibilityState === 'visible' && client.focused) {
+          isAppFocused = true;
+          break;
+        }
+      }
+
+      // Only show the system notification if the user isn't actively viewing the app
+      if (!isAppFocused) {
+        return self.registration.showNotification(data.title, options);
+      }
+    })
   );
 });
 

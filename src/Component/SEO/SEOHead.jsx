@@ -18,6 +18,7 @@ const SEOHead = ({
   article,
   breadcrumbs,
   faqSchema,
+  preloadImages,
 }) => {
   const fullTitle = title
     ? `${title} | ${SITE_NAME}`
@@ -51,6 +52,11 @@ const SEOHead = ({
       {keywords && <meta name="keywords" content={keywords} />}
       <link rel="canonical" href={canonical} />
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
+
+      {/* Preload Critical Images */}
+      {preloadImages && preloadImages.map((url, index) => (
+        <link key={`preload-img-${index}`} rel="preload" as="image" href={url} fetchPriority="high" />
+      ))}
 
       {/* Open Graph */}
       <meta property="og:title" content={fullTitle} />

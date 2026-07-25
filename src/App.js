@@ -115,6 +115,24 @@ const AppContent = () => {
   React.useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
 
   const [showBanner, setShowBanner] = React.useState(false);
+  const [showCookieBanner, setShowCookieBanner] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!localStorage.getItem('cookieConsent')) {
+      setShowCookieBanner(true);
+    }
+  }, []);
+
+  const handleCookieAction = () => {
+    // As requested: save cookies/consent even if declined, and hide banner
+    localStorage.setItem('cookieConsent', 'true');
+    setShowCookieBanner(false);
+  };
+
+  const handleDismissNotification = () => {
+    localStorage.setItem('pushConsentDismissed', 'true');
+    setShowBanner(false);
+  };
 
   React.useEffect(() => {
     const token = localStorage.getItem('token');
@@ -126,7 +144,7 @@ const AppContent = () => {
     if (perm === 'granted') {
       // Already granted — silently re-sync subscription to backend
       subscribeToPush().catch(console.error);
-    } else if (perm === 'default') {
+    } else if (perm === 'default' && !localStorage.getItem('pushConsentDismissed')) {
       // Not yet asked — show banner
       setShowBanner(true);
     }
@@ -160,29 +178,55 @@ const AppContent = () => {
         <Header />
 
         {/* ── Notification Permission Banner ── */}
-        {showBanner && (
-          <div style={{
-            position: 'fixed', top: 0, left: 0, right: 0, zIndex: 99999,
-            background: 'linear-gradient(135deg,#6d28d9,#4f46e5)',
-            color: '#fff', padding: '10px 16px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: 12, flexWrap: 'wrap',
-            boxShadow: '0 3px 12px rgba(0,0,0,.35)'
-          }}>
-            <span style={{ fontSize: 14 }}>
-              🔔 <strong>Enable notifications</strong> to get instant alerts for new chat messages!
-            </span>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={handleEnableClick} style={{
-                background: '#fff', color: '#4f46e5',
-                border: 'none', borderRadius: 999, padding: '5px 16px',
-                fontWeight: 700, cursor: 'pointer', fontSize: 13
-              }}>Enable</button>
-              <button onClick={() => setShowBanner(false)} style={{
-                background: 'transparent', color: '#fff',
-                border: '1px solid rgba(255,255,255,.5)', borderRadius: 999,
-                padding: '5px 12px', cursor: 'pointer', fontSize: 13
-              }}>Not now</button>
+        {showBanner && !isBlogPage && (
+          <div className="fixed bottom-[10%] md:bottom-auto md:top-24 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-8 z-[99999] bg-gradient-to-br from-[#6d28d9] to-[#4f46e5] text-white p-3 md:p-4 rounded-xl shadow-2xl flex flex-col gap-2 md:gap-3 w-[85%] max-w-[300px] md:w-80 border border-white/10 animate-fade-in">
+            <button 
+              onClick={handleDismissNotification} 
+              className="absolute top-1.5 right-2 md:top-2 md:right-2.5 text-white/70 hover:text-white transition-colors text-base md:text-lg"
+              title="Close"
+            >
+              ✕
+            </button>
+            <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-1 md:gap-2.5 mt-1 md:mt-0">
+              <span className="text-xl md:text-xl">🔔</span>
+              <p className="text-[12px] md:text-sm text-white font-medium leading-snug px-1 md:px-0 md:pr-4">
+                Enable notifications to get instant alerts for new chat messages!
+              </p>
+            </div>
+            <div className="flex justify-center md:justify-end gap-2 mt-1">
+              <button onClick={handleDismissNotification} className="px-3 py-1.5 md:px-3 md:py-1.5 text-[11px] md:text-xs font-semibold text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                Not now
+              </button>
+              <button onClick={handleEnableClick} className="px-4 py-1.5 md:px-4 md:py-1.5 text-[11px] md:text-xs font-bold text-[#4f46e5] bg-white hover:bg-gray-50 rounded-lg transition-colors shadow-sm">
+                Enable
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Cookie Consent Banner ── */}
+        {showCookieBanner && (
+          <div className="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-8 z-[99999] bg-white dark:bg-[#1A1035] text-gray-800 dark:text-gray-200 p-3 md:p-4 rounded-xl shadow-2xl flex flex-col gap-2 md:gap-3 w-[85%] max-w-[300px] md:w-80 border border-gray-200 dark:border-purple-900/40 animate-fade-in">
+            <button 
+              onClick={handleCookieAction} 
+              className="absolute top-1.5 right-2 md:top-2 md:right-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors text-base md:text-lg"
+              title="Close"
+            >
+              ✕
+            </button>
+            <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-1 md:gap-2.5 mt-1 md:mt-0">
+              <span className="text-xl md:text-xl">🍪</span>
+              <p className="text-[12px] md:text-sm text-gray-800 dark:text-gray-200 font-medium leading-snug px-1 md:px-0 md:pr-4">
+                We use cookies to improve your experience. By continuing to visit this site you agree to our use of cookies.
+              </p>
+            </div>
+            <div className="flex justify-center md:justify-end gap-2 mt-1">
+              <button onClick={handleCookieAction} className="px-3 py-1.5 md:px-3 md:py-1.5 text-[11px] md:text-xs font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg transition-colors">
+                Decline
+              </button>
+              <button onClick={handleCookieAction} className="px-4 py-1.5 md:px-4 md:py-1.5 text-[11px] md:text-xs font-bold text-white bg-gradient-to-r from-[#7C3AED] to-[#4f46e5] hover:opacity-90 rounded-lg transition-colors shadow-sm">
+                Accept
+              </button>
             </div>
           </div>
         )}
@@ -190,36 +234,22 @@ const AppContent = () => {
         <Routes />
         <MobileFooter />
         {!isBlogPage && (
-          <>
+          <div className="fixed bottom-[5.5rem] md:bottom-8 right-4 md:right-8 z-[9999] flex flex-col gap-3 items-center">
             <div
               onClick={() => navigate('/user/chat')}
-              style={{
-                position: 'fixed',
-                bottom: '5.2rem',
-                right: '2rem',
-                cursor: 'pointer',
-                width: '40px',
-                height: '40px',
-                backgroundColor: '#7C3AED',
-                borderRadius: '50%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                color: 'white',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                zIndex: 9999
-              }}
+              className="cursor-pointer w-10 h-10 bg-[#7C3AED] rounded-full flex justify-center items-center text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:scale-110 transition-transform"
               title="Open Chat"
             >
               <MessageOutlined style={{ fontSize: '20px' }} />
             </div>
-            <WhatsappIcon
-              onClick={handleMakeOffer} size={40} round
-              style={{ position: 'fixed', bottom: '2rem', right: '2rem', cursor: 'pointer', zIndex: 9999 }}
-            />
-          </>
+            <div className="hover:scale-110 transition-transform rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.15)] cursor-pointer">
+              <WhatsappIcon
+                onClick={handleMakeOffer} size={40} round
+              />
+            </div>
+          </div>
         )}
-        {!isBlogPage && <Footer />}
+        <Footer />
       </div>
     </div>
   );

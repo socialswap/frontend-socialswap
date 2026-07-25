@@ -171,7 +171,7 @@ const BlogDetail = () => {
              {/* Image */}
              {blog.imageUrl && (
                <div className="w-full rounded-[24px] overflow-hidden shadow-sm">
-                 <img src={blog.imageUrl} alt={blog.title} className="w-full h-auto max-h-[600px] object-cover" />
+                 <img src={blog.imageUrl} alt={blog.title} fetchpriority="high" className="w-full h-auto max-h-[600px] object-cover" />
                </div>
              )}
         </div>
@@ -237,27 +237,7 @@ const BlogDetail = () => {
                </div>
              )}
 
-             {/* FAQs */}
-             {blog.faq && blog.faq.length > 0 && (
-               <div className="mt-12 pt-8 border-t border-gray-100">
-                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
-                 <div className="space-y-4">
-                   {blog.faq.map((item, i) => (
-                     <details key={i} className="group bg-white border border-gray-200 rounded-xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                       <summary className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors">
-                         <span className="font-semibold text-gray-900">{item.question}</span>
-                         <span className="transition group-open:rotate-180">
-                           <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
-                         </span>
-                       </summary>
-                       <div className="px-4 pb-4 text-gray-600 bg-gray-50/50 pt-2 border-t border-gray-100">
-                         {item.answer}
-                       </div>
-                     </details>
-                   ))}
-                 </div>
-               </div>
-             )}
+             {/* FAQs - Removed from UI per user request, only kept for JSON-LD */}
           </main>
 
           {/* RIGHT SIDEBAR */}

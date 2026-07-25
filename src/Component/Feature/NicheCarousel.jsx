@@ -282,7 +282,7 @@ const NicheCarousel = () => {
 
       {/* ── Ticker Cards ────────────────────────────────────────────── */}
       {/* Cards are positioned relative to the CENTER of this container via GSAP x */}
-      <div className="absolute top-[28%] md:top-[22%] left-1/2 z-10 pointer-events-none">
+      <div className="absolute top-[33%] md:top-[27%] left-1/2 z-10 pointer-events-none">
         {niches.map((niche, i) => (
           <div
             key={niche.id}
@@ -324,7 +324,7 @@ const NicheCarousel = () => {
       </div>
 
       {/* ── Diamond Play Button ──────────────────────────────────────── */}
-      <div className="absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none flex flex-col items-center">
+      <div className="absolute top-[65%] md:top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none flex flex-col items-center">
         <style>{`
           @keyframes floatUpDown {
             0%   { transform: translateY(0px) scaleY(1); }

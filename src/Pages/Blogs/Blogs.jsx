@@ -163,6 +163,7 @@ const BlogSection = () => {
                   <img
                     src={item.imageUrl || 'https://via.placeholder.com/600x400?text=Blog+Image'}
                     alt={item.title}
+                    loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   {/* Category Badge - Overlaid */}
