@@ -6,6 +6,7 @@ import axiosInstance, { api } from '../../API/api';
 import { useGoogleLogin } from '@react-oauth/google';
 import Particles from 'react-tsparticles';
 import { loadSlim } from 'tsparticles-slim';
+import SEOHead from '../../Component/SEO/SEOHead';
 
 const Login = () => {
   const [form] = Form.useForm();
@@ -256,6 +257,7 @@ const Login = () => {
 
   return (
     <div className="futuristic-login-container min-h-screen flex justify-center items-center bg-gradient-to-br from-[#f5f5f5] via-[#ffffff] to-[#fafafa] dark:bg-gradient-to-br dark:from-[#070312] dark:via-[#110824] dark:to-[#0D071C] dark:text-white relative overflow-hidden p-5 font-sans">
+      <SEOHead title="Login | SocialSwap" noIndex={true} />
       <Particles
         id="tsparticles"
         init={particlesInit}

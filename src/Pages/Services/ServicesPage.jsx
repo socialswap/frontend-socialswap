@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axiosInstance, { api } from '../../API/api';
+import SEOHead from '../../Component/SEO/SEOHead';
 
 const ServicesPage = () => {
   const [services, setServices] = useState([]);
@@ -110,6 +111,7 @@ const ServicesPage = () => {
 
   return (
     <div className="min-h-screen bg-transparent pt-28 pb-20 px-4 sm:px-6 lg:px-8 font-sans relative">
+      <SEOHead title="Our Services | SocialSwap" description="Explore the professional services offered by SocialSwap." />
       {/* Scrollbar-hide helper styles */}
       <style>{`
         .no-scrollbar::-webkit-scrollbar {

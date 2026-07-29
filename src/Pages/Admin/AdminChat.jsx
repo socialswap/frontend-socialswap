@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import EmojiPicker from 'emoji-picker-react';
 import useChatSounds from '../../Utils/useChatSounds';
+import SEOHead from '../../Component/SEO/SEOHead';
 
 const { Option } = Select;
 
@@ -52,6 +53,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
     };
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
+      <SEOHead title="Admin Chat | SocialSwap" noIndex={true} />
   }, []);
   
   useEffect(() => {

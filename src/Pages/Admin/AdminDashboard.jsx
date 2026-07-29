@@ -35,6 +35,7 @@ import AdminDeals from './AdminDeals';
 import AdminServices from './AdminServices';
 import AdminUserChannels from './AdminUserChannels';
 import AdminTestimonials from './AdminTestimonials';
+import SEOHead from '../../Component/SEO/SEOHead';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -64,6 +65,7 @@ const AdminDashboard = () => {
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
     return () => observer.disconnect();
+      <SEOHead title="Admin Dashboard | SocialSwap" noIndex={true} />
   }, []);
 
   useEffect(() => {

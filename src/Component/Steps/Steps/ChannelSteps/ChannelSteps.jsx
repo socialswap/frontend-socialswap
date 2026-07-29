@@ -10,6 +10,7 @@ import {
 import { motion } from 'framer-motion';
 import PurchaseSteps from '../Steps';
 import SellChannelSteps from '../SellChannel';
+import SEOHead from '../../../../Component/SEO/SEOHead';
 
 const springy = { type: 'spring', stiffness: 400, damping: 28, mass: 0.9 };
 const fadeSlide = {
@@ -350,6 +351,7 @@ const ChannelTransactionSteps = () => {
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     return () => observer.disconnect();
+      <SEOHead title="How It Works | SocialSwap" description="Learn how to buy or sell a YouTube channel securely on SocialSwap." />
   }, []);
   const whatsappLink = 'https://wa.me/919423523291';
 

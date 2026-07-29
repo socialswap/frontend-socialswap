@@ -19,6 +19,7 @@ import axiosInstance, { api } from '../../API/api';
 import { useNavigate } from 'react-router-dom';
 import { subscribeToPush, unsubscribeFromPush } from '../../App';
 import imageCompression from 'browser-image-compression';
+import SEOHead from '../SEO/SEOHead';
 
 // Previous styled components remain the same...
 const StyledCard = styled(Card)`
@@ -442,6 +443,7 @@ const UserProfile = () => {
   if (loading) {
     return (
       <StyledCard>
+      <SEOHead title="My Profile | SocialSwap" noIndex={true} />
         <Spin size="large" />
       </StyledCard>
     );

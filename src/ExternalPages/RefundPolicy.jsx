@@ -1,8 +1,10 @@
 import React from 'react';
+import SEOHead from '../Component/SEO/SEOHead';
 
 const RefundAndReturnPolicy = () => {
   return (
     <div className="max-w-4xl mx-auto p-8 mt-20">
+      <SEOHead title="Refund Policy | SocialSwap" />
       <h1 className="text-4xl font-bold mb-6">Refund Policy</h1>
       
       <div className="space-y-6 text-gray-700 leading-relaxed">

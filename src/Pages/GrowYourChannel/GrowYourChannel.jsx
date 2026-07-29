@@ -8,6 +8,7 @@ import {
   WhatsAppOutlined
 } from '@ant-design/icons';
 import styled from 'styled-components';
+import SEOHead from '../../Component/SEO/SEOHead';
 
 const { Title, Paragraph } = Typography;
 
@@ -353,6 +354,7 @@ const GrowChannelTimeline = () => {
     );
     itemRefs.current.forEach((el) => el && observer.observe(el));
     return () => observer.disconnect();
+      <SEOHead title="Grow Your Channel | SocialSwap" description="Expert tips and strategies to grow your YouTube channel." />
   }, []);
 
   const handleMouseMove = (e, index) => {

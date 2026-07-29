@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import EmojiPicker from 'emoji-picker-react';
 import useChatSounds from '../../Utils/useChatSounds';
+import SEOHead from '../../Component/SEO/SEOHead';
 
 const SOCKET_URL = process.env.REACT_APP_API_URL || 'http://localhost:8090';
 
@@ -51,6 +52,7 @@ const UserChat = () => {
     };
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
+      <SEOHead title="Messages | SocialSwap" noIndex={true} />
   }, []);
 
   useEffect(() => {

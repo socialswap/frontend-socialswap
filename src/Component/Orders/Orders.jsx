@@ -11,6 +11,7 @@ import {
   RefreshCcw
 } from 'lucide-react';
 import axiosInstance, { api } from '../../API/api';
+import SEOHead from '../SEO/SEOHead';
 
 const StatusBadge = ({ status }) => {
   const statusConfig = {
@@ -158,6 +159,7 @@ const Orders = () => {
   if (loading) {
     return (
       <div className="w-full p-4 flex items-center justify-center">
+      <SEOHead title="My Orders | SocialSwap" noIndex={true} />
         <RefreshCcw className="w-8 h-8 text-blue-500 animate-spin" />
       </div>
     );

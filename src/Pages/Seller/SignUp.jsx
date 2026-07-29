@@ -3,6 +3,7 @@ import { Form, Input, Button, message } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance, { api } from '../../API/api';
+import SEOHead from '../../Component/SEO/SEOHead';
 
 const Signup = () => {
   const [form] = Form.useForm();
@@ -29,6 +30,7 @@ const Signup = () => {
 
   return (
     <div className="futuristic-login-container min-h-screen flex justify-center items-center bg-gradient-to-br from-[#f5f5f5] via-[#ffffff] to-[#fafafa] dark:bg-gradient-to-br dark:from-[#070312] dark:via-[#110824] dark:to-[#0D071C] dark:text-white relative overflow-hidden p-5 font-sans">
+      <SEOHead title="Sign Up | SocialSwap" noIndex={true} />
       {/* Floating background gradient circles */}
       <div className="absolute rounded-full pointer-events-none z-[1] filter blur-[40px] opacity-20 w-[300px] h-[300px] bg-gradient-to-br from-[rgba(255,255,255,0.4)] to-[rgba(255,255,255,0.2)] dark:bg-gradient-to-br dark:from-[rgba(124,58,237,0.45)] dark:to-[rgba(124,58,237,0.1)] top-[20%] right-[10%] animate-orb-float-1" aria-hidden="true" />
       <div className="absolute rounded-full pointer-events-none z-[1] filter blur-[40px] opacity-20 w-[250px] h-[250px] bg-gradient-to-br from-[rgba(255,255,255,0.35)] to-[rgba(255,255,255,0.15)] dark:bg-gradient-to-br dark:from-[rgba(217,70,239,0.35)] dark:to-[rgba(217,70,239,0.05)] bottom-[20%] left-[10%] animate-orb-float-2" aria-hidden="true" />

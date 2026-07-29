@@ -7,6 +7,7 @@ import {
   AlertCircle, Loader2, CheckCircle, XCircle, Timer, Edit, Trash2
 } from 'lucide-react';
 import axiosInstance, { api } from '../../API/api';
+import SEOHead from '../SEO/SEOHead';
 
 const statusConfig = {
   Available:  { color: 'text-emerald-500 dark:text-emerald-400', bg: 'bg-emerald-550/10 dark:bg-emerald-500/10', border: 'border-emerald-500/30', icon: CheckCircle, label: 'Available' },
@@ -59,6 +60,7 @@ const MyChannels = () => {
 
   return (
     <div className="w-full text-slate-800 dark:text-white transition-colors duration-200">
+      <SEOHead title="My Channels | SocialSwap" noIndex={true} />
       {/* ── Header ── */}
       <div className="flex items-center justify-between mb-7 flex-wrap gap-4">
         <div className="flex items-center gap-3">

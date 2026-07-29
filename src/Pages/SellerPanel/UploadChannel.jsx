@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import axiosInstance, { api } from '../../API/api';
 import { compressAndConvertToWebP } from '../../Utils/imageHelper';
+import SEOHead from '../../Component/SEO/SEOHead';
 
 const CATEGORY_OPTIONS = [
   'Gaming', 'Tech', 'Finance', 'Artificial intelligence',
@@ -317,6 +318,7 @@ export default function UploadChannel() {
   if (success) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-[#0d0b1a] flex items-center justify-center px-5 pt-24">
+      <SEOHead title="Upload Channel | SocialSwap" noIndex={true} />
         <motion.div
           className="bg-white dark:bg-white/[0.04] shadow-sm dark:shadow-none backdrop-blur-2xl border border-emerald-500/20 rounded-3xl p-10 text-center max-w-md w-full"
           initial={{ opacity: 0, scale: 0.9 }}

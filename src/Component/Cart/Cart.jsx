@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance, { api } from '../../API/api';
 import {jwtDecode} from 'jwt-decode';
 import ChannelCard from '../ChannelCard';
+import SEOHead from '../SEO/SEOHead';
 
 const { Title, Text } = Typography;
 
@@ -57,6 +58,7 @@ const CartPage = () => {
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
     return () => observer.disconnect();
+      <SEOHead title="Your Cart | SocialSwap" noIndex={true} />
   }, []);
 
   const formatCurrency = (value = 0) =>

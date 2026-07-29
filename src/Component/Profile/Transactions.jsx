@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import { api } from '../../API/api';
 import moment from 'moment';
+import SEOHead from '../SEO/SEOHead';
 
 const { Text, Title } = Typography;
 
@@ -273,6 +274,7 @@ const TransactionsPanel = () => {
 
   return (
     <div style={{ padding: '20px', margin: '4rem 0' }}>
+      <SEOHead title="Transactions | SocialSwap" noIndex={true} />
       <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: '20px' }}>
         <Title level={4} style={{ color: 'var(--text-primary)', margin: 0 }}>My Activity</Title>
         <Button 

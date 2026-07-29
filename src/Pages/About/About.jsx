@@ -6,6 +6,7 @@ import {
 } from '@ant-design/icons';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import SEOHead from '../../Component/SEO/SEOHead';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -493,6 +494,7 @@ const AboutPage = () => {
 
   return (
     <PageContainer className=''>
+      <SEOHead title="About Us | SocialSwap" description="Learn more about SocialSwap, India's most trusted YouTube channel marketplace." />
       <Keyframes />
       <AccentBackdrop />
       <HeroSection className='neumorphism-card mt-16' style={{ animation: 'fadeUp 0.6s ease both' }}>
