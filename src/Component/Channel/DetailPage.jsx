@@ -504,7 +504,14 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                 </div>
                 <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
               </div>
-              <h3 className="text-lg font-bold text-text-primary mb-1">{channel.createdBy?.name || channel.seller?.name || 'Seller'}</h3>
+              {channel.createdBy?.username ? (
+                <Link to={`/userprofile/@${channel.createdBy.username}`} className="group hover:underline flex flex-col items-center">
+                  <h3 className="text-lg font-bold text-text-primary group-hover:text-[#6E4BFF] transition-colors mb-0.5">{channel.createdBy?.name || channel.seller?.name || 'Seller'}</h3>
+                  <p className="text-xs text-[#6E4BFF] dark:text-[#C6B4FF] font-bold mb-2">@{channel.createdBy.username}</p>
+                </Link>
+              ) : (
+                <h3 className="text-lg font-bold text-text-primary mb-1">{channel.createdBy?.name || channel.seller?.name || 'Seller'}</h3>
+              )}
               <p className="text-sm text-text-secondary mb-4 flex items-center gap-1 justify-center">
                 <span className="text-green-500 text-lg"><CheckCircleFilled /></span>
                 <span className="ml-2 text-text-secondary">●</span> 

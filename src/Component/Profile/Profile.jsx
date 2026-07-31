@@ -11,7 +11,8 @@ import {
   TransactionOutlined,
   BellOutlined,
   CameraOutlined,
-  PhoneOutlined
+  PhoneOutlined,
+  ShareAltOutlined
 } from '@ant-design/icons';
 import styled from 'styled-components';
 import axios from 'axios';
@@ -175,6 +176,34 @@ const EditButton = styled(Button)`
   }
 `;
 
+const ShareButton = styled(Button)`
+  background: transparent;
+  color: #7c3aed;
+  border-radius: 999px;
+  border: 2px solid #7c3aed;
+  padding: 6px 20px;
+  height: auto;
+  font-weight: 700;
+  transition: all 0.2s ease;
+
+  .dark & {
+    color: #a855f7;
+    border-color: #a855f7;
+  }
+
+  &:hover {
+    color: #fff !important;
+    background: #7c3aed !important;
+    border-color: #7c3aed !important;
+    transform: translateY(-2px);
+    
+    .dark & {
+      background: #a855f7 !important;
+      border-color: #a855f7 !important;
+    }
+  }
+`;
+
 const StyledList = styled(List)`
   .ant-list-item {
     padding: 18px 24px;
@@ -317,7 +346,8 @@ const UserProfile = () => {
       setUser(response.data);
       profileForm.setFieldsValue({ 
         name: response.data.name,
-        mobile: response.data.mobile
+        mobile: response.data.mobile,
+        username: response.data.username
       });
     } catch (error) {
       message.error('Failed to fetch user profile');
@@ -340,7 +370,8 @@ const UserProfile = () => {
       message.success('Profile updated successfully');
       setIsEditProfileModalVisible(false);
     } catch (error) {
-      message.error('Failed to update profile');
+      const errMsg = error.response?.data?.message || 'Failed to update profile';
+      message.error(errMsg);
     } finally {
       setLoading(false);
     }
@@ -405,6 +436,35 @@ const UserProfile = () => {
       setLoading(false);
     }
   };
+  const handleShareProfile = async () => {
+    if (!user?.username) {
+      message.warning('Please set a username handle first to share your profile!');
+      return;
+    }
+    const profileUrl = `${window.location.origin}/userprofile/@${user.username}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${user.name}'s Profile on SocialSwap`,
+          text: `Check out YouTube channels listed for sale by ${user.name} on SocialSwap!`,
+          url: profileUrl,
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          copyToClipboard(profileUrl);
+        }
+      }
+    } else {
+      copyToClipboard(profileUrl);
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    message.success('Profile link copied to clipboard!');
+  };
+
   const handleMakeOffer = () => {
     const message = encodeURIComponent(`Hello, I'm interested in buying/selling the YouTube channel`);
     const whatsappUrl = `https://wa.me/+919423523291?text=${message}`;
@@ -475,10 +535,15 @@ const UserProfile = () => {
             </div>
           </div>
           <h3 className="username">{user?.name || 'User Name'}</h3>
-          <p className="user-handle">@{user?.handle || user?.name?.toLowerCase().replace(/\s/g, '') || 'username'}</p>
-          <EditButton onClick={() => setIsEditProfileModalVisible(true)}>
-            Edit Profile
-          </EditButton>
+          <p className="user-handle">@{user?.username || 'username'}</p>
+          <div className="flex items-center justify-center gap-3 mt-4">
+            <EditButton onClick={() => setIsEditProfileModalVisible(true)} style={{ marginTop: 0 }}>
+              Edit Profile
+            </EditButton>
+            <ShareButton onClick={handleShareProfile} icon={<ShareAltOutlined />}>
+              Share Profile
+            </ShareButton>
+          </div>
         </ProfileHeader>
 
         <StyledList
@@ -510,7 +575,7 @@ const UserProfile = () => {
           form={profileForm}
           layout="vertical"
           onFinish={handleProfileEdit}
-          initialValues={{ name: user?.name, mobile: user?.mobile }}
+          initialValues={{ name: user?.name, mobile: user?.mobile, username: user?.username }}
         >
           <Form.Item
             name="name"
@@ -521,6 +586,16 @@ const UserProfile = () => {
             ]}
           >
             <Input prefix={<UserOutlined />} />
+          </Form.Item>
+          <Form.Item
+            name="username"
+            label="Username Handle"
+            rules={[
+              { required: false },
+              { pattern: /^[a-zA-Z0-9_]{3,20}$/, message: 'Username must be between 3 and 20 characters and contain only letters, numbers, or underscores' }
+            ]}
+          >
+            <Input prefix="@" placeholder="e.g. shubham" />
           </Form.Item>
           <Form.Item
             name="mobile"
