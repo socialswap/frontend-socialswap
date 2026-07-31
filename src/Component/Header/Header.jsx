@@ -233,30 +233,15 @@ const Header = () => {
           {/* ── Left: Logo ── */}
           <div className="flex-1 flex justify-start z-10 pointer-events-auto">
             <Link to="/" className="flex items-center gap-2 group" aria-label="SocialSwap Home">
-              <img src="/images/logo.png" alt="SocialSwap logo" style={{ height: '2.25rem' }} className="transition-transform duration-300 group-hover:scale-105" />
+              <img src="/images/logo.webp" alt="SocialSwap logo" style={{ height: '2.25rem' }} className="transition-transform duration-300 group-hover:scale-105" />
               
               <div className="relative flex items-center pr-2">
-                <motion.span 
+                <span 
                   className="text-xl md:text-2xl font-bold tracking-tight whitespace-nowrap"
                   style={{ color: logoColor, display: 'inline-block' }}
-                  initial={{ clipPath: 'inset(0 100% 0 0)' }}
-                  animate={{ clipPath: 'inset(0 0% 0 0)' }}
-                  transition={{ duration: 1.5, ease: 'easeInOut', repeat: Infinity, repeatDelay: 1 }}
                 >
                   SocialSwap
-                </motion.span>
-                
-                <motion.div
-                  className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center text-[#ff0000]"
-                  initial={{ left: '0%', opacity: 1, scale: 1 }}
-                  animate={{ left: '100%', opacity: [1, 1, 0], scale: [1, 1, 0.5] }}
-                  transition={{ duration: 1.5, ease: 'easeInOut', repeat: Infinity, repeatDelay: 1 }}
-                  style={{ marginLeft: '-12px', marginTop: '-8px', zIndex: 10 }}
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
-                  </svg>
-                </motion.div>
+                </span>
               </div>
             </Link>
           </div>
@@ -504,7 +489,7 @@ const Header = () => {
       <Drawer
         title={
           <div className="flex items-center gap-2">
-            <img src="/images/logo.png" alt="SocialSwap logo" style={{ height: '1.75rem' }} />
+            <img src="/images/logo.webp" alt="SocialSwap logo" style={{ height: '1.75rem' }} />
             <span className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>Menu</span>
           </div>
         }
@@ -638,6 +623,7 @@ const Header = () => {
                     setLiveToasts(prev => prev.filter(t => t.id !== toast.id));
                   }}
                   className="ml-2 text-gray-500 hover:text-white text-xs shrink-0"
+                  aria-label="Dismiss notification"
                 >✕</button>
               </div>
               <p className="text-xs text-gray-300 truncate">{toast.preview}</p>
