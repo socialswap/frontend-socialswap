@@ -22,7 +22,6 @@
     "crypto-js": "^4.2.0",
     "emoji-picker-react": "^4.19.1",
     "env-cmd": "^10.1.0",
-    "express": "^5.2.1",
     "firebase": "^12.5.0",
     "framer-motion": "^11.18.2",
     "gsap": "^3.15.0",
@@ -55,8 +54,7 @@
     "start": "env-cmd -f .env react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "start:prod": "node server.js"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
