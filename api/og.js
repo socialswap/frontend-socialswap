@@ -28,15 +28,15 @@ module.exports = async (req, res) => {
   try {
     if (API_BASE_URL) {
       if (path.startsWith('/channel/') && username) {
-        const cleanUsername = username.replace(/^@/, '').toLowerCase().trim();
-        const resApi = await fetch(`${API_BASE_URL}/channels/username/${cleanUsername}`);
+        const rawUsername = username.trim();
+        const resApi = await fetch(`${API_BASE_URL}/channels/username/${encodeURIComponent(rawUsername)}`);
         if (resApi.ok) {
           const data = await resApi.json();
           const channel = data.channel || data;
           if (channel && channel.name) {
             title = `Buy ${channel.name} YouTube Channel | SocialSwap`;
             description = `Buy the ${channel.name} YouTube channel with ${channel.subscriberCount || 0} subscribers on SocialSwap.`;
-            image = channel.bannerImage || channel.thumbnail || image;
+            image = channel.logoUrl || (channel.imageUrls && channel.imageUrls[0]) || image;
           }
         }
       } else if (path.startsWith('/userprofile/') && username) {
@@ -57,9 +57,9 @@ module.exports = async (req, res) => {
           const data = await resApi.json();
           const blog = data.blog || data;
           if (blog && blog.title) {
-            title = `${blog.title} | SocialSwap`;
-            description = blog.seoDescription || blog.excerpt || blog.title;
-            image = blog.coverImage || blog.image || image;
+            title = blog.metaTitle || `${blog.title} | SocialSwap`;
+            description = blog.metaDescription || blog.excerpt || blog.title;
+            image = blog.ogImage || blog.imageUrl || image;
           }
         }
       }
