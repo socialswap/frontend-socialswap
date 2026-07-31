@@ -517,7 +517,7 @@ const Header = () => {
         <div className="flex flex-col h-full">
           <nav className="flex flex-col flex-1 p-4 overflow-y-auto">
             <div className="text-xs font-bold uppercase tracking-wider mb-2 ml-2" style={{ color: 'var(--text-muted)' }}>Main</div>
-            {menuItems.map((item) => (
+            {menuItems.filter(item => item.type !== 'dropdown').map((item) => (
               <button
                 key={item.path}
                 onClick={() => handleNavigation(item.path)}
