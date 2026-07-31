@@ -1,12 +1,8 @@
 {
   "rewrites": [
-    {
-      "source": "/sitemap.xml",
-      "destination": "https://YOUR_BACKEND_DOMAIN.com/sitemap.xml"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/channel/:username", "destination": "/api/og" },
+    { "source": "/userprofile/:username", "destination": "/api/og" },
+    { "source": "/blogs/:slug", "destination": "/api/og" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
