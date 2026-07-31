@@ -25,7 +25,7 @@ import {
 } from '@ant-design/icons';
 import axiosInstance, { api } from '../../API/api';
 
-const AdminBanners = () => {
+const AdminBanners = ({ isEmbedded = false }) => {
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -303,7 +303,7 @@ const AdminBanners = () => {
   };
 
   return (
-    <div className="p-6 mt-[5rem]">
+    <div className={`p-6 ${isEmbedded ? '' : 'mt-[5rem]'}`}>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Banner Management</h1>
         <Button

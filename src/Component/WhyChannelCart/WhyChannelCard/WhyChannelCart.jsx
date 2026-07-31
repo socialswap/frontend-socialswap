@@ -52,8 +52,8 @@ const ParticleBackground = () => {
         }
 
         context.save();
-        context.fillStyle = `rgba(239, 68, 68, ${particle.alpha})`;
-        context.shadowColor = 'rgba(220, 38, 38, 0.65)';
+        context.fillStyle = `rgba(110, 75, 255, ${particle.alpha})`;
+        context.shadowColor = 'rgba(110, 75, 255, 0.65)';
         context.shadowBlur = 12;
         context.beginPath();
         context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
@@ -91,11 +91,11 @@ const FeatureCard = ({ icon, title, description, index }) => {
         scale: 1.05,
         rotateY: 5,
         rotateX: -5,
-        boxShadow: "0 32px 60px -22px rgba(239, 68, 68, 0.35)",
-        borderColor: "rgba(239, 68, 68, 0.45)",
+        boxShadow: "0 32px 60px -22px rgba(110, 75, 255, 0.35)",
+        borderColor: "rgba(110, 75, 255, 0.45)",
         transition: { type: "spring", stiffness: 320 }
       }}
-      className="group relative rounded-3xl bg-white/95 backdrop-blur-lg border border-slate-200 p-8 shadow-[0_14px_50px_-28px_rgba(15,23,42,0.65)] hover:shadow-[0_28px_90px_-30px_rgba(239,68,68,0.45)] transition-all duration-500 cursor-pointer overflow-hidden"
+      className="group relative rounded-card bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/40 dark:border-white/10 p-8 shadow-card hover:shadow-purple-glow-hover transition-all duration-500 cursor-pointer overflow-hidden"
     >
       <div className="glow-trail" />
       <div className="card-play" aria-hidden="true">
@@ -103,11 +103,11 @@ const FeatureCard = ({ icon, title, description, index }) => {
           <polygon points="45,35 85,60 45,85" fill="currentColor" />
         </svg>
       </div>
-      <div className="absolute inset-0 bg-gradient-to-br from-rose-100/40 via-red-50/40 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FAF8FF]/40 via-[#F2ECFF]/40 to-[#FFEAF2]/40 dark:from-purple-900/10 dark:via-[#110C1F]/10 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
       <div className="relative z-10">
         <motion.div
-          className={`neon-ring w-16 h-16 mx-auto mb-6 relative flex items-center justify-center text-slate-700 group-hover:text-red-500 transition-colors duration-300 ${isVerifiedCard ? "verify-ring" : ""}`}
+          className={`neon-ring w-16 h-16 mx-auto mb-6 relative flex items-center justify-center text-slate-700 dark:text-text-secondary group-hover:text-[#6E4BFF] transition-colors duration-300 ${isVerifiedCard ? "verify-ring" : ""}`}
           whileHover={{ rotate: 360 }}
           transition={{ duration: 0.6 }}
         >
@@ -122,17 +122,17 @@ const FeatureCard = ({ icon, title, description, index }) => {
           </div>
         </motion.div>
 
-        <h3 className="text-xl font-semibold text-center mb-3 text-slate-900">
+        <h3 className="text-xl font-semibold text-center mb-3 text-text-primary">
           {title}
         </h3>
-        <div className="mx-auto mb-4 h-0.5 w-12 rounded-full bg-gradient-to-r from-red-500 via-rose-500 to-red-400 opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="mx-auto mb-4 h-0.5 w-12 rounded-full bg-gradient-to-r from-[#7B61FF] via-[#8A6CFF] to-[#B88DFF] opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
 
-        <p className="text-slate-600 text-center leading-relaxed text-sm">
+        <p className="text-slate-600 dark:text-text-secondary text-center leading-relaxed text-sm">
           {description}
         </p>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-rose-500 to-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#7B61FF] via-[#8A6CFF] to-[#B88DFF] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
     </motion.div>
   );
 };
@@ -196,12 +196,12 @@ const WhySocialSwap = () => {
   ];
 
   return (
-    <div className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-100 text-slate-900">
+    <div className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-transparent text-text-primary transition-all duration-300">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <ParticleBackground />
-        <div className="absolute top-10 left-1/4 w-72 h-72 bg-rose-200/40 rounded-full mix-blend-soft-light blur-3xl animate-blob" />
-        <div className="absolute -top-12 right-10 w-80 h-80 bg-red-100/50 rounded-full mix-blend-soft-light blur-3xl animate-blob animation-delay-2000" />
-        <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-rose-100/45 rounded-full mix-blend-soft-light blur-[90px] animate-blob animation-delay-4000" />
+        <div className="absolute top-10 left-1/4 w-72 h-72 bg-[#B79DFF]/15 rounded-full mix-blend-soft-light blur-3xl animate-blob opacity-40 dark:opacity-10" />
+        <div className="absolute -top-12 right-10 w-80 h-80 bg-[#F4B6D2]/15 rounded-full mix-blend-soft-light blur-3xl animate-blob animation-delay-2000 opacity-40 dark:opacity-10" />
+        <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-[#FFEAF2]/15 rounded-full mix-blend-soft-light blur-[90px] animate-blob animation-delay-4000 opacity-40 dark:opacity-10" />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -212,20 +212,20 @@ const WhySocialSwap = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-rose-500 via-red-500 to-amber-500 animate-gradient">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent" style={{ backgroundImage: 'var(--btn-gradient)' }}>
             Why SocialSwap?
           </h2>
-          <div className="h-1 w-32 mx-auto pulse-line bg-gradient-to-r from-red-500 via-rose-400 to-amber-400 rounded-full" />
+          <div className="h-1 w-32 mx-auto pulse-line bg-gradient-to-r from-[#7B61FF] via-[#8A6CFF] to-[#B88DFF] rounded-full" />
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-6 text-slate-600 max-w-2xl mx-auto"
+            className="mt-6 text-slate-600 dark:text-text-secondary max-w-2xl mx-auto"
           >
             The safest way to buy and sell verified YouTube channels — powered by trust and technology.
           </motion.p>
-          <p className="mt-3 text-slate-500 max-w-xl mx-auto">
+          <p className="mt-3 text-slate-500 dark:text-text-muted max-w-xl mx-auto">
             Join thousands of creators who rely on our vetted marketplace for transparent valuations, secure escrow, and white-glove deal support.
           </p>
         </motion.div>
@@ -245,7 +245,7 @@ const WhySocialSwap = () => {
         >
           <a
             href="/channels"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-red-500 via-rose-500 to-amber-400 text-white font-semibold rounded-full shadow-[0_18px_45px_-18px_rgba(239,68,68,0.55)] hover:shadow-[0_26px_60px_-18px_rgba(239,68,68,0.65)] hover:scale-105 transition-all duration-300"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-btn-gradient text-white font-semibold rounded-button shadow-purple-glow-soft hover:shadow-purple-glow-hover hover:translate-y-[-3px] hover:scale-[1.05] transition-all duration-300"
           >
             <span>Explore Channels</span>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -281,9 +281,9 @@ const WhySocialSwap = () => {
         .glow-trail {
           position: absolute;
           inset: -55%;
-          background: radial-gradient(circle at 20% 20%, rgba(248, 113, 113, 0.25), transparent 60%),
-            radial-gradient(circle at 80% 30%, rgba(239, 68, 68, 0.2), transparent 55%),
-            radial-gradient(circle at 50% 80%, rgba(190, 18, 60, 0.22), transparent 60%);
+          background: radial-gradient(circle at 20% 20%, rgba(110, 75, 255, 0.25), transparent 60%),
+            radial-gradient(circle at 80% 30%, rgba(138, 108, 255, 0.2), transparent 55%),
+            radial-gradient(circle at 50% 80%, rgba(198, 180, 255, 0.22), transparent 60%);
           opacity: 0;
           filter: blur(48px);
           transition: opacity 0.5s ease, transform 0.6s ease;
@@ -297,7 +297,7 @@ const WhySocialSwap = () => {
           position: absolute;
           inset: -6px;
           border-radius: 9999px;
-          background: linear-gradient(135deg, rgba(248, 113, 113, 0.4), rgba(244, 63, 94, 0.28), rgba(248, 113, 113, 0.35));
+          background: linear-gradient(135deg, rgba(110, 75, 255, 0.4), rgba(138, 108, 255, 0.28), rgba(198, 180, 255, 0.35));
           filter: blur(12px);
           opacity: 0.4;
           transition: opacity 0.35s ease;
@@ -309,7 +309,7 @@ const WhySocialSwap = () => {
           position: absolute;
           inset: -6px;
           border-radius: 9999px;
-          background: radial-gradient(circle, rgba(248, 113, 113, 0.35), rgba(248, 113, 113, 0));
+          background: radial-gradient(circle, rgba(110, 75, 255, 0.35), rgba(110, 75, 255, 0));
           filter: blur(10px);
           opacity: 0.7;
           transition: opacity 0.3s ease;
@@ -321,7 +321,7 @@ const WhySocialSwap = () => {
           position: absolute;
           inset: 18%;
           pointer-events: none;
-          color: rgba(248, 113, 113, 0.15);
+          color: rgba(110, 75, 255, 0.15);
           transform: rotate(-7deg);
           transition: opacity 0.4s ease, transform 0.6s ease;
         }
@@ -330,7 +330,7 @@ const WhySocialSwap = () => {
           transform: rotate(-2deg) scale(1.05);
         }
         .verify-ring {
-          box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.08);
+          box-shadow: 0 0 0 4px rgba(110, 75, 255, 0.08);
         }
         .check-pulse {
           display: flex;
@@ -338,18 +338,18 @@ const WhySocialSwap = () => {
           justify-content: center;
           font-size: 0.65rem;
           line-height: 1;
-          box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4);
+          box-shadow: 0 0 0 0 rgba(110, 75, 255, 0.4);
           animation: ringPulse 1.6s ease-out infinite;
         }
         @keyframes ringPulse {
           0% {
-            box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4);
+            box-shadow: 0 0 0 0 rgba(110, 75, 255, 0.4);
           }
           70% {
-            box-shadow: 0 0 0 8px rgba(248, 113, 113, 0);
+            box-shadow: 0 0 0 8px rgba(110, 75, 255, 0);
           }
           100% {
-            box-shadow: 0 0 0 0 rgba(248, 113, 113, 0);
+            box-shadow: 0 0 0 0 rgba(110, 75, 255, 0);
           }
         }
         .pulse-line {
@@ -360,7 +360,7 @@ const WhySocialSwap = () => {
           content: "";
           position: absolute;
           inset: 0;
-          background: linear-gradient(90deg, transparent, rgba(248, 113, 113, 0.85), rgba(244, 63, 94, 0.8), transparent);
+          background: linear-gradient(90deg, transparent, rgba(110, 75, 255, 0.85), rgba(138, 108, 255, 0.8), transparent);
           animation: pulse 2.5s linear infinite;
           transform: translateX(-100%);
         }

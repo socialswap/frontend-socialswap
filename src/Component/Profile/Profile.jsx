@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Button, List, message, Spin, Modal, Form, Input } from 'antd';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Card, Button, List, message, Spin, Modal, Form, Input, Switch } from 'antd';
 import { 
   UserOutlined, 
   SettingOutlined, 
@@ -8,30 +8,38 @@ import {
   LockOutlined,
   QuestionCircleOutlined,
   LogoutOutlined,
-  ArrowLeftOutlined,
-  TransactionOutlined
+  TransactionOutlined,
+  BellOutlined,
+  CameraOutlined,
+  PhoneOutlined
 } from '@ant-design/icons';
 import styled from 'styled-components';
 import axios from 'axios';
 import axiosInstance, { api } from '../../API/api';
 import { useNavigate } from 'react-router-dom';
+import { subscribeToPush, unsubscribeFromPush } from '../../App';
+import imageCompression from 'browser-image-compression';
+import SEOHead from '../SEO/SEOHead';
 
 // Previous styled components remain the same...
 const StyledCard = styled(Card)`
   width: 100%;
-  max-width: 480px;
-  margin: 4rem auto;
-  border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.65)) padding-box,
-              linear-gradient(120deg, #7c3aed, #06b6d4, #f43f5e) border-box;
-  border: 1px solid transparent;
-  box-shadow: 0 20px 40px rgba(17, 12, 46, 0.08);
-  backdrop-filter: blur(10px);
-  transition: transform 220ms ease, box-shadow 220ms ease;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 20px 50px rgba(124, 58, 237, 0.1);
+  overflow: hidden;
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 24px 48px rgba(17, 12, 46, 0.12);
+  .dark & {
+    background: rgba(17, 12, 31, 0.45);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 50px rgba(124, 58, 237, 0.2);
+  }
+
+  .ant-card-body {
+    padding: 2rem !important;
   }
 `;
 
@@ -39,8 +47,33 @@ const ProfileHeader = styled.div`
   text-align: center;
   padding: 1.75rem 0 1.25rem;
   position: relative;
-  border-bottom: 1px dashed rgba(0,0,0,0.06);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
   margin-bottom: 1rem;
+  
+  .dark & {
+    border-bottom-color: rgba(255,255,255,0.06);
+    
+    .back-button {
+      color: #9ca3af;
+      &:hover {
+        background: rgba(168, 85, 247, 0.15);
+        color: #a855f7;
+      }
+    }
+    
+    .avatar-container img {
+      border-color: rgba(17,12,31,0.9);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3), 0 0 0 6px rgba(168, 85, 247, 0.15);
+    }
+    
+    .username {
+      color: #f9fafb;
+    }
+    
+    .user-handle {
+      color: #9ca3af;
+    }
+  }
 
   .back-button {
     position: absolute;
@@ -52,19 +85,20 @@ const ProfileHeader = styled.div`
     cursor: pointer;
     color: #6b7280;
     border-radius: 12px;
-    transition: background 180ms ease, transform 180ms ease, color 180ms ease;
-  }
-  .back-button:hover {
-    background: rgba(124, 58, 237, 0.08);
-    color: #7c3aed;
-    transform: translateX(-1px);
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: rgba(124, 58, 237, 0.08);
+      color: #7c3aed;
+      transform: translateX(-1px);
+    }
   }
 
   .header-text {
     font-size: 1.1rem;
     font-weight: 700;
     letter-spacing: .3px;
-    background: linear-gradient(120deg, #7c3aed, #06b6d4);
+    background: linear-gradient(120deg, #7c3aed, #ec4899);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -72,71 +106,124 @@ const ProfileHeader = styled.div`
 
   .avatar-container {
     margin: 1rem 0 0.75rem;
+    display: inline-block;
+    position: relative;
+    
+    img {
+      height: 100px;
+      width: 100px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.9);
+      box-shadow: 0 10px 24px rgba(17, 12, 46, 0.12), 0 0 0 6px rgba(124, 58, 237, 0.08);
+      object-fit: cover;
+    }
   }
-  .avatar-container img {
-    height: 88px;
-    width: 88px;
+  
+  .avatar-overlay {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: #7c3aed;
+    color: white;
     border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.9);
-    box-shadow: 0 10px 24px rgba(17, 12, 46, 0.12), 0 0 0 6px rgba(124, 58, 237, 0.08);
-    object-fit: cover;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(124,58,237,0.4);
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: scale(1.1) rotate(5deg);
+      background: #6d28d9;
+    }
   }
 
   .username {
-    font-size: 1.2rem;
-    font-weight: 700;
-    margin: 0.6rem 0 0.15rem;
-    color: #0f172a;
-    letter-spacing: 0.2px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 1rem 0 0.15rem;
+    color: #111827;
+    letter-spacing: -0.02em;
   }
 
   .user-handle {
-    color: #64748b;
+    color: #6b7280;
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 500;
   }
 `;
 
 const EditButton = styled(Button)`
-  background-image: linear-gradient(120deg, #7c3aed, #06b6d4);
+  background-image: linear-gradient(120deg, #7c3aed, #ec4899);
   color: #fff;
   border-radius: 999px;
   border: none;
-  padding: 6px 18px;
-  margin-top: 0.75rem;
-  box-shadow: 0 10px 20px rgba(124, 58, 237, 0.18);
-  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
-  font-weight: 600;
+  padding: 6px 20px;
+  margin-top: 1rem;
+  box-shadow: 0 10px 20px rgba(124, 58, 237, 0.2);
+  transition: all 0.2s ease;
+  font-weight: 700;
 
   &:hover {
-    filter: brightness(1.03);
     color: #fff;
-    transform: translateY(-1px);
-    box-shadow: 0 14px 28px rgba(124, 58, 237, 0.22);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(124, 58, 237, 0.3);
   }
 `;
 
 const StyledList = styled(List)`
   .ant-list-item {
-    padding: 14px 18px;
+    padding: 18px 24px;
     cursor: pointer;
-    border-radius: 14px;
-    margin: 6px 8px;
-    border: 1px solid rgba(124, 58, 237, 0.08);
-    background: rgba(255,255,255,0.6);
-    transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    border-radius: 16px;
+    margin: 12px 0;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
     
+    .dark & {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.06);
+      
+      &:hover {
+        background: rgba(168, 85, 247, 0.1);
+        box-shadow: 0 8px 20px rgba(168, 85, 247, 0.2);
+        border-color: rgba(168, 85, 247, 0.3);
+      }
+
+      .ant-list-item-meta-title {
+        color: #f3f4f6;
+      }
+      
+      .ant-list-item-meta-description {
+        color: #9ca3af;
+      }
+    }
+
     &:hover {
-      background-color: rgba(124, 58, 237, 0.04);
-      transform: translateY(-1px);
-      box-shadow: 0 10px 22px rgba(17, 12, 46, 0.06);
-      border-color: rgba(124, 58, 237, 0.18);
+      background: rgba(124, 58, 237, 0.08);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.15);
+      border-color: rgba(124, 58, 237, 0.3);
     }
 
     .ant-list-item-meta-title {
       margin: 0;
       font-weight: 600;
-      color: #0f172a;
+      color: #1f2937;
+    }
+    
+    .ant-list-item-meta-description {
+      color: #6b7280;
+    }
+    
+    .ant-list-item-action {
+      margin-left: 16px;
     }
   }
 `;
@@ -144,11 +231,77 @@ const StyledList = styled(List)`
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const [isEditProfileModalVisible, setIsEditProfileModalVisible] = useState(false);
+  const fileInputRef = useRef(null);
   const [passwordForm] = Form.useForm();
   const [profileForm] = Form.useForm();
   const navigate = useNavigate();
+
+  // Notification toggle state — checks REAL subscription, not just browser permission
+  const [notifEnabled, setNotifEnabled] = useState(false);
+  const [notifLoading, setNotifLoading] = useState(false);
+
+  // Check if a real push subscription currently exists in the browser
+  const checkSubscriptionStatus = async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+    if (!('Notification' in window) || Notification.permission !== 'granted') return false;
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      return !!sub; // true if subscribed, false if not
+    } catch {
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    checkSubscriptionStatus().then(setNotifEnabled);
+  }, []);
+
+  const handleNotifToggle = async (checked) => {
+    setNotifLoading(true);
+    try {
+      if (checked) {
+        // Request browser permission first
+        const perm = await Notification.requestPermission();
+        if (perm === 'granted') {
+          const sub = await subscribeToPush();
+          if (sub) {
+            setNotifEnabled(true);
+            message.success('🔔 Push notifications enabled!');
+          } else {
+            setNotifEnabled(false);
+            message.error('Failed to subscribe. Please try again.');
+          }
+        } else if (perm === 'denied') {
+          setNotifEnabled(false);
+          message.warning(
+            'Notifications are blocked. Click the 🔒 icon in your browser address bar → Notifications → Allow.',
+            6
+          );
+        }
+      } else {
+        // Unsubscribe from push manager AND remove from backend
+        await unsubscribeFromPush();
+        const stillActive = await checkSubscriptionStatus();
+        setNotifEnabled(stillActive);
+        if (!stillActive) {
+          message.success('🔕 Push notifications disabled.');
+          message.info(
+            'Note: Browser-level permission stays "Allowed" — only our app stops sending you pushes.',
+            5
+          );
+        }
+      }
+    } catch (err) {
+      console.error('[Push Toggle]', err);
+      message.error('Something went wrong. Try refreshing.');
+    } finally {
+      setNotifLoading(false);
+    }
+  };
 
 
   const getAuthHeader = () => {
@@ -162,7 +315,10 @@ const UserProfile = () => {
         headers: getAuthHeader()
       });
       setUser(response.data);
-      profileForm.setFieldsValue({ name: response.data.name });
+      profileForm.setFieldsValue({ 
+        name: response.data.name,
+        mobile: response.data.mobile
+      });
     } catch (error) {
       message.error('Failed to fetch user profile');
     } finally {
@@ -187,6 +343,46 @@ const UserProfile = () => {
       message.error('Failed to update profile');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAvatarUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      setUploadingAvatar(true);
+      message.loading({ content: 'Optimizing and uploading image...', key: 'avatarUpload' });
+      
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+        fileType: 'image/webp',
+      };
+      const compressedFile = await imageCompression(file, options);
+      
+      const formData = new FormData();
+      formData.append('avatar', compressedFile, compressedFile.name.replace(/\.[^/.]+$/, "") + ".webp");
+
+      const response = await axiosInstance.post(`${api}/profile/avatar`, formData, {
+        headers: {
+          ...getAuthHeader(),
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (response.data.success) {
+        setUser(prev => ({ ...prev, avatar: response.data.url }));
+        message.success({ content: 'Profile photo updated successfully!', key: 'avatarUpload' });
+        // Optionally update localStorage if Header relies on it, though Header fetches it now
+      }
+    } catch (error) {
+      console.error('Avatar upload failed:', error);
+      message.error({ content: 'Failed to upload profile photo', key: 'avatarUpload' });
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -216,48 +412,38 @@ const UserProfile = () => {
   };
   const menuItems = [
     {
-      title: 'Seller Panel',
-      icon: <DashboardOutlined /> ,
-      onClick: () => navigate('/seller-dashboard')
-    },
-    {
-      title: 'My Channels',
-      icon: <SettingOutlined />,
-      onClick: () => navigate('/my-channels')
-    },
-    {
-      title: 'My Orders',
-      icon: <ShoppingOutlined />,
-      onClick: () => navigate('/orders')
-    },
-    {
-      title: 'Transactions',
-      icon: <TransactionOutlined />,
-      onClick: () => navigate('/transactions')
-    },
-    {
       title: 'Change Password',
       icon: <LockOutlined />,
-      onClick: () => setIsPasswordModalVisible(true)
+      onClick: () => setIsPasswordModalVisible(true),
+      action: null
+    },
+    {
+      title: 'Push Notifications',
+      icon: <BellOutlined />,
+      onClick: null,
+      action: (
+        <Switch
+          checked={notifEnabled}
+          loading={notifLoading}
+          onChange={handleNotifToggle}
+          checkedChildren="On"
+          unCheckedChildren="Off"
+          style={{ background: notifEnabled ? '#6d28d9' : undefined }}
+        />
+      )
     },
     {
       title: 'Help & Support',
       icon: <QuestionCircleOutlined />,
-      onClick: () => handleMakeOffer()
-    },
-    {
-      title: 'Log out',
-      icon: <LogoutOutlined />,
-      onClick: () => {
-        localStorage.removeItem('token');
-        navigate('/login');
-      }
+      onClick: () => handleMakeOffer(),
+      action: null
     }
   ];
 
   if (loading) {
     return (
       <StyledCard>
+      <SEOHead title="My Profile | SocialSwap" noIndex={true} />
         <Spin size="large" />
       </StyledCard>
     );
@@ -267,12 +453,26 @@ const UserProfile = () => {
     <>
       <StyledCard bordered={false}>
         <ProfileHeader>
-          <button className="back-button" onClick={() => navigate(-1)}>
-            <ArrowLeftOutlined />
-          </button>
           <span className="header-text">Profile</span>
-          <div className="avatar-container m-auto flex align-center justify-center">
-            <img src="/images/userImg.jpg" alt="" style={{height:'82px'}}/>
+          <div className="avatar-container m-auto flex items-center justify-center">
+            <div className="relative inline-block">
+              <Spin spinning={uploadingAvatar}>
+                <img src={user?.avatar || "/images/userImg.jpg"} alt="User Avatar" />
+              </Spin>
+              <div 
+                className="avatar-overlay" 
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <CameraOutlined style={{ fontSize: '14px' }} />
+              </div>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                style={{ display: 'none' }} 
+                accept="image/*"
+                onChange={handleAvatarUpload}
+              />
+            </div>
           </div>
           <h3 className="username">{user?.name || 'User Name'}</h3>
           <p className="user-handle">@{user?.handle || user?.name?.toLowerCase().replace(/\s/g, '') || 'username'}</p>
@@ -285,7 +485,11 @@ const UserProfile = () => {
           itemLayout="horizontal"
           dataSource={menuItems}
           renderItem={item => (
-            <List.Item onClick={item.onClick}>
+            <List.Item
+              onClick={item.action ? undefined : item.onClick}
+              style={{ cursor: item.action ? 'default' : 'pointer' }}
+              extra={item.action}
+            >
               <List.Item.Meta
                 avatar={item.icon}
                 title={item.title}
@@ -306,7 +510,7 @@ const UserProfile = () => {
           form={profileForm}
           layout="vertical"
           onFinish={handleProfileEdit}
-          initialValues={{ name: user?.name }}
+          initialValues={{ name: user?.name, mobile: user?.mobile }}
         >
           <Form.Item
             name="name"
@@ -317,6 +521,16 @@ const UserProfile = () => {
             ]}
           >
             <Input prefix={<UserOutlined />} />
+          </Form.Item>
+          <Form.Item
+            name="mobile"
+            label="Mobile Number"
+            rules={[
+              { required: false, message: 'Please enter your mobile number' },
+              { pattern: /^[0-9]{10}$/, message: 'Please enter a valid 10-digit mobile number' }
+            ]}
+          >
+            <Input prefix={<PhoneOutlined />} placeholder="e.g. 9876543210" />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={loading}>

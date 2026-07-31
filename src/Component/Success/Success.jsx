@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import SEOHead from '../SEO/SEOHead';
 
 const PaymentSuccessful = ({ 
   onBackToHome = () => {} 
@@ -8,6 +9,7 @@ const PaymentSuccessful = ({
     const navigate = useNavigate()
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+      <SEOHead title="Payment Successful | SocialSwap" noIndex={true} />
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden text-center p-8">
         <div className="flex items-center justify-center mb-6">
           <svg 

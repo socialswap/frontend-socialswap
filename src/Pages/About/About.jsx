@@ -6,18 +6,19 @@ import {
 } from '@ant-design/icons';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import SEOHead from '../../Component/SEO/SEOHead';
 
 const { Title, Paragraph, Text } = Typography;
 
-// YouTube-like light theme with subtle gaming-inspired accents
-const primaryColor = '#FF0000'; // YouTube red
-const backgroundColor = '#ffffff';
-const surfaceColor = '#ffffff';
-const surfaceAltColor = '#fafafa';
-const textColor = '#111111';
-const subTextColor = '#444444';
-const accentNeon = '#00E5FF';
-const accentPurple = '#7C4DFF';
+// Glassmorphism theme constants
+const primaryColor = '#6E4BFF';
+const backgroundColor = 'transparent';
+const surfaceColor = 'rgba(255,255,255,0.45)';
+const surfaceAltColor = 'rgba(255,255,255,0.25)';
+const textColor = 'var(--text-primary)';
+const subTextColor = 'var(--text-secondary)';
+const accentNeon = '#F4B6D2';
+const accentPurple = '#8A6CFF';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -83,14 +84,17 @@ const TrustedRibbon = styled.div`
 
 const FeatureCard = styled(Card)`
   height: 100%;
-  border: 1px solid ${surfaceAltColor};
-  background-color: ${surfaceColor};
+  border: 1px solid rgba(255,255,255,0.4);
+  background: var(--bg-glass, rgba(255,255,255,0.45));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 24px;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  box-shadow: 0 15px 40px rgba(120,90,255,0.12);
   &:hover {
     transform: translateY(-6px) rotateX(2deg);
     border-color: ${primaryColor};
-    box-shadow: 0 16px 36px rgba(0,0,0,0.12), 0 0 0 3px rgba(255,0,0,0.08);
+    box-shadow: 0 25px 60px rgba(120,90,255,0.22);
   }
 `;
 
@@ -490,6 +494,7 @@ const AboutPage = () => {
 
   return (
     <PageContainer className=''>
+      <SEOHead title="About Us | SocialSwap" description="Learn more about SocialSwap, India's most trusted YouTube channel marketplace." />
       <Keyframes />
       <AccentBackdrop />
       <HeroSection className='neumorphism-card mt-16' style={{ animation: 'fadeUp 0.6s ease both' }}>
@@ -662,7 +667,7 @@ const AboutPage = () => {
         <CTAHint>New listings added daily</CTAHint>
         <StyledButton
           size="large"
-          onClick={() => navigate('/seller-dashboard')}
+          onClick={() => navigate('/user/upload-channel')}
         >
           List Your Channel
         </StyledButton>

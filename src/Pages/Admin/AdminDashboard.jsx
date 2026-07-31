@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../API/api';
 import {
   Table,
   Button,
@@ -19,12 +19,23 @@ import {
   Statistic,
   Empty,
   Typography,
+  Tabs,
+  ConfigProvider,
+  theme,
 } from 'antd';
-import { PictureOutlined, ReloadOutlined, UserOutlined, TeamOutlined, SafetyCertificateOutlined, SearchOutlined, DeleteOutlined, EyeOutlined, FileTextOutlined } from '@ant-design/icons';
+import { PictureOutlined, ReloadOutlined, UserOutlined, TeamOutlined, SafetyCertificateOutlined, SearchOutlined, DeleteOutlined, EyeOutlined, FileTextOutlined, MessageOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../API/api';
 import AdminChannels from './AdminChannels';
 import AdminTransactions from './AdminTransactions';
+import AdminChat from './AdminChat';
+import AdminBanners from './AdminBanners';
+import AdminBlogs from './AdminBlogs';
+import AdminDeals from './AdminDeals';
+import AdminServices from './AdminServices';
+import AdminUserChannels from './AdminUserChannels';
+import AdminTestimonials from './AdminTestimonials';
+import SEOHead from '../../Component/SEO/SEOHead';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -37,7 +48,25 @@ const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState('users');
+  const [openChatUserId, setOpenChatUserId] = useState(null);
   const [form] = Form.useForm();
+
+  const [isDarkMode, setIsDarkMode] = useState(
+    document.documentElement.classList.contains('dark') || 
+    document.documentElement.getAttribute('data-theme') === 'dark'
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const isDark = document.documentElement.classList.contains('dark') || 
+                     document.documentElement.getAttribute('data-theme') === 'dark';
+      setIsDarkMode(isDark);
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+    return () => observer.disconnect();
+      <SEOHead title="Admin Dashboard | SocialSwap" noIndex={true} />
+  }, []);
 
   useEffect(() => {
     fetchUsers();
@@ -46,7 +75,7 @@ const AdminDashboard = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${api}/users`);
+      const response = await axiosInstance.get(`${api}/users`);
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -57,31 +86,42 @@ const AdminDashboard = () => {
 
   const handleViewDetails = (user) => {
     setSelectedUser(user);
-    form.setFieldsValue(user);
+    form.setFieldsValue({
+      ...user,
+      status: user.status || 'active'
+    });
     setModalVisible(true);
   };
 
-  const handleUpdateRole = async (values) => {
+  const handleUpdateUser = async (values) => {
     try {
-      await axios.put(`${api}/users/${selectedUser._id}/role`, { role: values.role });
-      message.success('User role updated successfully');
+      await axiosInstance.put(`${api}/users/${selectedUser._id}/admin-update`, {
+        role: values.role,
+        status: values.status
+      });
+      message.success('User updated successfully');
       setModalVisible(false);
       fetchUsers();
     } catch (error) {
-      console.error('Error updating user role:', error);
-      message.error('Failed to update user role');
+      console.error('Error updating user:', error);
+      message.error('Failed to update user');
     }
   };
 
   const handleDeleteUser = async (userId) => {
     try {
-      await axios.delete(`${api}/users/${userId}`);
+      await axiosInstance.delete(`${api}/users/${userId}`);
       message.success('User deleted successfully');
       fetchUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
       message.error('Failed to delete user');
     }
+  };
+
+  const handleStartChat = (user) => {
+    setOpenChatUserId(user._id);
+    setActiveTab('chats');
   };
 
   const totalUsers = users.length;
@@ -108,8 +148,12 @@ const AdminDashboard = () => {
         const initials = (record?.name || record?.email || 'U').charAt(0).toUpperCase();
         return (
           <Space>
-            <Avatar style={{ backgroundColor: '#1890ff' }} icon={!record?.name && !record?.email ? <UserOutlined /> : null}>
-              {record?.name || record?.email ? initials : null}
+            <Avatar 
+              src={record?.avatar} 
+              style={{ backgroundColor: '#1890ff' }} 
+              icon={!record?.name && !record?.email && !record?.avatar ? <UserOutlined /> : null}
+            >
+              {!record?.avatar && (record?.name || record?.email) ? initials : null}
             </Avatar>
             <div>
               <div className="font-medium">{record?.name || '-'}</div>
@@ -136,12 +180,44 @@ const AdminDashboard = () => {
         ),
     },
     {
+      title: 'Channels',
+      dataIndex: 'channelCount',
+      key: 'channelCount',
+      sorter: (a, b) => (a.channelCount || 0) - (b.channelCount || 0),
+      render: (count) => (
+        <Tag color="purple">{count || 0} Posted</Tag>
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      filters: [
+        { text: 'Active', value: 'active' },
+        { text: 'Suspended', value: 'suspended' },
+        { text: 'Disabled', value: 'disabled' },
+        { text: 'Deleted', value: 'deleted' },
+      ],
+      onFilter: (value, record) => (record.status || 'active') === value,
+      render: (status) => {
+        const currentStatus = status || 'active';
+        let color = 'green';
+        if (currentStatus === 'suspended') color = 'orange';
+        else if (currentStatus === 'disabled') color = 'red';
+        else if (currentStatus === 'deleted') color = 'gray';
+        return <Tag color={color}>{currentStatus.toUpperCase()}</Tag>;
+      }
+    },
+    {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
         <Space>
           <Tooltip title="View details">
             <Button icon={<EyeOutlined />} onClick={() => handleViewDetails(record)} />
+          </Tooltip>
+          <Tooltip title="Chat with user">
+            <Button icon={<MessageOutlined />} style={{ color: '#7C3AED', borderColor: '#7C3AED' }} onClick={() => handleStartChat(record)} />
           </Tooltip>
           <Popconfirm
             title="Delete user?"
@@ -159,35 +235,8 @@ const AdminDashboard = () => {
     },
   ];
 
-  return (
-    <div className="mt-20 px-3 pb-8 md:px-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
-        <Title level={2} style={{ margin: 0 }}>Admin Dashboard</Title>
-        <Space wrap className="justify-start md:justify-end">
-          <Tooltip title="Refresh">
-            <Button icon={<ReloadOutlined />} onClick={fetchUsers} loading={loading}>
-              Refresh
-            </Button>
-          </Tooltip>
-          <Button
-            type="primary"
-            icon={<PictureOutlined />}
-            onClick={() => navigate('/admin/banners')}
-            size="large"
-          >
-            Manage Banners
-          </Button>
-          <Button
-            type="default"
-            icon={<FileTextOutlined />}
-            onClick={() => navigate('/admin/blogs')}
-            size="large"
-          >
-            Manage Blogs
-          </Button>
-        </Space>
-      </div>
-
+  const usersTabContent = (
+    <>
       <Row gutter={[16, 16]} className="mb-6">
         <Col xs={24} sm={12} md={8}>
           <Card bordered hoverable>
@@ -267,6 +316,94 @@ const AdminDashboard = () => {
           </div>
         </div>
       </Card>
+    </>
+  );
+
+  const tabItems = [
+    {
+      key: 'users',
+      label: 'Users',
+      children: usersTabContent,
+    },
+    {
+      key: 'channels',
+      label: 'Channels',
+      children: <AdminChannels />,
+    },
+    {
+      key: 'transactions',
+      label: 'Transactions',
+      children: <AdminTransactions />,
+    },
+    {
+      key: 'chats',
+      label: 'Chats & Deals',
+      children: <AdminChat isEmbedded={true} prefillUserId={openChatUserId} />,
+    },
+    {
+      key: 'deals_management',
+      label: 'Escrow Deals',
+      children: <AdminDeals />,
+    },
+    {
+      key: 'banners',
+      label: 'Poster Management',
+      children: <AdminBanners isEmbedded={true} />,
+    },
+    {
+      key: 'blogs',
+      label: 'Blog Management',
+      children: <AdminBlogs isEmbedded={true} />,
+    },
+    {
+      key: 'services',
+      label: 'Services',
+      children: <AdminServices />,
+    },
+    {
+      key: 'user_channels',
+      label: "User's Channel",
+      children: <AdminUserChannels />,
+    },
+    {
+      key: 'testimonials',
+      label: 'Testimonials',
+      children: <AdminTestimonials isEmbedded={true} />,
+    },
+  ];
+
+  return (
+    <ConfigProvider 
+      theme={{ 
+        algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
+        token: isDarkMode ? {
+          colorBgBase: '#07030F',
+          colorBgContainer: '#171127',
+          colorBgElevated: '#1f1635',
+          colorBorder: 'rgba(255,255,255,0.08)',
+          colorPrimary: '#7C3AED',
+          colorTextBase: '#ffffff',
+        } : {
+          colorPrimary: '#7C3AED',
+        }
+      }}
+    >
+      <div className="max-w-7xl mx-auto mt-20 px-4 pb-8 sm:px-6 lg:px-8">
+      <Tabs 
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        items={tabItems} 
+        destroyInactiveTabPane={true}
+        size="large"
+        className="admin-dashboard-tabs"
+        tabBarExtraContent={
+          <Tooltip title="Refresh">
+            <Button icon={<ReloadOutlined />} onClick={fetchUsers} loading={loading}>
+              Refresh
+            </Button>
+          </Tooltip>
+        }
+      />
 
       <Modal
         title="User Details"
@@ -276,15 +413,25 @@ const AdminDashboard = () => {
         destroyOnClose
       >
         <Space align="start" className="mb-4">
-          <Avatar size={48} style={{ backgroundColor: '#1677ff' }} icon={<UserOutlined />}>
-            {(selectedUser?.name || selectedUser?.email || 'U').charAt(0).toUpperCase()}
+          <Avatar 
+            size={48} 
+            src={selectedUser?.avatar} 
+            style={{ backgroundColor: '#1677ff' }} 
+            icon={!selectedUser?.avatar ? <UserOutlined /> : null}
+          >
+            {!selectedUser?.avatar ? (selectedUser?.name || selectedUser?.email || 'U').charAt(0).toUpperCase() : null}
           </Avatar>
           <div>
             <Title level={5} style={{ margin: 0 }}>{selectedUser?.name || '-'}</Title>
             <Text type="secondary">{selectedUser?.email || '-'}</Text>
+            {selectedUser?.channelCount !== undefined && (
+              <div className="mt-1">
+                <Tag color="purple">{selectedUser.channelCount} Channels Posted</Tag>
+              </div>
+            )}
           </div>
         </Space>
-        <Form layout="vertical" form={form} onFinish={handleUpdateRole}>
+        <Form layout="vertical" form={form} onFinish={handleUpdateUser}>
           <Form.Item name="name" label="Name">
             <Input disabled />
           </Form.Item>
@@ -301,24 +448,30 @@ const AdminDashboard = () => {
               <Option value="admin">Admin</Option>
             </Select>
           </Form.Item>
+          <Form.Item
+            name="status"
+            label="Status"
+            rules={[{ required: true, message: 'Please select a status' }]}
+          >
+            <Select>
+              <Option value="active">Active</Option>
+              <Option value="suspended">Suspended</Option>
+              <Option value="disabled">Disabled</Option>
+              <Option value="deleted">Deleted</Option>
+            </Select>
+          </Form.Item>
           <Form.Item>
             <Space>
               <Button onClick={() => setModalVisible(false)}>Cancel</Button>
               <Button type="primary" htmlType="submit">
-                Update Role
+                Update User
               </Button>
             </Space>
           </Form.Item>
         </Form>
       </Modal>
-
-      <div className="mt-8">
-        <AdminChannels />
-      </div>
-      <div className="mt-8">
-        <AdminTransactions />
-      </div>
     </div>
+    </ConfigProvider>
   );
 };
 

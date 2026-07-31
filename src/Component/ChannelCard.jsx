@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axiosInstance from "../API/api";
 
-const ChannelCard = ({ channel }) => {
+const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
@@ -40,8 +40,13 @@ const ChannelCard = ({ channel }) => {
       return;
     }
 
+    if (isCartView && onRemove) {
+      onRemove(channel);
+      return;
+    }
+
     if (isInCart) {
-      navigate('/cart');
+      navigate('/user/cart');
       return;
     }
 
@@ -53,6 +58,7 @@ const ChannelCard = ({ channel }) => {
       });
       setIsInCart(true);
       message.success('Channel added to cart');
+      navigate('/user/cart');
     } catch (error) {
       console.error('Failed to add channel to cart', error);
       message.error('Unable to add channel to cart right now.');
@@ -64,7 +70,8 @@ const ChannelCard = ({ channel }) => {
   if (!channel) return null;
 
   const handleClick = () => {
-    navigate(`/channel/${channel._id}`);
+    const slug = channel.customUrl || channel._id;
+    navigate(`/channel/${slug}`);
   };
 
   const banner = channel.logoUrl || channel.bannerUrl || channel.imageUrls?.[0] || '/images/yt.png';
@@ -78,18 +85,18 @@ const ChannelCard = ({ channel }) => {
       onClick={handleClick}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      whileHover={{ y: -8 }}
+      whileHover={{ y: -6, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="relative rounded-2xl overflow-hidden bg-white cursor-pointer group"
+      className="relative rounded-card overflow-hidden bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] cursor-pointer group border border-white/40 dark:border-white/10"
       style={{
         boxShadow: isHovered 
-          ? '0 20px 40px rgba(37, 99, 235, 0.15), 0 0 0 2px rgba(37, 99, 235, 0.1)' 
-          : '0 4px 24px rgba(0, 0, 0, 0.06)',
+          ? '0 30px 70px rgba(120, 90, 255, 0.25)' 
+          : '0 15px 40px rgba(120, 90, 255, 0.15)',
         transition: 'all 0.3s ease',
       }}
     >
       {/* Banner Section with Interactive Overlay */}
-      <div className="relative h-40 overflow-hidden">
+      <div className="relative h-20 overflow-hidden">
         <motion.img
           src={banner}
           alt={channel.name}
@@ -106,7 +113,7 @@ const ChannelCard = ({ channel }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: isHovered ? 1 : 0 }}
           transition={{ duration: 0.3 }}
-          className="absolute inset-0 bg-gradient-to-t from-blue-600/90 to-transparent flex items-center justify-center"
+          className="absolute inset-0 bg-gradient-to-t from-[#6E4BFF]/90 to-transparent flex items-center justify-center"
         >
           <motion.div
             initial={{ y: 20, opacity: 0 }}
@@ -114,8 +121,8 @@ const ChannelCard = ({ channel }) => {
             transition={{ delay: 0.1 }}
             className="text-white text-center"
           >
-            <p className="text-lg font-bold mb-1">View Details</p>
-            <p className="text-xs opacity-90">→</p>
+            <p className="text-base font-bold mb-1">View Details</p>
+            <p className="text-[10px] opacity-90">→</p>
           </motion.div>
         </motion.div>
 
@@ -149,31 +156,26 @@ const ChannelCard = ({ channel }) => {
           )}
         </div>
 
-        {/* Channel Name Overlay */}
+        {/* Category & Language Overlay */}
         <div className="absolute bottom-3 left-4 right-4">
-          <div className="flex items-start gap-2">
-            <h3 className="text-lg text-white font-bold line-clamp-1 flex-1 drop-shadow-lg">
-              {channel.name}
-            </h3>
-            {channel.verified && (
-              <CheckCircleFilled className="text-blue-400 text-base flex-shrink-0 mt-1" />
-            )}
-          </div>
-          <p className="text-xs text-gray-200 drop-shadow">
+          <h3 className="text-xs text-white font-bold line-clamp-1 drop-shadow-lg">
             {channel.category || "N/A"} • {channel.channelType || "Standard"}
+          </h3>
+          <p className="text-[10px] text-gray-200 drop-shadow">
+            {channel.my_language || "English"} • {channel.country?.trim() || "Global"}
           </p>
         </div>
       </div>
 
       {/* Channel Info */}
-      <div className="p-4">
+      <div className="p-2.5">
         {/* Avatar & Info Row */}
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-2 mb-2">
           <div className="relative">
             <img
               src={avatar}
               alt="avatar"
-              className="w-12 h-12 rounded-full border-2 border-gray-200 object-cover"
+              className="w-8 h-8 rounded-full border-2 border-white/40 dark:border-white/10 object-cover"
             />
             {channel.monetized && (
               <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1">
@@ -182,14 +184,17 @@ const ChannelCard = ({ channel }) => {
             )}
           </div>
           <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-gray-800">
-                {channel.my_language || "English"} • {channel.country?.trim() || "Global"}
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm font-bold text-[#312E4A] dark:text-white line-clamp-1">
+                {channel.name}
               </p>
+              {channel.verified && (
+                <CheckCircleFilled className="text-blue-500 text-xs flex-shrink-0" />
+              )}
             </div>
             <Tag
               color={channel.monetized ? "green" : "default"}
-              className="rounded-md text-xs mt-1"
+              className="rounded text-[10px] py-0 px-1 mt-0.5 border-none bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400"
             >
               {channel.monetized ? "✓ Monetized" : "Not Monetized"}
             </Tag>
@@ -198,50 +203,47 @@ const ChannelCard = ({ channel }) => {
 
         {/* Stats Grid with Icons */}
         <div 
-          className="grid grid-cols-3 gap-2 mb-4 p-3 rounded-xl"
-          style={{
-            background: 'linear-gradient(135deg, rgba(249, 250, 251, 0.9) 0%, rgba(243, 244, 246, 0.9) 100%)',
-          }}
+          className="grid grid-cols-3 gap-1 mb-2 px-2 py-1.5 rounded-card bg-white/30 dark:bg-[#110C1F]/30 backdrop-blur-md border border-white/20 dark:border-white/10"
         >
           <Tooltip title="Total Subscribers">
             <div className="text-center">
-              <UserOutlined className="text-blue-500 text-base mb-1" />
-              <p className="text-sm font-bold text-gray-900">
+              <UserOutlined className="text-[#6E4BFF] text-[10px] mb-0.5" />
+              <p className="text-[11px] font-bold text-[#312E4A] dark:text-white">
                 {(channel.subscriberCount || 0) >= 1000 
                   ? `${(channel.subscriberCount / 1000).toFixed(1)}K` 
                   : channel.subscriberCount || 0}
               </p>
-              <p className="text-[10px] text-gray-500 font-medium">Subscribers</p>
+              <p className="text-[8px] text-[#6F6B8A] dark:text-[#C6B4FF] font-medium uppercase tracking-wider">Subscribers</p>
             </div>
           </Tooltip>
           <Tooltip title="Total Views">
-            <div className="text-center border-l border-r border-gray-300">
-              <EyeOutlined className="text-green-500 text-base mb-1" />
-              <p className="text-sm font-bold text-gray-900">
+            <div className="text-center border-l border-r border-white/20 dark:border-white/10">
+              <EyeOutlined className="text-green-500 text-[10px] mb-0.5" />
+              <p className="text-[11px] font-bold text-[#312E4A] dark:text-white">
                 {(channel.viewCount || 0) >= 1000000 
                   ? `${(channel.viewCount / 1000000).toFixed(1)}M` 
                   : (channel.viewCount || 0) >= 1000 
                   ? `${(channel.viewCount / 1000).toFixed(1)}K` 
                   : channel.viewCount || 0}
               </p>
-              <p className="text-[10px] text-gray-500 font-medium">Views</p>
+              <p className="text-[8px] text-[#6F6B8A] dark:text-[#C6B4FF] font-medium uppercase tracking-wider">Views</p>
             </div>
           </Tooltip>
           <Tooltip title="Videos Published">
             <div className="text-center">
-              <VideoCameraOutlined className="text-purple-500 text-base mb-1" />
-              <p className="text-sm font-bold text-gray-900">
+              <VideoCameraOutlined className="text-purple-500 text-[10px] mb-0.5" />
+              <p className="text-[11px] font-bold text-[#312E4A] dark:text-white">
                 {channel.videoCount || 0}
               </p>
-              <p className="text-[10px] text-gray-500 font-medium">Videos</p>
+              <p className="text-[8px] text-[#6F6B8A] dark:text-[#C6B4FF] font-medium uppercase tracking-wider">Videos</p>
             </div>
           </Tooltip>
         </div>
 
         {/* Info Strip with Credibility */}
-        <div className="flex items-center justify-between text-xs text-gray-600 mb-4 pb-3 border-b border-gray-100">
+        <div className="flex items-center justify-between text-[10px] text-[#6F6B8A] dark:text-[#C6B4FF] mb-2 pb-2 border-b border-white/20 dark:border-white/10">
           <div className="flex items-center gap-1">
-            <span className="text-gray-500">Est. Earnings:</span>
+            <span className="text-[#6F6B8A] dark:text-[#C6B4FF]">Est. Earnings:</span>
             <span className="font-bold text-green-600">
               ₹{(channel.estimatedEarnings || 0).toLocaleString()}/mo
             </span>
@@ -254,16 +256,15 @@ const ChannelCard = ({ channel }) => {
           )}
         </div>
 
-        {/* Price Section with CTA */}
         <div className="flex justify-between items-center">
           <div>
-            <p className="text-xs text-gray-500 font-medium mb-0.5">Asking Price</p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-2xl font-bold text-gray-900">
+            <p className="text-[10px] text-[#6F6B8A] dark:text-[#C6B4FF] font-medium mb-0">Asking Price</p>
+            <div className="flex items-baseline gap-1.5">
+              <p className="text-lg font-bold text-[#312E4A] dark:text-white">
                 ₹{parseInt(channel.price || 0).toLocaleString()}
               </p>
               {hasDiscount && (
-                <p className="text-sm text-gray-400 line-through">
+                <p className="text-xs text-gray-400 line-through">
                   ₹{parseInt(channel.price / (1 - channel.discount / 100)).toLocaleString()}
                 </p>
               )}
@@ -272,34 +273,63 @@ const ChannelCard = ({ channel }) => {
 
           <Tooltip title="View on YouTube">
             <motion.a
-              href={channel.customUrl}
+              href={(() => {
+                const url = channel.customUrl || '';
+                if (url.startsWith('http')) return url;
+                if (url.startsWith('@') || url.startsWith('UC')) return `https://www.youtube.com/${url}`;
+                if (url) return `https://www.youtube.com/@${url}`;
+                return `https://www.youtube.com/results?search_query=${encodeURIComponent(channel.name)}`;
+              })()}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center text-white text-lg shadow-lg transition-colors"
+              className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center text-white text-base shadow-lg transition-colors"
             >
               <YoutubeOutlined />
             </motion.a>
           </Tooltip>
         </div>
 
-        <motion.button
-          whileHover={{ scale: isInCart ? 1 : 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          disabled={cartLoading}
-          onClick={handleAddToCart}
-          className={`mt-4 w-full text-center py-3 rounded-xl font-semibold text-white ${cartLoading ? 'opacity-80 cursor-not-allowed' : ''}`}
-          style={{
-            background: isInCart
-              ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-              : 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
-            boxShadow: '0 10px 20px rgba(248, 55, 88, 0.2)',
-          }}
-        >
-          {isInCart ? 'Go to Cart' : cartLoading ? 'Adding...' : 'Add to Cart'}
-        </motion.button>
+        <div className="flex gap-2 mt-2.5">
+          <motion.button
+            whileHover={{ scale: (isInCart && !isCartView) ? 1 : 1.03, y: -3 }}
+            whileTap={{ scale: 0.98 }}
+            disabled={cartLoading}
+            onClick={handleAddToCart}
+            className={`flex-1 text-center py-1.5 rounded-button font-semibold text-white text-[11px] ${cartLoading ? 'opacity-80 cursor-not-allowed' : ''}`}
+            style={{
+              background: (isInCart && !isCartView)
+                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                : 'linear-gradient(135deg, #F83758 0%, #ff6b6b 100%)',
+              boxShadow: '0 8px 16px rgba(248, 55, 88, 0.2)',
+            }}
+          >
+            {isCartView ? 'Remove from Cart' : (isInCart ? 'In Cart' : cartLoading ? 'Adding...' : 'Add to Cart')}
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.03, y: -3 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!localStorage.getItem('token')) {
+                message.info('Please login to request an Escrow Deal.');
+                navigate('/login');
+                return;
+              }
+              navigate('/user/chat', { state: { requestDeal: channel } });
+            }}
+            className="flex-1 text-center py-1.5 rounded-button font-semibold text-white text-[11px]"
+            style={{
+              background: 'linear-gradient(135deg, #7B61FF 0%, #B88DFF 100%)',
+              boxShadow: '0 8px 16px rgba(120, 90, 255, 0.25)',
+            }}
+          >
+            Request Deal
+          </motion.button>
+        </div>
 
         {/* Hot Deal Pulsing Badge */}
         {channel.mostDemanding && (

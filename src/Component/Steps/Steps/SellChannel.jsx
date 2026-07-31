@@ -20,7 +20,7 @@ const SellChannelSteps = () => {
           <TextArea
             value="Hey team SocialSwap, I have submitted my channel with the channel ID _________. Guide me further to sell my channel."
             readOnly
-            style={{ margin: '10px 0', backgroundColor: 'rgba(248,55,88,0.06)', borderRadius: 12 }}
+            style={{ margin: '10px 0', backgroundColor: 'rgba(110,75,255,0.06)', borderRadius: 12 }}
             rows={3}
           />
         </>
@@ -43,9 +43,9 @@ const SellChannelSteps = () => {
             type="primary"
             icon={<ArrowRightOutlined />}
             style={{
-              backgroundImage: 'linear-gradient(90deg, rgb(248,55,88), rgb(255,159,64))',
+              backgroundImage: 'linear-gradient(90deg, #7B61FF, #B88DFF)',
               border: 'none',
-              boxShadow: '0 12px 30px rgba(248,55,88,0.25)',
+              boxShadow: '0 12px 30px rgba(110,75,255,0.25)',
               padding:'0.5rem',
               borderRadius:'8px'
             }}
@@ -71,17 +71,17 @@ const SellChannelSteps = () => {
   // ... rest of the component remains the same
 
   return (
-    <Card style={{ maxWidth: 800, margin: '0 auto', marginTop: 20 }} className="rounded-3xl bg-white/70 backdrop-blur border border-white/70 shadow-xl relative overflow-hidden">
+    <Card style={{ maxWidth: 800, margin: '0 auto', marginTop: 20 }} className="rounded-card bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/40 dark:border-white/10 shadow-card relative overflow-hidden text-gray-900 dark:text-gray-100 [&_.ant-steps-item-title]:dark:!text-gray-100 [&_.ant-steps-item-description]:dark:!text-gray-300 [&_.ant-steps-item-tail::after]:dark:!bg-white/10">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 -right-24 w-72 h-72 bg-rose-100/60 blur-3xl rounded-full" />
-        <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-orange-100/60 blur-3xl rounded-full" />
+        <div className="absolute -top-24 -right-24 w-72 h-72 bg-purple-100/40 blur-3xl rounded-full" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-pink-100/40 blur-3xl rounded-full" />
       </div>
       <Title
         level={2}
         style={{
           textAlign: 'center',
           marginBottom: 24,
-          backgroundImage: 'linear-gradient(90deg, rgb(248,55,88), rgb(255,159,64))',
+          backgroundImage: 'var(--btn-gradient)',
           WebkitBackgroundClip: 'text',
           backgroundClip: 'text',
           color: 'transparent',
@@ -91,7 +91,7 @@ const SellChannelSteps = () => {
       >
         Sell Your YouTube Channel
       </Title>
-      <Paragraph style={{ fontSize: 16, marginBottom: 24, textAlign: 'center', color: '#374151' }}>
+      <Paragraph style={{ fontSize: 16, marginBottom: 24, textAlign: 'center', color: 'var(--text-secondary)' }}>
         Follow these simple steps to sell your YouTube channel on our platform.
       </Paragraph>
       <Steps
@@ -101,10 +101,7 @@ const SellChannelSteps = () => {
             <span
               style={{
                 fontWeight: 700,
-                backgroundImage: 'linear-gradient(90deg, #111827, #374151)',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                color: 'transparent'
+                color: 'inherit'
               }}
             >
               {step.title}
@@ -112,19 +109,19 @@ const SellChannelSteps = () => {
           ),
           description: (
             <div>
-              <Paragraph style={{ marginBottom: 8, color: '#4B5563' }}>{step.description}</Paragraph>
+              <Paragraph style={{ marginBottom: 8, color: 'inherit' }}>{step.description}</Paragraph>
             </div>
           ),
           icon: React.cloneElement(step.icon, {
             style: {
-              color: 'rgb(248, 55, 88)',
-              filter: 'drop-shadow(0 6px 14px rgba(248,55,88,0.35))',
+              color: '#6E4BFF',
+              filter: 'drop-shadow(0 6px 14px rgba(110,75,255,0.35))',
               transform: 'translateZ(0)'
             }
           })
         }))}
       />
-      <Paragraph style={{ marginTop: 20, textAlign: 'center', color: '#111827', fontWeight: 600 }}>
+      <Paragraph style={{ marginTop: 20, textAlign: 'center', color: 'inherit', fontWeight: 600 }}>
         Thank you for choosing our platform to sell your YouTube channel. If you have any questions or need assistance during the process, please don't hesitate to contact us.
       </Paragraph>
     </Card>

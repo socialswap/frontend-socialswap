@@ -8,17 +8,18 @@ import {
   WhatsAppOutlined
 } from '@ant-design/icons';
 import styled from 'styled-components';
+import SEOHead from '../../Component/SEO/SEOHead';
 
 const { Title, Paragraph } = Typography;
 
 const PageWrapper = styled.div`
   position: relative;
-  overflow: hidden;
+  overflow: clip;
 `;
 
 const Container = styled.div`
   max-width: 1080px;
-  margin: 0 auto;
+  margin: 6rem auto 2rem;
   padding: 24px;
   display: grid;
   grid-template-columns: 260px 1fr;
@@ -34,20 +35,23 @@ const Container = styled.div`
 
 const StepContent = styled(Card)`
   margin-bottom: 16px;
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 16px;
+  background: var(--bg-glass, rgba(255,255,255,0.45));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 24px;
   transition: transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease, background 280ms ease;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  box-shadow: 0 15px 40px rgba(120,90,255,0.15);
   position: relative;
   overflow: hidden;
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.12);
-    border-color: ${props => props.accent || 'rgba(64,150,255,0.4)'};
-    background: rgba(255,255,255,0.85);
+    box-shadow: 0 20px 45px rgba(120,90,255,0.22);
+    border-color: ${props => props.accent || 'var(--primary)'};
+    background: var(--bg-glass, rgba(255,255,255,0.55));
+  }
+  .ant-typography {
+    color: var(--text-primary, rgba(0, 0, 0, 0.88)) !important;
   }
   &::after {
     content: "";
@@ -138,14 +142,14 @@ const WhatsAppButton = styled(Button)`
 
 const Sidebar = styled.aside`
   position: sticky;
-  top: 24px;
-  height: calc(100vh - 48px);
+  top: 6rem;
+  align-self: start;
+  height: max-content;
+  max-height: calc(100vh - 7rem);
   padding: 16px 12px;
   border-radius: 16px;
-  background: linear-gradient(180deg, #ffffffbb, #ffffff88);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(0,0,0,0.06);
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border, rgba(0,0,0,0.06));
   box-shadow: 0 8px 28px rgba(0,0,0,0.06);
   overflow: auto;
   @media (max-width: 992px) {
@@ -166,12 +170,12 @@ const NavItem = styled.button`
   border-radius: 10px;
   border: 0;
   background: ${props => (props.active ? `${props.accent}14` : 'transparent')};
-  color: #1f1f1f;
+  color: var(--text-primary, #1f1f1f);
   cursor: pointer;
   transition: background 200ms ease, transform 120ms ease;
   outline: none;
   &:hover {
-    background: ${props => (props.accent ? `${props.accent}12` : '#f5f5f5')};
+    background: ${props => (props.accent ? `${props.accent}12` : 'var(--bg-secondary, #f5f5f5)')};
     transform: translateX(2px);
   }
   @media (max-width: 992px) {
@@ -350,6 +354,7 @@ const GrowChannelTimeline = () => {
     );
     itemRefs.current.forEach((el) => el && observer.observe(el));
     return () => observer.disconnect();
+      <SEOHead title="Grow Your Channel | SocialSwap" description="Expert tips and strategies to grow your YouTube channel." />
   }, []);
 
   const handleMouseMove = (e, index) => {
@@ -384,7 +389,7 @@ const GrowChannelTimeline = () => {
       <ParallaxLayer size={200} left="14%" top="70%" colorStart="#efe6ff" colorEnd="#cdb8ff" opacity={0.2} duration={20} />
       <Container ref={containerRef}>
         <Sidebar>
-          <Title level={4} style={{ marginTop: 0, marginBottom: 10 }}>Roadmap</Title>
+          <Title level={4} style={{ marginTop: 0, marginBottom: 10, color: 'var(--text-primary)' }}>Roadmap</Title>
           {sidebarItems.map((s, i) => (
             <NavItem
               key={s.title}
@@ -401,10 +406,10 @@ const GrowChannelTimeline = () => {
         </Sidebar>
         <div>
           <ContentHeader>
-            <Title className='mt-16' level={2} style={{ color: '#1f1f1f', marginBottom: 8 }}>
+            <Title level={2} style={{ color: 'var(--text-primary)', marginBottom: 8 }}>
               Grow Your Channel
             </Title>
-            <Paragraph style={{ color: '#595959', margin: 0 }}>
+            <Paragraph style={{ color: 'var(--text-secondary)', margin: 0 }}>
               Follow the interactive roadmap. Sections light up as you progress.
             </Paragraph>
           </ContentHeader>

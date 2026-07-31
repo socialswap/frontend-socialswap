@@ -1,8 +1,10 @@
 import React from 'react';
+import SEOHead from '../Component/SEO/SEOHead';
 
 const ShippingAndCancellationPolicy = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-16 space-y-12 mt-4 "  style={{marginTop:'2rem'}}>
+      <SEOHead title="Shipping & Cancellation | SocialSwap" />
       <h1 className="text-3xl font-bold text-gray-900 mb-8">
         Shipping and Cancellation Policy
       </h1>

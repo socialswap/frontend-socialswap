@@ -1,23 +1,30 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Tag, Button, message, Image, Progress } from 'antd';
 import {
   UserOutlined, EyeOutlined, VideoCameraOutlined, WhatsAppOutlined, 
   ShoppingCartOutlined, CheckCircleFilled, GlobalOutlined, CalendarOutlined,
-  WarningOutlined, DollarOutlined, SafetyOutlined, FireOutlined, ClockCircleOutlined,
+  DollarOutlined, SafetyOutlined, FireOutlined, ClockCircleOutlined,
   YoutubeOutlined, ThunderboltOutlined, RiseOutlined,
-  TrophyOutlined, LineChartOutlined
+  TrophyOutlined, LineChartOutlined, HeartOutlined, MessageOutlined,
+  PlaySquareOutlined, ShareAltOutlined, CopyOutlined, CheckOutlined
 } from '@ant-design/icons';
 import axiosInstance, { api } from '../../API/api';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { jwtDecode } from 'jwt-decode';
+import ChannelCard from '../ChannelCard';
 
 const DetailPage = ({ channel: initialChannel, refreshData }) => {
   const [channel, setChannel] = useState(initialChannel);
   const [isInCart, setIsInCart] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const { id } = useParams();
+  const [relatedChannels, setRelatedChannels] = useState([]);
+  const [sellerChannels, setSellerChannels] = useState([]);
+  
+  const [showShare, setShowShare] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const { username } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,112 +33,109 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
     }
   }, [initialChannel]);
 
-  const checkCartStatus = useCallback(async () => {
-    if (!localStorage.getItem('token')) {
-      return;
+  const fetchAdditionalChannels = useCallback(async (chan) => {
+    try {
+      if (chan.category) {
+        const catRes = await axiosInstance.get(`${api}/channels?category=["${chan.category}"]&limit=5`);
+        if (catRes.data.success) {
+          setRelatedChannels(catRes.data.channels.filter(c => c._id !== chan._id).slice(0, 4));
+        }
+      }
+      if (chan.createdBy) {
+        const sellRes = await axiosInstance.get(`${api}/channels?createdBy=${chan.createdBy}&limit=3`);
+        if (sellRes.data.success) {
+          setSellerChannels(sellRes.data.channels.filter(c => c._id !== chan._id).slice(0, 2));
+        }
+      }
+    } catch(e) {
+      console.error(e);
     }
+  }, []);
+
+  useEffect(() => {
+    // If we're on a new channel and channel isn't loaded via props, fetch it
+    const loadData = async () => {
+      try {
+        if (!initialChannel && username) {
+          const res = await axiosInstance.get(`${api}/channels/username/${username}`);
+          setChannel(res.data);
+          fetchAdditionalChannels(res.data);
+        } else if (channel) {
+          fetchAdditionalChannels(channel);
+        }
+      } catch (err) {
+        console.error('Failed to fetch channel', err);
+      }
+    };
+    loadData();
+  }, [username, initialChannel, fetchAdditionalChannels, channel]);
+
+  // Keep existing logic
+  const checkCartStatus = useCallback(async () => {
+    if (!localStorage.getItem('token')) return;
     try {
       const response = await axiosInstance.get(`${api}/cart`);
-      const cartItems = response.data.channels;
-      setIsInCart(cartItems.some((item) => item._id === id));
+      const cartItems = response.data.channels || []; // Ensure array
+      const currentChannelId = channel?._id || initialChannel?._id;
+      setIsInCart(cartItems.some((item) => item._id === currentChannelId));
     } catch (err) {
       console.error('Cart check failed:', err);
     }
-  }, [id]);
+  }, [channel?._id, initialChannel?._id]);
 
-  useEffect(() => {
-    checkCartStatus();
-  }, [checkCartStatus]);
+  useEffect(() => { checkCartStatus(); }, [checkCartStatus]);
 
   const decodeToken = () => {
     const token = localStorage.getItem('token');
     if (!token) return null;
-    try {
-      const decoded = jwtDecode(token);
-      return { decoded, userId: decoded._id };
-    } catch (error) {
-      console.error('Failed to decode token:', error);
-      return null;
-    }
+    try { return { decoded: jwtDecode(token), userId: jwtDecode(token)._id }; } 
+    catch (error) { return null; }
   };
 
   const handleMakeOffer = () => {
-    const msg = encodeURIComponent(
-      `Hello, I'm interested in buying the YouTube channel "${channel.name}" (ID: ${channel._id}). Can we discuss the details?`
-    );
-    const whatsappUrl = `https://wa.me/+919423523291?text=${msg}`;
-    window.open(whatsappUrl, '_blank');
+    const msg = encodeURIComponent(`Hello, I'm interested in buying the YouTube channel "${channel.name}" (ID: ${channel._id}). Can we discuss the details?`);
+    window.open(`https://wa.me/+919423523291?text=${msg}`, '_blank');
   };
 
   const handleAddToCart = async () => {
-    if (!localStorage.getItem('token')) {
-      return navigate('/login');
-    }
+    if (!localStorage.getItem('token')) return navigate('/login');
     try {
       if (isInCart) {
         await axiosInstance.delete(`${api}/cart/remove/${channel._id}`);
         setIsInCart(false);
         message.success(`${channel.name} removed from cart`);
       } else {
-        await axiosInstance.post(`${api}/cart/add`, {
-          channelId: channel._id,
-          quantity: 1,
-        });
+        await axiosInstance.post(`${api}/cart/add`, { channelId: channel._id, quantity: 1 });
         setIsInCart(true);
         message.success(`${channel.name} added to cart!`);
       }
-    } catch (err) {
-      message.error('Error updating cart');
-    }
+    } catch (err) { message.error('Error updating cart'); }
   };
 
   const handleBuyNow = async () => {
-    if (!channel) {
-        message.error('Channel data not available');
-        return;
-    }
-
+    if (!channel) return message.error('Channel data not available');
     setPaymentLoading(true);
-
     try {
         const user = decodeToken();
         const paymentResponse = await axiosInstance.post(`${api}/create-order`, {
             amount: channel.price,
-            cartItems: [{
-                id: channel._id,
-                name: channel.name,
-                price: channel.price,
-                quantity: 1
-            }],
+            cartItems: [{ id: channel._id, name: channel.name, price: channel.price, quantity: 1 }],
             user: user?.decoded
         });
-
         if (paymentResponse.data.success) {
             const { data } = paymentResponse.data;
-
             localStorage.setItem('currentTransaction', JSON.stringify({
-                transactionId: data.transactionId,
-                amount: channel.price,
-                cartItems: [channel]
+                transactionId: data.transactionId, amount: channel.price, cartItems: [channel]
             }));
-
             if (data.data.instrumentResponse?.redirectInfo?.url) {
                 window.location.href = data.data.instrumentResponse.redirectInfo.url;
-        } else {
-          message.error('No redirect URL found');
-        }
-      } else {
-        message.error('Failed to create payment order');
-        }
-    } catch (error) {
-      console.error('Payment error:', error);
-      message.error('Payment processing failed');
-    } finally {
-        setPaymentLoading(false);
-    }
-};
+            } else message.error('No redirect URL found');
+        } else message.error('Failed to create payment order');
+    } catch (error) { message.error('Payment processing failed'); }
+    finally { setPaymentLoading(false); }
+  };
 
-  if (!channel) return null;
+  if (!channel) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
   const formatNumber = (num) => {
     if (!num) return '0';
@@ -140,697 +144,398 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
     return num.toString();
   };
 
-  const getAvatarGradient = (name) => {
-    const gradients = [
-      'from-blue-500 to-blue-600',
-      'from-purple-500 to-purple-600',
-      'from-pink-500 to-pink-600',
-      'from-red-500 to-red-600',
-      'from-orange-500 to-orange-600',
-      'from-yellow-500 to-yellow-600',
-      'from-green-500 to-green-600',
-      'from-teal-500 to-teal-600',
-      'from-cyan-500 to-cyan-600',
-      'from-indigo-500 to-indigo-600',
-    ];
-    const charCode = name?.charCodeAt(0) || 67;
-    return gradients[charCode % gradients.length];
-  };
-
-  // Calculate engagement metrics
-  const engagementRate = channel.subscriberCount > 0 
-    ? ((channel.viewCount / channel.subscriberCount / channel.videoCount) * 100).toFixed(1)
-    : 0;
-  
-  const avgViewsGrowth = channel.recentViews > channel.averageViewsPerVideo ? '+14' : '-5';
+  const mainImage = channel.imageUrls && channel.imageUrls.length > 0 ? channel.imageUrls[currentImageIndex] : (channel.logoUrl || channel.avatar);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20">
-      {/* FULL-WIDTH CHANNEL HEADER */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="bg-white border-b border-gray-200 shadow-sm"
-      >
-        <div className="max-w-[1600px] mx-auto px-4 md:px-8 py-8 md:py-12">
-          {/* Channel Profile & Identity */}
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-8">
-            {/* Large Avatar */}
-            <motion.div
-              whileHover={{ scale: 1.05, rotateY: 5 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="relative"
-            >
-              <div className={`w-28 h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white shadow-2xl flex items-center justify-center bg-gradient-to-br ${getAvatarGradient(channel.name)}`}>
-                {channel.logoUrl || channel.avatar ? (
-                  <img
-                    src={channel.logoUrl || channel.avatar}
-                    alt={channel.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-white text-4xl md:text-6xl font-bold">
-                    {channel.name?.charAt(0).toUpperCase() || 'C'}
-                  </span>
-                )}
-              </div>
-              {channel.monetized && (
-                <div className="absolute -bottom-2 -right-2 bg-gradient-to-br from-green-400 to-green-600 rounded-full p-3 shadow-lg">
-                  <DollarOutlined className="text-white text-2xl" />
+    <div className="min-h-screen bg-transparent pt-24 pb-8 font-sans text-text-primary transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        {/* Breadcrumb */}
+        <div className="text-sm text-text-secondary mb-6 flex gap-2">
+          <Link to="/" className="hover:text-[#6E4BFF] transition font-medium">Home</Link>
+          <span>/</span>
+          <span className="text-text-primary font-medium">{channel.name}</span>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          
+          {/* ================= LEFT COLUMN: MAIN CONTENT ================= */}
+          <div className="flex-1 space-y-8 min-w-0">
+            
+            {/* Header Box (New YouTube Style Layout) */}
+            <div className="bg-white/65 dark:bg-[#110C1F]/65 backdrop-blur-[20px] rounded-card p-6 shadow-card border border-white/60 dark:border-white/15 relative">
+              
+              {/* Top Right Share & WhatsApp */}
+              <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
+                
+                {/* Regular Share Button */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowShare(v => !v)}
+                    className="w-9 h-9 flex items-center justify-center rounded-full bg-white/50 dark:bg-white/5 border border-white/60 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:text-[#6E4BFF] transition shadow-sm active:scale-95"
+                    title="Share this channel"
+                  >
+                    <ShareAltOutlined className="text-base" />
+                  </button>
+
+                  {/* Share Dropdown */}
+                  <AnimatePresence>
+                    {showShare && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 8 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 8 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute top-12 right-0 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-4 z-50"
+                      >
+                        <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Share this channel</p>
+                        
+                        {/* Copy Link */}
+                        <button
+                          onClick={() => {
+                            const url = `https://www.socialswap.in/channel/${channel.customUrl || channel._id}`;
+                            navigator.clipboard.writeText(url).then(() => {
+                              setCopied(true);
+                              message.success('Link copied!');
+                              setTimeout(() => setCopied(false), 2000);
+                            });
+                          }}
+                          className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition text-left"
+                        >
+                          <span className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-600">
+                            {copied ? <CheckOutlined /> : <CopyOutlined />}
+                          </span>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{copied ? 'Copied!' : 'Copy Link'}</p>
+                            <p className="text-xs text-gray-400 truncate max-w-[150px]">/channel/{channel.customUrl || channel._id}</p>
+                          </div>
+                        </button>
+
+                        {/* Twitter/X */}
+                        <a
+                          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`🎬 ${channel.name} YouTube channel for sale! ${channel.subscriberCount?.toLocaleString()} subscribers. Check it out on SocialSwap 👇`)}&url=${encodeURIComponent(`https://www.socialswap.in/channel/${channel.customUrl || channel._id}`)}`}
+                          target="_blank" rel="noopener noreferrer"
+                          className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition mt-1"
+                        >
+                          <span className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center text-sky-600 font-bold text-sm">𝕏</span>
+                          <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">Share on X</p>
+                        </a>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-              )}
-            </motion.div>
-
-            {/* Channel Info */}
-            <div className="flex-1 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
-                <h1 className="text-3xl md:text-5xl font-bold text-gray-900 break-words">{channel.name}</h1>
-                {channel.verified && (
-                  <CheckCircleFilled className="text-blue-500 text-3xl" />
-                )}
               </div>
 
-              <p className="text-lg md:text-2xl text-gray-600 mb-4">
-                {formatNumber(channel.subscriberCount)} Subscribers • {channel.videoCount} Videos
-              </p>
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-6 text-center md:text-left mt-2 md:mt-0">
+                
+                {/* Circular Logo on the Left */}
+                <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden shrink-0 border-2 border-[#C6B4FF]/40 dark:border-purple-800 shadow-md flex items-center justify-center bg-white/40 dark:bg-purple-900/30 text-purple-400 mx-auto md:mx-0">
+                  {channel.logoUrl || channel.avatar || mainImage ? (
+                    <Image 
+                      src={channel.logoUrl || channel.avatar || mainImage} 
+                      alt={channel.name}
+                      rootClassName="w-full h-full"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-4xl"><YoutubeOutlined /></span>
+                  )}
+                </div>
 
-              {/* YouTube Red Accent Line */}
-              <div className="w-24 md:w-32 h-1.5 bg-gradient-to-r from-red-500 via-red-600 to-red-500 rounded-full mx-auto md:mx-0 mb-6"></div>
+                {/* Channel Details on the Right */}
+                <div className="flex-1 min-w-0">
+                  {/* Title & Badge */}
+                  <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
+                    <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary truncate">{channel.name}</h1>
+                    <CheckCircleFilled className="text-[#6E4BFF] text-lg" />
+                  </div>
+                  
+                  {/* Handle, Subs, Videos */}
+                  <div className="text-sm text-text-secondary mb-3 flex flex-wrap items-center justify-center md:justify-start gap-1">
+                    <span className="font-semibold text-text-primary">@{channel.customUrl ? channel.customUrl.split('/').pop().replace('https:', '').replace('http:', '') : channel.name.replace(/\s+/g, '')}</span>
+                    <span>•</span>
+                    <span>{formatNumber(channel.subscriberCount)} subscribers</span>
+                    <span>•</span>
+                    <span>{channel.videoCount || '1.4K'} videos</span>
+                  </div>
 
-              {/* Badges Row */}
-              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                <Tag color="blue" className="text-sm font-semibold px-4 py-1.5 rounded-lg border-0">
-                  <CheckCircleFilled className="mr-1" /> Verified Listing
-                </Tag>
-                <Tag 
-                  color={channel.monetized ? 'green' : 'red'} 
-                  className="text-sm font-semibold px-4 py-1.5 rounded-lg border-0"
+                  {/* Description / Info Line */}
+                  <div className="text-text-secondary text-sm mb-4 leading-relaxed bg-white/50 dark:bg-white/5 border border-white/40 dark:border-white/10 rounded-input p-3 inline-block text-left w-full">
+                     <span className="font-semibold text-text-primary">Category:</span> {channel.category || 'Premium'} • 
+                     {channel.monetized && <span> <span className="font-semibold text-text-primary ml-1">Monetized:</span> Yes •</span>} 
+                     <span className="font-semibold text-text-primary ml-1">Views:</span> {formatNumber(channel.viewCount)} 
+                     {channel.organicGrowth && <span> • <span className="font-semibold text-text-primary ml-1">Growth:</span> Organic</span>}
+                  </div>
+
+                  {/* Links */}
+                  <div className="mb-6 flex flex-wrap items-center justify-center md:justify-start gap-2 text-sm">
+                    {channel.customUrl ? (
+                      <a href={channel.customUrl} target="_blank" rel="noopener noreferrer" className="text-[#6E4BFF] dark:text-[#C6B4FF] font-semibold hover:underline flex items-center gap-1">
+                        <GlobalOutlined /> {channel.customUrl}
+                      </a>
+                    ) : (
+                       <span className="text-text-secondary italic">No external link provided</span>
+                    )}
+                    {/* YouTube Visit Button */}
+                    <a
+                      href={(() => {
+                        const url = channel.customUrl || '';
+                        if (url.startsWith('http')) return url;
+                        if (url.startsWith('@') || url.startsWith('UC')) return `https://www.youtube.com/${url}`;
+                        if (url) return `https://www.youtube.com/@${url}`;
+                        return `https://www.youtube.com/results?search_query=${encodeURIComponent(channel.name)}`;
+                      })()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-button bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white text-xs font-bold transition shadow-md shadow-red-500/20 active:scale-95"
+                    >
+                      <YoutubeOutlined className="text-sm" /> View on YouTube
+                    </a>
+                  </div>
+                  
+                  {/* Buttons */}
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                    {decodeToken()?.decoded?.role === 'admin' ? (
+                      <button onClick={() => {
+                        navigate('/admin/chats', { state: { prefillDeal: channel } });
+                      }} className="bg-btn-gradient hover:shadow-purple-glow-hover hover:translate-y-[-3px] hover:scale-[1.03] text-white text-sm font-bold py-3 px-6 rounded-button transition-all shadow-purple-glow-soft flex items-center gap-2">
+                        <SafetyOutlined /> Make a Contract
+                      </button>
+                    ) : (
+                      <button onClick={() => {
+                        if (!localStorage.getItem('token')) {
+                          message.info('Please login to request an Escrow Deal.');
+                          navigate('/login');
+                          return;
+                        }
+                        navigate('/user/chat', { state: { requestDeal: channel } });
+                      }} className="bg-btn-gradient hover:shadow-purple-glow-hover hover:translate-y-[-3px] hover:scale-[1.03] text-white text-sm font-bold py-3 px-6 rounded-button transition-all shadow-purple-glow-soft flex items-center gap-2">
+                        <MessageOutlined /> Contact Admin to Buy
+                      </button>
+                    )}
+                    <button onClick={handleBuyNow} className="bg-white/60 dark:bg-[#1C1438]/80 text-[#6E4BFF] dark:text-[#C6B4FF] border border-[#C6B4FF] dark:border-purple-600/40 text-sm font-bold py-3 px-6 rounded-button hover:bg-[#6E4BFF] hover:text-white transition-all shadow-sm">
+                      Buy ${channel.price || 0}
+                    </button>
+                    <button onClick={handleAddToCart} className={`w-11 h-11 flex items-center justify-center rounded-button border transition active:scale-95 ${isInCart ? 'bg-red-50 dark:bg-red-900/30 text-red-500 border-red-200 dark:border-red-800' : 'bg-white/50 dark:bg-white/5 text-gray-500 dark:text-gray-400 border-white/60 dark:border-white/10 hover:text-red-500 hover:border-red-200 shadow-sm'}`} title="Add to Cart">
+                      <HeartOutlined className="text-base" />
+                    </button>
+                    {/* WhatsApp Chat Button */}
+                    <button
+                      onClick={() => {
+                        const msg = encodeURIComponent(`Hello, I'm interested in the "${channel.name}" channel on SocialSwap. Let's discuss details.`);
+                        window.open(`https://wa.me/+919423523291?text=${msg}`, '_blank');
+                      }}
+                      className="w-11 h-11 flex items-center justify-center rounded-button border border-green-200 dark:border-green-800/40 bg-green-500 text-white hover:bg-green-600 transition shadow-sm active:scale-95"
+                      title="Chat on WhatsApp"
+                    >
+                      <WhatsAppOutlined className="text-xl" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Channel Images Section (Moved Below Header) */}
+            <div className="bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] rounded-card p-6 shadow-card border border-white/40 dark:border-white/10">
+              <h3 className="text-lg font-bold text-text-primary mb-4">Channel Gallery</h3>
+              <div className="flex flex-col gap-4">
+                <div className="w-full bg-white/30 dark:bg-[#110C1F]/30 backdrop-blur-md rounded-card overflow-hidden aspect-video flex items-center justify-center border border-white/40 dark:border-white/10 shadow-sm relative group max-h-[400px]">
+                  {mainImage ? (
+                    <Image.PreviewGroup 
+                      items={channel.imageUrls?.length ? channel.imageUrls : [mainImage]}
+                      preview={{ 
+                        current: currentImageIndex, 
+                        onChange: (current) => setCurrentImageIndex(current) 
+                      }}
+                    >
+                      <Image 
+                        src={mainImage} 
+                        alt={channel.name} 
+                        rootClassName="w-full h-full flex items-center justify-center"
+                        className="w-full h-full object-contain transition duration-300 group-hover:scale-[1.02]" 
+                        style={{ objectFit: 'contain', width: '100%', height: '100%' }}
+                      />
+                    </Image.PreviewGroup>
+                  ) : (
+                    <span className="text-5xl text-gray-300"><YoutubeOutlined /></span>
+                  )}
+                </div>
+                {channel.imageUrls && channel.imageUrls.length > 1 && (
+                  <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                    {channel.imageUrls.map((img, i) => (
+                      <div 
+                        key={i} 
+                        onClick={() => setCurrentImageIndex(i)}
+                        className={`w-16 h-16 md:w-20 md:h-20 rounded-image overflow-hidden shrink-0 cursor-pointer border-2 transition ${currentImageIndex === i ? 'border-[#6E4BFF] shadow-md ring-2 ring-[#C6B4FF]/50' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                      >
+                        <img src={img} alt={`thumb-${i}`} className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* General Info & Metrics Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] rounded-card p-6 shadow-card border border-white/40 dark:border-white/10">
+              
+              {/* General Info */}
+              <div className="lg:col-span-2">
+                <h3 className="text-lg font-bold text-text-primary mb-4">General Info</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1 text-xs md:text-sm">
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Subscribers:</span>
+                    <span className="font-bold text-text-primary">{formatNumber(channel.subscriberCount)}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Content Type:</span>
+                    <span className="font-bold text-text-primary">{channel.channelType || '-'}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Language:</span>
+                    <span className="font-bold text-text-primary">{channel.my_language || '-'}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Country:</span>
+                    <span className="font-bold text-text-primary">{channel.country || '-'}</span>
+                  </div>
+                  {channel.monetized && (
+                    <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                      <span className="text-text-secondary">Monetized:</span>
+                      <span className="font-bold text-text-primary">Yes</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Gender of viewers:</span>
+                    <span className="font-bold text-text-primary">-</span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Age of viewers:</span>
+                    <span className="font-bold text-text-primary">-</span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Last upload date:</span>
+                    <span className="font-bold text-text-primary">-</span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Channel creation year:</span>
+                    <span className="font-bold text-text-primary">{channel.joinedDate ? new Date(channel.joinedDate).getFullYear() : '-'}</span>
+                  </div>
+                  <div className="flex justify-between pb-1">
+                    <span className="text-text-secondary">Advanced features enabled:</span>
+                    <span className="font-bold text-text-primary">-</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Metrics */}
+              <div>
+                <h3 className="text-lg font-bold text-text-primary mb-4">Metrics</h3>
+                <div className="space-y-3 text-xs md:text-sm">
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">RPM:</span>
+                    <span className="font-bold text-text-primary">-</span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Revenue Monthly:</span>
+                    <span className="font-bold text-text-primary">₹{formatNumber(channel.estimatedEarnings)}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Revenue last year:</span>
+                    <span className="font-bold text-text-primary">-</span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Views Last 48h:</span>
+                    <span className="font-bold text-text-primary">{formatNumber(channel.recentViews)}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Views Last 28 days:</span>
+                    <span className="font-bold text-text-primary">-</span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Views Last Year:</span>
+                    <span className="font-bold text-text-primary">-</span>
+                  </div>
+                  <div className="flex justify-between pb-1">
+                    <span className="text-text-secondary">Watch time (hours) last 90 days:</span>
+                    <span className="font-bold text-text-primary">{formatNumber(channel.watchTimeHours)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+            {/* Related Products */}
+            {relatedChannels.length > 0 && (
+              <div className="pt-2">
+                <h3 className="text-lg font-bold text-text-primary mb-4">Related Products</h3>
+                <motion.div
+                  layout
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
                 >
-                  {channel.monetized ? '💰 Monetized' : '❌ Not Monetized'}
-                </Tag>
-                {channel.organicGrowth && (
-                  <Tag color="gold" className="text-sm font-semibold px-4 py-1.5 rounded-lg border-0">
-                    <FireOutlined className="mr-1" /> Organic Growth
-                  </Tag>
-                )}
-                <Tag color="purple" className="text-sm font-semibold px-4 py-1.5 rounded-lg border-0">
-                  📁 {channel.category}
-                </Tag>
+                  <AnimatePresence>
+                    {relatedChannels.map(c => (
+                      <motion.div
+                        key={c._id}
+                        layout
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <ChannelCard channel={c} />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </motion.div>
               </div>
-            </div>
-
-            {/* Last Updated Badge */}
-            <div className="text-center md:text-right">
-              <div className="text-sm text-gray-500 mb-2">Last Updated</div>
-              <div className="text-base font-semibold text-gray-700">
-                {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              </div>
-            </div>
+            )}
           </div>
 
-          {/* Description */}
-          {channel.description && (
-            <div className="max-w-4xl mx-auto md:mx-0">
-              <p className="text-gray-700 text-lg leading-relaxed text-center md:text-left">
-                {channel.description}
+
+          {/* ================= RIGHT COLUMN: SIDEBAR ================= */}
+          <div className="w-full lg:w-[280px] xl:w-[320px] shrink-0 space-y-5">
+            
+            {/* Seller Profile Card */}
+            <div className="bg-white/65 dark:bg-[#110C1F]/65 backdrop-blur-[20px] rounded-card p-6 shadow-card border border-white/60 dark:border-white/15 flex flex-col items-center text-center">
+              <div className="relative mb-3">
+                <div className="w-20 h-20 rounded-full bg-btn-gradient flex items-center justify-center text-white text-2xl font-bold border-4 border-white dark:border-[#110C1F] shadow-purple-glow-soft overflow-hidden">
+                  {(channel.createdBy?.avatar || channel.seller?.avatar) ? <img src={channel.createdBy?.avatar || channel.seller?.avatar} alt="Seller" className="w-full h-full object-cover"/> : <UserOutlined />}
+                </div>
+                <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+              </div>
+              <h3 className="text-lg font-bold text-text-primary mb-1">{channel.createdBy?.name || channel.seller?.name || 'Seller'}</h3>
+              <p className="text-sm text-text-secondary mb-4 flex items-center gap-1 justify-center">
+                <span className="text-green-500 text-lg"><CheckCircleFilled /></span>
+                <span className="ml-2 text-text-secondary">●</span> 
+                <span className="ml-1 text-text-secondary">6 min ago</span>
               </p>
+
+              <div className="bg-[#6E4BFF]/10 text-[#6E4BFF] dark:text-[#C6B4FF] text-xs font-semibold px-4 py-1.5 rounded-full mb-6 inline-block border border-[#6E4BFF]/20">
+                Since {channel.joinedDate ? new Date(channel.joinedDate).getFullYear() : '2026'}
+              </div>
+
             </div>
-          )}
-        </div>
-      </motion.div>
 
-      {/* MAIN DASHBOARD CONTENT */}
-      <div className="max-w-[1600px] mx-auto px-4 md:px-8 py-6 md:py-8">
-        <div className="space-y-8">
-            {/* 📊 ANALYTICS DASHBOARD SECTION */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                  <LineChartOutlined className="text-blue-500" />
-                  Channel Analytics
-                </h2>
-                <div className="text-sm text-gray-500">Real-time data</div>
-              </div>
+            {/* Channel Price Calculator Button */}
+            <button className="w-full bg-btn-gradient hover:shadow-purple-glow-hover hover:translate-y-[-3px] hover:scale-[1.03] text-white font-bold py-3.5 px-4 rounded-button transition-all shadow-purple-glow-soft flex items-center justify-center gap-2 active:scale-95 text-sm">
+              Channel Price Calculator
+            </button>
 
-              {/* 3×2 Analytics Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {/* Card 1: Subscribers */}
-                <motion.div
-                  whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(59, 130, 246, 0.15)' }}
-                  transition={{ duration: 0.2 }}
-                  className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl p-6 border border-blue-200 relative overflow-hidden"
-                >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/30 rounded-full -mr-16 -mt-16"></div>
-                  <div className="relative">
-                    <div className="bg-blue-500 rounded-xl p-3 w-fit mb-4 shadow-lg">
-                      <UserOutlined className="text-white text-2xl" />
-                    </div>
-                    <p className="text-sm text-blue-700 font-semibold mb-1">Total Subscribers</p>
-                    <p className="text-4xl font-bold text-gray-900 mb-2">
-                      {formatNumber(channel.subscriberCount)}
-                    </p>
-                    <div className="flex items-center gap-2 text-sm text-blue-600">
-                      <RiseOutlined />
-                      <span>Active audience</span>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Card 2: Total Views */}
-                <motion.div
-                  whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(34, 197, 94, 0.15)' }}
-                  transition={{ duration: 0.2 }}
-                  className="bg-gradient-to-br from-green-50 to-green-100/50 rounded-2xl p-6 border border-green-200 relative overflow-hidden"
-                >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-green-200/30 rounded-full -mr-16 -mt-16"></div>
-                  <div className="relative">
-                    <div className="bg-green-500 rounded-xl p-3 w-fit mb-4 shadow-lg">
-                      <EyeOutlined className="text-white text-2xl" />
-                    </div>
-                    <p className="text-sm text-green-700 font-semibold mb-1">Total Views</p>
-                    <p className="text-4xl font-bold text-gray-900 mb-2">
-                      {formatNumber(channel.viewCount)}
-                    </p>
-                    <div className="flex items-center gap-2 text-sm text-green-600">
-                      <TrophyOutlined />
-                      <span>Lifetime reach</span>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Card 3: Total Videos */}
-                <motion.div
-                  whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(168, 85, 247, 0.15)' }}
-                  transition={{ duration: 0.2 }}
-                  className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-2xl p-6 border border-purple-200 relative overflow-hidden"
-                >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200/30 rounded-full -mr-16 -mt-16"></div>
-                  <div className="relative">
-                    <div className="bg-purple-500 rounded-xl p-3 w-fit mb-4 shadow-lg">
-                      <VideoCameraOutlined className="text-white text-2xl" />
-                    </div>
-                    <p className="text-sm text-purple-700 font-semibold mb-1">Total Videos</p>
-                    <p className="text-4xl font-bold text-gray-900 mb-2">
-                      {channel.videoCount}
-                    </p>
-                    <div className="flex items-center gap-2 text-sm text-purple-600">
-                      <VideoCameraOutlined />
-                      <span>Content library</span>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Card 4: Est. Earnings */}
-                <motion.div
-                  whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(251, 191, 36, 0.15)' }}
-                  transition={{ duration: 0.2 }}
-                  className="bg-gradient-to-br from-yellow-50 to-yellow-100/50 rounded-2xl p-6 border border-yellow-200 relative overflow-hidden"
-                >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-200/30 rounded-full -mr-16 -mt-16"></div>
-                  <div className="relative">
-                    <div className="bg-yellow-500 rounded-xl p-3 w-fit mb-4 shadow-lg">
-                      <DollarOutlined className="text-white text-2xl" />
-                    </div>
-                    <p className="text-sm text-yellow-700 font-semibold mb-1">Est. Monthly Earnings</p>
-                    <p className="text-4xl font-bold text-gray-900 mb-2">
-                      ₹{formatNumber(channel.estimatedEarnings || 0)}
-                    </p>
-                    <div className="flex items-center gap-2 text-sm text-yellow-600">
-                      <FireOutlined />
-                      <span>Revenue potential</span>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Card 5: Avg Views/Video */}
-                <motion.div
-                  whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(107, 114, 128, 0.15)' }}
-                  transition={{ duration: 0.2 }}
-                  className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl p-6 border border-gray-200 relative overflow-hidden"
-                >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gray-200/30 rounded-full -mr-16 -mt-16"></div>
-                  <div className="relative">
-                    <div className="bg-gray-500 rounded-xl p-3 w-fit mb-4 shadow-lg">
-                      <EyeOutlined className="text-white text-2xl" />
-                    </div>
-                    <p className="text-sm text-gray-700 font-semibold mb-1">Avg. Views / Video</p>
-                    <p className="text-4xl font-bold text-gray-900 mb-2">
-                      {formatNumber(channel.averageViewsPerVideo)}
-                    </p>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <LineChartOutlined />
-                      <span>Per content</span>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Card 6: Recent Views (28d) */}
-                <motion.div
-                  whileHover={{ y: -4, boxShadow: '0 12px 24px rgba(59, 130, 246, 0.15)' }}
-                  transition={{ duration: 0.2 }}
-                  className="bg-gradient-to-br from-cyan-50 to-cyan-100/50 rounded-2xl p-6 border border-cyan-200 relative overflow-hidden"
-                >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-200/30 rounded-full -mr-16 -mt-16"></div>
-                  <div className="relative">
-                    <div className="bg-cyan-500 rounded-xl p-3 w-fit mb-4 shadow-lg">
-                      <ClockCircleOutlined className="text-white text-2xl" />
-                    </div>
-                    <p className="text-sm text-cyan-700 font-semibold mb-1">Recent Views (28 Days)</p>
-                    <p className="text-4xl font-bold text-gray-900 mb-2">
-                      {formatNumber(channel.recentViews)}
-                    </p>
-                    <div className="flex items-center gap-2 text-sm text-cyan-600">
-                      <RiseOutlined />
-                      <span>{avgViewsGrowth}% vs avg</span>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
-
-            {/* 📈 PERFORMANCE OVERVIEW */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-white rounded-2xl shadow-md p-6 border border-gray-100"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <LineChartOutlined className="text-blue-500" />
-                  Performance Overview
-                </h3>
-                <div className="flex items-center gap-2 text-sm">
-                  <Tag color="green" className="font-semibold">
-                    <RiseOutlined /> {avgViewsGrowth}% growth
-                  </Tag>
-                </div>
-              </div>
-
-              {/* Performance Bars */}
-              <div className="space-y-5">
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-700">Engagement Rate</span>
-                    <span className="text-sm font-bold text-blue-600">{engagementRate}%</span>
-                  </div>
-                  <Progress 
-                    percent={parseFloat(engagementRate)} 
-                    strokeColor={{
-                      '0%': '#3b82f6',
-                      '100%': '#8b5cf6',
-                    }}
-                    showInfo={false}
-                    strokeWidth={12}
-                    className="mb-1"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-700">Content Consistency</span>
-                    <span className="text-sm font-bold text-green-600">92%</span>
-                  </div>
-                  <Progress 
-                    percent={92} 
-                    strokeColor={{
-                      '0%': '#10b981',
-                      '100%': '#059669',
-                    }}
-                    showInfo={false}
-                    strokeWidth={12}
-                  />
-                </div>
-
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-700">Audience Retention</span>
-                    <span className="text-sm font-bold text-purple-600">87%</span>
-                  </div>
-                  <Progress 
-                    percent={87} 
-                    strokeColor={{
-                      '0%': '#a855f7',
-                      '100%': '#7c3aed',
-                    }}
-                    showInfo={false}
-                    strokeWidth={12}
-                  />
-                </div>
-              </div>
-
-              {/* Quick Stats Row */}
-              <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">{formatNumber(channel.averageViewsPerVideo)}</p>
-                  <p className="text-xs text-gray-500 mt-1">Avg. Views</p>
-                </div>
-                <div className="text-center border-x border-gray-200">
-                  <p className="text-2xl font-bold text-gray-900">{formatNumber(channel.recentViews)}</p>
-                  <p className="text-xs text-gray-500 mt-1">Recent Views</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">{channel.videoCount}</p>
-                  <p className="text-xs text-gray-500 mt-1">Total Videos</p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* 📺 CHANNEL PREVIEW SECTION */}
-            {channel.imageUrls && channel.imageUrls.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-white rounded-2xl shadow-md p-6 border border-gray-100"
-              >
-                <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <VideoCameraOutlined className="text-red-500 text-2xl" />
-                  Channel Preview & Screenshots
-                </h3>
-
-                {/* Main Image Display */}
-                <div className="relative mb-6 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 shadow-lg" style={{ height: '300px', }}>
-                  <Image
-                    src={channel.imageUrls[currentImageIndex]}
-                    alt={`Preview ${currentImageIndex + 1}`}
-                    className="w-full h-full object-contain"
-                    preview={{
-                      src: channel.imageUrls[currentImageIndex]
-                    }}
-                  />
-                  
-                  {/* Image Counter Badge */}
-                  <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium">
-                    {currentImageIndex + 1} / {channel.imageUrls.length}
-                  </div>
-                </div>
-
-                {/* Thumbnail Navigation */}
-                <div className="flex gap-3 overflow-x-auto pb-2">
-                  {channel.imageUrls.map((img, index) => (
-                    <motion.div
-                      key={index}
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={`flex-shrink-0 w-24 h-24 md:w-28 md:h-28 rounded-xl overflow-hidden cursor-pointer border-3 transition-all ${
-                        currentImageIndex === index
-                          ? 'border-blue-500 shadow-xl ring-2 ring-blue-200'
-                          : 'border-gray-300 opacity-60 hover:opacity-100 hover:border-blue-300'
-                      }`}
-                    >
-                      <img
-                        src={img}
-                        alt={`Thumbnail ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </motion.div>
+            {/* Other channels from this seller */}
+            {sellerChannels.length > 0 && (
+              <div className="bg-transparent pt-4">
+                <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Other channels from this Seller</h4>
+                <div className="space-y-4">
+                  {sellerChannels.map(c => (
+                    <ChannelCard key={c._id} channel={c} />
                   ))}
                 </div>
-
-                {/* YouTube Link Button */}
-                {channel.customUrl && (
-                  <a
-                    href={channel.customUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-6 block"
-                  >
-                    <Button
-                      type="primary"
-                      size="large"
-                      icon={<YoutubeOutlined />}
-                      className="w-full font-semibold"
-                      style={{
-                        background: 'linear-gradient(135deg, #FF0000 0%, #CC0000 100%)',
-                        border: 'none',
-                        height: '48px'
-                      }}
-                    >
-                      🎥 View Full Channel on YouTube
-                    </Button>
-                  </a>
-                )}
-              </motion.div>
+              </div>
             )}
 
-            {/* 📋 CHANNEL DETAILS PANEL */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="bg-white rounded-2xl shadow-md p-6 border border-gray-100"
-            >
-              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <GlobalOutlined className="text-blue-500" />
-                Channel Information
-              </h3>
-              
-              <div className="space-y-4">
-                {/* Joined Date */}
-                <div className="flex items-center justify-between py-3 border-b border-gray-100 hover:bg-gray-50 px-3 rounded-lg transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-100 rounded-lg p-2">
-                      <CalendarOutlined className="text-blue-600 text-lg" />
-                    </div>
-                    <span className="text-gray-700 font-medium">Joined Date</span>
-                  </div>
-                  <span className="font-bold text-gray-900">
-                    {new Date(channel.joinedDate).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </span>
-                </div>
+          </div>
 
-                {/* Country */}
-                <div className="flex items-center justify-between py-3 border-b border-gray-100 hover:bg-gray-50 px-3 rounded-lg transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-green-100 rounded-lg p-2">
-                      <GlobalOutlined className="text-green-600 text-lg" />
-                    </div>
-                    <span className="text-gray-700 font-medium">Country</span>
-                  </div>
-                  <span className="font-bold text-gray-900">{channel.country}</span>
-                </div>
-
-                {/* Channel Type */}
-                <div className="flex items-center justify-between py-3 border-b border-gray-100 hover:bg-gray-50 px-3 rounded-lg transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-purple-100 rounded-lg p-2">
-                      <VideoCameraOutlined className="text-purple-600 text-lg" />
-                    </div>
-                    <span className="text-gray-700 font-medium">Channel Type</span>
-                  </div>
-                  <span className="font-bold text-gray-900">{channel.channelType}</span>
-                </div>
-
-                {/* Language */}
-                <div className="flex items-center justify-between py-3 border-b border-gray-100 hover:bg-gray-50 px-3 rounded-lg transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-cyan-100 rounded-lg p-2">
-                      <GlobalOutlined className="text-cyan-600 text-lg" />
-                    </div>
-                    <span className="text-gray-700 font-medium">Language</span>
-                  </div>
-                  <span className="font-bold text-gray-900">{channel.my_language}</span>
-                </div>
-
-                {/* Copyright Strikes */}
-                <div className="flex items-center justify-between py-3 hover:bg-gray-50 px-3 rounded-lg transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className={`rounded-lg p-2 ${channel.copyrightStrike === '0' ? 'bg-green-100' : 'bg-red-100'}`}>
-                      <WarningOutlined className={`text-lg ${channel.copyrightStrike === '0' ? 'text-green-600' : 'text-red-600'}`} />
-                    </div>
-                    <span className="text-gray-700 font-medium">Copyright Strikes</span>
-                  </div>
-                  <Tag 
-                    color={channel.copyrightStrike === '0' ? 'green' : 'red'} 
-                    className="font-bold text-base px-4 py-1 rounded-lg"
-                  >
-                    {channel.copyrightStrike || 0}
-                  </Tag>
-                </div>
-              </div>
-            </motion.div>
-
-          {/* PURCHASE PANEL - Full Width */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-          >
-              {/* Main Purchase Card */}
-              <div className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-200 relative">
-                {/* Decorative gradient background */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-20 -mr-32 -mt-32"></div>
-                
-                <div className="relative">
-                  {/* Price Section */}
-                  <div className="mb-8 text-center">
-                    <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                      Asking Price
-                    </p>
-                    <div className="flex items-center justify-center gap-2 mb-3">
-                      <span className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                        ₹{parseInt(channel.price || 0).toLocaleString()}
-                      </span>
-                    </div>
-                    <Tag 
-                      color="blue" 
-                      className="text-sm font-semibold px-4 py-1.5 border-0"
-                      icon={<CheckCircleFilled />}
-                    >
-                      Verified Listing
-                    </Tag>
-                  </div>
-
-                  {/* Quick Stats */}
-                  <div className="mb-6 p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-                    <div className="space-y-3 text-sm">
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600 flex items-center gap-2">
-                          <UserOutlined className="text-blue-500" />
-                          Subscribers
-                        </span>
-                        <span className="font-bold text-gray-900">{formatNumber(channel.subscriberCount)}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600 flex items-center gap-2">
-                          <EyeOutlined className="text-green-500" />
-                          Total Views
-                        </span>
-                        <span className="font-bold text-gray-900">{formatNumber(channel.viewCount)}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-600 flex items-center gap-2">
-                          <DollarOutlined className="text-yellow-500" />
-                          Monthly Earnings
-                        </span>
-                        <span className="font-bold text-gray-900">₹{formatNumber(channel.estimatedEarnings || 0)}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="space-y-3">
-                    <Button
-                      type="primary"
-                      size="large"
-                      icon={<WhatsAppOutlined />}
-                      onClick={handleMakeOffer}
-                      className="w-full h-12 sm:h-14 font-semibold sm:font-bold text-sm sm:text-base whitespace-normal break-words"
-                      style={{
-                        background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-                        border: 'none',
-                        boxShadow: '0 4px 12px rgba(37, 211, 102, 0.3)',
-                      }}
-                    >
-                      💬 Make an Offer via WhatsApp
-                    </Button>
-
-                    <Button
-                      type={isInCart ? 'default' : 'primary'}
-                      size="large"
-                      icon={<ShoppingCartOutlined />}
-                      onClick={handleAddToCart}
-                      className="w-full h-12 sm:h-14 font-semibold sm:font-bold text-sm sm:text-base whitespace-normal break-words"
-                      style={
-                        !isInCart
-                          ? {
-                              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                              border: 'none',
-                              color: 'white',
-                              boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-                            }
-                          : {
-                              borderColor: '#d1d5db',
-                              color: '#6b7280'
-                            }
-                      }
-                    >
-                      {isInCart ? '✓ In Cart - Remove' : '🛒 Add to Cart'}
-                    </Button>
-
-                    <Button
-                      type="primary"
-                      size="large"
-                      icon={<ThunderboltOutlined />}
-                      onClick={handleBuyNow}
-                      loading={paymentLoading}
-                      className="w-full h-14 sm:h-16 font-bold sm:font-extrabold text-base sm:text-lg whitespace-normal break-words"
-                      style={{
-                        background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                        border: 'none',
-                        boxShadow: '0 8px 24px rgba(99, 102, 241, 0.4)',
-                      }}
-                    >
-                      ⚡ Buy Now - ₹{parseInt(channel.price || 0).toLocaleString()}
-                    </Button>
-                  </div>
-
-                  {/* Trust Badges */}
-                  <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
-                    <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                      <SafetyOutlined className="text-green-500 text-lg" />
-                      <span className="font-medium">🔒 Secure Payment via Razorpay</span>
-                    </div>
-                    <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                      <CheckCircleFilled className="text-blue-500" />
-                      <span className="font-medium">✅ Verified Channel Transfer</span>
-                    </div>
-                  </div>
-
-                  {/* Social Proof Badge */}
-                  <div className="mt-4 p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border border-orange-200">
-                    <div className="flex items-center justify-center gap-2 text-sm">
-                      <FireOutlined className="text-orange-500" />
-                      <span className="font-semibold text-gray-700">
-                        🔥 12 buyers viewed today
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Additional Info Card */}
-              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-200">
-                <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                  <TrophyOutlined className="text-yellow-500" />
-                  Why This Channel?
-                </h4>
-                <ul className="space-y-2 text-sm text-gray-700">
-                  {channel.monetized && (
-                    <li className="flex items-center gap-2">
-                      <CheckCircleFilled className="text-green-500" />
-                      <span>Fully Monetized & Revenue Ready</span>
-                    </li>
-                  )}
-                  {channel.organicGrowth && (
-                    <li className="flex items-center gap-2">
-                      <CheckCircleFilled className="text-blue-500" />
-                      <span>Organic Growth - No Fake Engagement</span>
-                    </li>
-                  )}
-                  <li className="flex items-center gap-2">
-                    <CheckCircleFilled className="text-purple-500" />
-                    <span>Active Audience & High Engagement</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircleFilled className="text-orange-500" />
-                    <span>Complete Ownership Transfer</span>
-                  </li>
-                </ul>
-              </div>
-          </motion.div>
         </div>
       </div>
     </div>

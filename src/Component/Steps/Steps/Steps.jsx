@@ -61,17 +61,17 @@ const PurchaseSteps = () => {
   const paymentMethods = ['Razorpay'];
 
   return (
-    <Card  className="rounded-3xl bg-white/70 backdrop-blur border border-white/70 shadow-xl relative overflow-hidden">
+    <Card className="rounded-3xl bg-white/70 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/70 dark:border-white/10 shadow-xl relative overflow-hidden text-gray-900 dark:text-gray-100 [&_.ant-steps-item-title]:dark:!text-gray-100 [&_.ant-steps-item-description]:dark:!text-gray-300 [&_.ant-steps-item-tail::after]:dark:!bg-white/10">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 -right-24 w-72 h-72 bg-rose-100/60 blur-3xl rounded-full" />
-        <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-orange-100/60 blur-3xl rounded-full" />
+        <div className="absolute -top-24 -right-24 w-72 h-72 bg-purple-100/60 blur-3xl rounded-full" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-100/60 blur-3xl rounded-full" />
       </div>
       <Title
         level={2}
         style={{
           textAlign: 'center',
           marginBottom: 22,
-          backgroundImage: 'linear-gradient(90deg, rgb(248,55,88), rgb(255,159,64))',
+          backgroundImage: 'linear-gradient(90deg, #7B61FF, #B88DFF)',
           WebkitBackgroundClip: 'text',
           backgroundClip: 'text',
           color: 'transparent',
@@ -81,7 +81,7 @@ const PurchaseSteps = () => {
       >
         Welcome to our platform!
       </Title>
-      <Paragraph style={{ fontSize: 16, marginBottom: 24, textAlign: 'center', color: '#374151' }}>
+      <Paragraph style={{ fontSize: 16, marginBottom: 24, textAlign: 'center', color: 'inherit' }}>
         Follow these simple steps to buy a YouTube channel seamlessly.
       </Paragraph>
       <Steps
@@ -91,10 +91,7 @@ const PurchaseSteps = () => {
             <span
               style={{
                 fontWeight: 700,
-                backgroundImage: 'linear-gradient(90deg, #111827, #374151)',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                color: 'transparent'
+                color: 'inherit'
               }}
             >
               {step.title}
@@ -102,7 +99,7 @@ const PurchaseSteps = () => {
           ),
           description: (
             <div>
-              <Paragraph style={{ marginBottom: 8, color: '#4B5563' }}>{step.description}</Paragraph>
+              <Paragraph style={{ marginBottom: 8, color: 'inherit' }}>{step.description}</Paragraph>
               {index === 3 && (
                 <ul style={{ paddingLeft: 0, display: 'grid', gap: 8 }}>
                   {paymentMethods.map((method, i) => (
@@ -114,8 +111,8 @@ const PurchaseSteps = () => {
                         width: 'fit-content',
                         padding: '6px 10px',
                         borderRadius: 12,
-                        backgroundColor: 'rgba(248,55,88,0.08)',
-                        color: 'rgb(248,55,88)',
+                        backgroundColor: 'rgba(110,75,255,0.08)',
+                        color: '#6E4BFF',
                         fontWeight: 600
                       }}
                     >
@@ -128,17 +125,17 @@ const PurchaseSteps = () => {
           ),
           icon: React.cloneElement(step.icon, {
             style: {
-              color: 'rgb(248, 55, 88)',
-              filter: 'drop-shadow(0 6px 14px rgba(248,55,88,0.35))',
+              color: '#6E4BFF',
+              filter: 'drop-shadow(0 6px 14px rgba(110,75,255,0.35))',
               transform: 'translateZ(0)'
             }
           })
         }))}
       />
-      <Paragraph style={{ marginTop: 20, textAlign: 'center', color: '#111827', fontWeight: 600 }}>
+      <Paragraph style={{ marginTop: 20, textAlign: 'center', color: 'inherit', fontWeight: 600 }}>
         Receive Further Assistance: Our team will review your message and assist you with the channel transfer process.
       </Paragraph>
-      <Paragraph style={{ marginTop: 6, textAlign: 'center', color: '#4B5563' }}>
+      <Paragraph style={{ marginTop: 6, textAlign: 'center', color: 'inherit' }}>
         Thank you for choosing our platform. If you have any questions or need further assistance, feel free to contact us!
       </Paragraph>
       <div className="w-full flex items-center justify-center mt-4">

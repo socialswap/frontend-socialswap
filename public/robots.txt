@@ -1,3 +1,10 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin/
+Disallow: /user/
+Disallow: /edit-channel/
+Disallow: /confirmation/
+Disallow: /payment/
+Disallow: /unauthorized
+
+Sitemap: https://www.socialswap.in/sitemap.xml

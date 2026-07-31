@@ -1,10 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import SEOHead from '../SEO/SEOHead';
 
 const NotFoundPage = () => {
     const navigate = useNavigate()
     return (
         <div className="min-h-screen flex items-center justify-center  p-4">
+      <SEOHead title="Page Not Found | SocialSwap" noIndex={true} />
             <div className="max-w-md w-full bg-white rounded-lg overflow-hidden">
                 <div className="p-8">
                     <h1 className="text-9xl font-bold text-red-500 text-center mb-4">404</h1>

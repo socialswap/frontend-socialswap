@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { 
   Play, 
   Users, 
-  DollarSign, 
+  IndianRupee, 
   ChevronDown, 
   ChevronUp,
   Eye,
@@ -11,6 +11,7 @@ import {
   RefreshCcw
 } from 'lucide-react';
 import axiosInstance, { api } from '../../API/api';
+import SEOHead from '../SEO/SEOHead';
 
 const StatusBadge = ({ status }) => {
   const statusConfig = {
@@ -87,10 +88,10 @@ const ChannelDetails = ({ channel }) => {
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                <DollarSign className="w-4 h-4" />
+                <IndianRupee className="w-4 h-4" />
                 <span>Est. Earnings</span>
               </div>
-              <p className="text-sm text-gray-900">${channel.estimatedEarnings.toLocaleString()}</p>
+              <p className="text-sm text-gray-900">₹{channel.estimatedEarnings.toLocaleString()}</p>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -157,7 +158,8 @@ const Orders = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4 flex items-center justify-center">
+      <div className="w-full p-4 flex items-center justify-center">
+      <SEOHead title="My Orders | SocialSwap" noIndex={true} />
         <RefreshCcw className="w-8 h-8 text-blue-500 animate-spin" />
       </div>
     );
@@ -165,8 +167,8 @@ const Orders = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-4xl mx-auto">
+      <div className="w-full p-4">
+        <div className="w-full">
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <h3 className="text-red-800 font-medium">Error</h3>
             <p className="text-red-600">{error}</p>
@@ -177,8 +179,8 @@ const Orders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="w-full p-4">
+      <div className="w-full">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">YouTube Channels</h1>
         
         {channels.length === 0 ? (
