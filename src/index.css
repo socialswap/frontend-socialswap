@@ -1,14 +1,6 @@
-@layer tailwind-base, antd, tailwind-components, tailwind-utilities;
-
-@layer tailwind-base {
-  @tailwind base;
-}
-@layer tailwind-components {
-  @tailwind components;
-}
-@layer tailwind-utilities {
-  @tailwind utilities;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ============================================================
    SocialSwap – Global Design System
