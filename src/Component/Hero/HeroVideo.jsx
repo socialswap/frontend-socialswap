@@ -27,7 +27,7 @@ const HeroVideo = () => {
   };
 
   return (
-    <section className="relative w-full py-16 md:py-24 px-4 flex justify-center bg-gradient-to-b from-[#110720] via-[#1A0E38]/50 to-transparent">
+    <section className="relative w-full py-8 md:py-24 px-4 flex justify-center bg-gradient-to-b from-[#110720] via-[#1A0E38]/50 to-transparent">
       
       {/* Top Gradient Connecting Blend */}
       <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-[#110720] to-transparent pointer-events-none z-0" />
@@ -36,12 +36,12 @@ const HeroVideo = () => {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl h-[400px] bg-gradient-to-r from-[#6E4BFF]/20 via-[#8A6CFF]/25 to-[#C6B4FF]/15 blur-[120px] rounded-full pointer-events-none z-0" />
 
       {/* Floating Glass Card Container */}
-      <div className="relative z-10 container mx-auto max-w-6xl rounded-[28px] p-6 md:p-10 bg-white/50 dark:bg-[#110C1F]/50 backdrop-blur-[24px] border border-white/60 dark:border-white/10 shadow-[0_20px_50px_rgba(110,75,255,0.15)]">
+      <div className="relative z-10 container mx-auto max-w-6xl rounded-[28px] p-4 sm:p-6 md:p-10 bg-white/50 dark:bg-[#110C1F]/50 backdrop-blur-[24px] border border-white/60 dark:border-white/10 shadow-[0_20px_50px_rgba(110,75,255,0.15)]">
         
         {/* Soft Ambient Purple Glow inside Card */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-[300px] bg-purple-primary/10 dark:bg-purple-600/15 blur-[100px] rounded-full pointer-events-none z-0" />
 
-        <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
+        <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-10">
           <motion.div 
             variants={containerVariants}
             initial="hidden"
@@ -51,20 +51,20 @@ const HeroVideo = () => {
           >
             <motion.span 
               variants={itemVariants}
-              className="inline-block py-1.5 px-4 rounded-full bg-purple-primary/10 text-purple-primary font-bold text-xs uppercase tracking-wider mb-4 border border-purple-primary/20 shadow-sm"
+              className="inline-block py-1.5 px-4 rounded-full bg-purple-primary/10 text-purple-primary font-bold text-xs uppercase tracking-wider mb-3 md:mb-4 border border-purple-primary/20 shadow-sm"
             >
               India's #1 Marketplace
             </motion.span>
             <motion.h1 
               variants={itemVariants}
-              className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6 leading-tight text-text-primary tracking-tight"
+              className="text-2xl sm:text-4xl md:text-5xl font-extrabold mb-3 md:mb-6 leading-tight text-text-primary tracking-tight"
             >
               Turn Your Channel <br />
               Into <span className="bg-clip-text text-transparent" style={{ backgroundImage: 'var(--btn-gradient)' }}>Real Value</span>
             </motion.h1>
             <motion.p 
               variants={itemVariants}
-              className="text-base md:text-lg text-text-secondary mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed font-normal"
+              className="text-sm md:text-lg text-text-secondary mb-6 md:mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed font-normal"
             >
               SocialSwap offers the safest, fastest, and most reliable way to buy and sell monetized YouTube channels with 100% Escrow Protection.
             </motion.p>

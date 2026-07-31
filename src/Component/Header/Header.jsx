@@ -169,11 +169,11 @@ const Header = () => {
     { label: 'Monetized', type: 'dropdown', monetized: 'monetized' },
     { label: 'Non-Monetized', type: 'dropdown', monetized: 'non-monetized' },
     { label: 'Sell Channel', path: '/user/upload-channel' },
-    { label: 'Services', path: '/services' },
-    { label: 'Tools', path: '/tools' }
+    { label: 'Services', path: '/services' }
   ];
 
   const moreOptions = [
+    { label: 'Tools', path: '/tools' },
     { label: 'Blogs', path: '/blogs' },
     { label: 'About', path: '/about' },
     { label: 'How to', path: '/how-to' },
