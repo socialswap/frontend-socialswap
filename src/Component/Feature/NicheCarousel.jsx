@@ -9,21 +9,21 @@ import {
 } from 'lucide-react';
 
 const niches = [
-  { id: 0,  title: 'Gaming',          icon: '/homelogos/gaming (1).png',          color: '#8B5CF6' },
-  { id: 1,  title: 'Education',       icon: '/homelogos/education (1).png',        color: '#10B981' },
-  { id: 2,  title: 'Fashion & Beauty',icon: '/homelogos/fashion & beauty (1).png', color: '#EC4899' },
-  { id: 3,  title: 'Tech',            icon: '/homelogos/tech (1).png',             color: '#3B82F6' },
-  { id: 4,  title: 'Entertainment',   icon: '/homelogos/entertainment (1).png',    color: '#F59E0B' },
-  { id: 5,  title: 'Business',        icon: '/homelogos/business (1).png',         color: '#84CC16' },
-  { id: 6,  title: 'Finance',         icon: '/homelogos/finance (1).png',          color: '#06B6D4' },
-  { id: 7,  title: 'Music',           icon: '/homelogos/music (1).png',            color: '#6366F1' },
-  { id: 8,  title: 'Vlogging',        icon: '/homelogos/Vlogging (1).png',         color: '#F43F5E' },
-  { id: 9,  title: 'Cooking',         icon: '/homelogos/cooking (1).png',          color: '#F97316' },
-  { id: 10, title: 'News',            icon: '/homelogos/news (1).png',             color: '#0EA5E9' },
-  { id: 11, title: 'Facts',           icon: '/homelogos/facts (1).png',            color: '#A855F7' },
-  { id: 12, title: 'Animation',       icon: '/homelogos/animation (1).png',        color: '#14B8A6' },
-  { id: 13, title: 'Podcast',         icon: '/homelogos/podcast (1).png',          color: '#EF4444' },
-  { id: 14, title: 'Real Estate',     icon: '/homelogos/real estate (1).png',      color: '#22C55E' },
+  { id: 0,  title: 'Gaming',          icon: '/homelogos/gaming (1).webp',          color: '#8B5CF6' },
+  { id: 1,  title: 'Education',       icon: '/homelogos/education (1).webp',        color: '#10B981' },
+  { id: 2,  title: 'Fashion & Beauty',icon: '/homelogos/fashion & beauty (1).webp', color: '#EC4899' },
+  { id: 3,  title: 'Tech',            icon: '/homelogos/tech (1).webp',             color: '#3B82F6' },
+  { id: 4,  title: 'Entertainment',   icon: '/homelogos/entertainment (1).webp',    color: '#F59E0B' },
+  { id: 5,  title: 'Business',        icon: '/homelogos/business (1).webp',         color: '#84CC16' },
+  { id: 6,  title: 'Finance',         icon: '/homelogos/finance (1).webp',          color: '#06B6D4' },
+  { id: 7,  title: 'Music',           icon: '/homelogos/music (1).webp',            color: '#6366F1' },
+  { id: 8,  title: 'Vlogging',        icon: '/homelogos/Vlogging (1).webp',         color: '#F43F5E' },
+  { id: 9,  title: 'Cooking',         icon: '/homelogos/cooking (1).webp',          color: '#F97316' },
+  { id: 10, title: 'News',            icon: '/homelogos/news (1).webp',             color: '#0EA5E9' },
+  { id: 11, title: 'Facts',           icon: '/homelogos/facts (1).webp',            color: '#A855F7' },
+  { id: 12, title: 'Animation',       icon: '/homelogos/animation (1).webp',        color: '#14B8A6' },
+  { id: 13, title: 'Podcast',         icon: '/homelogos/podcast (1).webp',          color: '#EF4444' },
+  { id: 14, title: 'Real Estate',     icon: '/homelogos/real estate (1).webp',      color: '#22C55E' },
 ];
 
 const N = niches.length;
@@ -89,7 +89,7 @@ const NicheCarousel = () => {
 
     const tween = gsap.to(progressObj.current, {
       value: 1,
-      duration: 14, // ← speed: lower = faster
+      duration: 28, // ← speed: higher = slower (was 14)
       repeat: -1,
       ease: 'none',
       onUpdate: () => {
@@ -234,7 +234,7 @@ const NicheCarousel = () => {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: `url('${isMobile ? '/homelogos/mobileBG (1).png' : '/homelogos/backgroundLogo (1).png'}')`,
+          backgroundImage: `url('${isMobile ? '/homelogos/mobileBG (1).webp' : '/homelogos/backgroundLogo (1).webp'}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -282,7 +282,7 @@ const NicheCarousel = () => {
 
       {/* ── Ticker Cards ────────────────────────────────────────────── */}
       {/* Cards are positioned relative to the CENTER of this container via GSAP x */}
-      <div className="absolute top-[33%] md:top-[27%] left-1/2 z-10 pointer-events-none">
+      <div className="absolute top-[33%] md:top-[40%] left-1/2 z-10 pointer-events-none">
         {niches.map((niche, i) => (
           <div
             key={niche.id}
@@ -345,7 +345,7 @@ const NicheCarousel = () => {
           onClick={() => navigate('/channels')}
         >
           <img
-            src="/homelogos/DiamandPlayButton.png"
+            src="/homelogos/DiamandPlayButton.webp"
             alt="Diamond Play Button"
             className="w-full h-auto drop-shadow-2xl"
             draggable={false}
