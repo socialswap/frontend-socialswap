@@ -16,7 +16,7 @@ import { motion } from 'framer-motion';
 import axiosInstance from '../../API/api';
 import useChatSounds from '../../Utils/useChatSounds';
 
-const SOCKET_URL = process.env.REACT_APP_API_URL || 'http://localhost:8090';
+const SOCKET_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND || 'http://localhost:8090';
 
 const Header = () => {
   const navigate = useNavigate();
