@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion, useMotionValue, useAnimationFrame } from 'framer-motion';
 
 const Carousel = ({ children, direction = 'left', speed = 1.0 }) => {

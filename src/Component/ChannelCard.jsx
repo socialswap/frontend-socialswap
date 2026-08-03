@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Tag, Tooltip, Badge, message } from "antd";
-import { EyeOutlined, UserOutlined, DollarOutlined, YoutubeOutlined, CheckCircleFilled, FireOutlined, VideoCameraOutlined } from "@ant-design/icons";
+import { Tag, Tooltip, message } from "antd";
+import { EyeOutlined, UserOutlined, YoutubeOutlined, CheckCircleFilled, FireOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axiosInstance from "../API/api";

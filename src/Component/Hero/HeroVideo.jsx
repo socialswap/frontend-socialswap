@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PlayCircleOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance, { api } from '../../API/api';
 

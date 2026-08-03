@@ -14,13 +14,6 @@ const BestForBeginners = () => {
       try {
         const response = await axiosInstance.get(`${API_BASE_URL}/channels`);
         const payload = response?.data ?? {};
-        let list = Array.isArray(payload?.channels)
-          ? payload.channels
-          : Array.isArray(payload)
-          ? payload
-          : [];
-        
-        // Sort by price ascending (cheapest first) for "Beginners"
         
         // Sort by price ascending and take top 8 for "Beginners"
         const sortedList = (payload.channels || [])

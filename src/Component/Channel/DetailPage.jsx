@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Tag, Button, message, Image, Progress } from 'antd';
+import { message, Image } from 'antd';
 import {
-  UserOutlined, EyeOutlined, VideoCameraOutlined, WhatsAppOutlined, 
-  ShoppingCartOutlined, CheckCircleFilled, GlobalOutlined, CalendarOutlined,
-  DollarOutlined, SafetyOutlined, FireOutlined, ClockCircleOutlined,
-  YoutubeOutlined, ThunderboltOutlined, RiseOutlined,
-  TrophyOutlined, LineChartOutlined, HeartOutlined, MessageOutlined,
-  PlaySquareOutlined, ShareAltOutlined, CopyOutlined, CheckOutlined
+  UserOutlined, WhatsAppOutlined, 
+  CheckCircleFilled, GlobalOutlined,
+  SafetyOutlined,
+  YoutubeOutlined, HeartOutlined, MessageOutlined,
+  ShareAltOutlined, CopyOutlined, CheckOutlined
 } from '@ant-design/icons';
 import axiosInstance, { api } from '../../API/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,7 +16,6 @@ import ChannelCard from '../ChannelCard';
 const DetailPage = ({ channel: initialChannel, refreshData }) => {
   const [channel, setChannel] = useState(initialChannel);
   const [isInCart, setIsInCart] = useState(false);
-  const [paymentLoading, setPaymentLoading] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [relatedChannels, setRelatedChannels] = useState([]);
   const [sellerChannels, setSellerChannels] = useState([]);
@@ -92,11 +90,6 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
     catch (error) { return null; }
   };
 
-  const handleMakeOffer = () => {
-    const msg = encodeURIComponent(`Hello, I'm interested in buying the YouTube channel "${channel.name}" (ID: ${channel._id}). Can we discuss the details?`);
-    window.open(`https://wa.me/+919423523291?text=${msg}`, '_blank');
-  };
-
   const handleAddToCart = async () => {
     if (!localStorage.getItem('token')) return navigate('/login');
     try {
@@ -114,7 +107,6 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
 
   const handleBuyNow = async () => {
     if (!channel) return message.error('Channel data not available');
-    setPaymentLoading(true);
     try {
         const user = decodeToken();
         const paymentResponse = await axiosInstance.post(`${api}/create-order`, {
@@ -132,7 +124,6 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
             } else message.error('No redirect URL found');
         } else message.error('Failed to create payment order');
     } catch (error) { message.error('Payment processing failed'); }
-    finally { setPaymentLoading(false); }
   };
 
   if (!channel) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;

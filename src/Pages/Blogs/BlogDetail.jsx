@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Typography, Skeleton, Button, message } from 'antd';
 import axiosInstance, { api } from '../../API/api';
-import { motion } from 'framer-motion';
 import SEOHead from '../../Component/SEO/SEOHead';
 
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 const BASE_URL = 'https://www.socialswap.in';
 
 const BlogDetail = () => {
