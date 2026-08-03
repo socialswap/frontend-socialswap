@@ -177,11 +177,6 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
               alt="avatar"
               className="w-8 h-8 rounded-full border-2 border-white/40 dark:border-white/10 object-cover"
             />
-            {channel.monetized && (
-              <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1">
-                <DollarOutlined className="text-white text-[10px]" />
-              </div>
-            )}
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-1.5">
@@ -192,12 +187,14 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
                 <CheckCircleFilled className="text-blue-500 text-xs flex-shrink-0" />
               )}
             </div>
-            <Tag
-              color={channel.monetized ? "green" : "default"}
-              className="rounded text-[10px] py-0 px-1 mt-0.5 border-none bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400"
-            >
-              {channel.monetized ? "✓ Monetized" : "Not Monetized"}
-            </Tag>
+            {channel.monetized && (
+              <Tag
+                color="green"
+                className="rounded text-[10px] py-0 px-1 mt-0.5 border-none bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+              >
+                ✓ Monetized
+              </Tag>
+            )}
           </div>
         </div>
 
@@ -331,19 +328,6 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
           </motion.button>
         </div>
 
-        {/* Hot Deal Pulsing Badge */}
-        {channel.mostDemanding && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="mt-3 text-center"
-          >
-            <Tag color="orange" className="font-semibold animate-pulse">
-              🔥 Hot Deal - High Demand
-            </Tag>
-          </motion.div>
-        )}
       </div>
     </motion.div>
   );
