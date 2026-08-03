@@ -150,7 +150,7 @@ const BlogDetail = () => {
         faqSchema={faqSchema}
       />
 
-      <div className="relative min-h-screen bg-gray-50 dark:bg-[#120a27] text-gray-900 dark:text-white pt-24 pb-16 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-300">
+      <div className="relative min-h-screen bg-gray-50 dark:bg-[#120a27] text-gray-900 dark:text-white pt-24 pb-16 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-300 overflow-x-hidden">
         {/* HEADER & COVER IMAGE (Full width top section) */}
         <div className="max-w-7xl mx-auto mb-16">
              {/* Header */}
@@ -216,8 +216,53 @@ const BlogDetail = () => {
           <main className="lg:col-span-7 pt-2">
 
              {/* Content */}
-             <div className="prose prose-lg max-w-none text-[#374151] dark:text-gray-300 prose-headings:font-bold prose-headings:text-[#111827] dark:prose-headings:text-white prose-a:text-red-500 hover:prose-a:text-red-600 prose-img:rounded-xl dark:prose-strong:text-white">
-               <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+             <style>{`
+               .blog-html-content * {
+                 max-width: 100% !important;
+                 overflow-x: hidden !important;
+                 box-sizing: border-box !important;
+               }
+               .blog-html-content p,
+               .blog-html-content li,
+               .blog-html-content span,
+               .blog-html-content div {
+                 text-align: left !important;
+                 word-break: break-word !important;
+                 overflow-wrap: break-word !important;
+                 white-space: normal !important;
+               }
+               .blog-html-content h1,
+               .blog-html-content h2,
+               .blog-html-content h3,
+               .blog-html-content h4,
+               .blog-html-content h5,
+               .blog-html-content h6 {
+                 text-align: left !important;
+                 word-break: break-word !important;
+               }
+               .blog-html-content img {
+                 max-width: 100% !important;
+                 height: auto !important;
+                 border-radius: 12px;
+               }
+               .blog-html-content table {
+                 width: 100% !important;
+                 display: block;
+                 overflow-x: auto;
+               }
+               .blog-html-content pre,
+               .blog-html-content code {
+                 max-width: 100% !important;
+                 overflow-x: auto !important;
+                 white-space: pre-wrap !important;
+                 word-break: break-word !important;
+               }
+               .blog-html-content iframe {
+                 max-width: 100% !important;
+               }
+             `}</style>
+             <div className="prose prose-lg max-w-none text-[#374151] dark:text-gray-300 prose-headings:font-bold prose-headings:text-[#111827] dark:prose-headings:text-white prose-a:text-red-500 hover:prose-a:text-red-600 prose-img:rounded-xl dark:prose-strong:text-white overflow-x-hidden">
+               <div className="blog-html-content" dangerouslySetInnerHTML={{ __html: blog.content }} />
              </div>
 
              {/* Tags */}
