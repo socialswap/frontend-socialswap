@@ -118,7 +118,7 @@ const TopChannelsCarousel = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <Carousel>
+              <Carousel direction="right" speed={1.0}>
                 {topChannels.map((channel) => (
                   <ChannelCard key={channel?._id} channel={channel} />
                 ))}

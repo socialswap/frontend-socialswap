@@ -29,12 +29,12 @@ import { api } from '../../API/api';
 import AdminChannels from './AdminChannels';
 import AdminTransactions from './AdminTransactions';
 import AdminChat from './AdminChat';
-import AdminBanners from './AdminBanners';
 import AdminBlogs from './AdminBlogs';
 import AdminDeals from './AdminDeals';
 import AdminServices from './AdminServices';
 import AdminUserChannels from './AdminUserChannels';
 import AdminTestimonials from './AdminTestimonials';
+import AdminHomeVideo from './AdminHomeVideo';
 import SEOHead from '../../Component/SEO/SEOHead';
 
 const { Option } = Select;
@@ -346,11 +346,6 @@ const AdminDashboard = () => {
       children: <AdminDeals />,
     },
     {
-      key: 'banners',
-      label: 'Poster Management',
-      children: <AdminBanners isEmbedded={true} />,
-    },
-    {
       key: 'blogs',
       label: 'Blog Management',
       children: <AdminBlogs isEmbedded={true} />,
@@ -369,6 +364,11 @@ const AdminDashboard = () => {
       key: 'testimonials',
       label: 'Testimonials',
       children: <AdminTestimonials isEmbedded={true} />,
+    },
+    {
+      key: 'home_video',
+      label: 'Home Video',
+      children: <AdminHomeVideo />,
     },
   ];
 

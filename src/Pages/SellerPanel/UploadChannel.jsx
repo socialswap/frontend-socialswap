@@ -206,8 +206,8 @@ export default function UploadChannel() {
   const handleImages = async (e) => {
     const files = Array.from(e.target.files);
     const totalCount = existingImages.length + images.length + files.length;
-    if (totalCount > 4) {
-      setError('Maximum 4 channel screenshots allowed');
+    if (totalCount > 10) {
+      setError('Maximum 10 channel screenshots allowed');
       return;
     }
     setLoading(true);
@@ -265,7 +265,7 @@ export default function UploadChannel() {
     if (step === 3) {
       const totalScreenshots = existingImages.length + images.length;
       if (totalScreenshots < 2) errors.images = 'At least 2 channel screenshots required';
-      if (totalScreenshots > 4) errors.images = 'Maximum 4 channel screenshots allowed';
+      if (totalScreenshots > 10) errors.images = 'Maximum 10 channel screenshots allowed';
     }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -691,7 +691,7 @@ export default function UploadChannel() {
                   {/* Channel Screenshots */}
                   <div>
                     <p className="text-xs font-semibold text-gray-500 dark:text-white/50 mb-2">
-                      Channel Screenshots <span className="font-normal text-gray-400 dark:text-white/30">(2–4 images required)</span>
+                      Channel Screenshots <span className="font-normal text-gray-400 dark:text-white/30">(2–10 images required)</span>
                     </p>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-2">
                       {imagePreviews.map((src, i) => (
@@ -703,7 +703,7 @@ export default function UploadChannel() {
                           ><X size={12} /></button>
                         </div>
                       ))}
-                      {(existingImages.length + images.length) < 4 && (
+                      {(existingImages.length + images.length) < 10 && (
                         <label className={`flex flex-col items-center justify-center gap-1.5 aspect-video border-2 border-dashed rounded-xl cursor-pointer transition-all text-xs font-medium
                           ${fieldErrors.images ? 'border-red-500/40 text-red-400' : 'border-gray-300 dark:border-white/[0.12] hover:border-purple-500 hover:bg-purple-500/[0.06] text-gray-400 dark:text-white/30 hover:text-purple-400'}`}>
                           <Upload size={18} />

@@ -132,11 +132,11 @@ const HomePage = () => {
         ogType="website"
         structuredData={[websiteSchema, orgSchema]}
         preloadImages={[
-          '/homelogos/DiamandPlayButton.png',
-          '/homelogos/mobileBG (1).png',
-          '/homelogos/backgroundLogo (1).png',
-          '/homelogos/gaming (1).png',
-          '/homelogos/education (1).png'
+          '/homelogos/DiamandPlayButton.webp',
+          '/homelogos/mobileBG (1).webp',
+          '/homelogos/backgroundLogo (1).webp',
+          '/homelogos/gaming (1).webp',
+          '/homelogos/education (1).webp'
         ]}
       />
       

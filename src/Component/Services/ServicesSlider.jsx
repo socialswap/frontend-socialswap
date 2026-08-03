@@ -58,6 +58,9 @@ const ServicesSlider = () => {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 2000,
+    draggable: true,
+    swipeToSlide: true,
+    touchMove: true,
     prevArrow: <SlickArrowLeft />,
     nextArrow: <SlickArrowRight />,
     responsive: [

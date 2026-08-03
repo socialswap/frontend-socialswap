@@ -1,11 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PlayCircleOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance, { api } from '../../API/api';
 
 const HeroVideo = () => {
   const navigate = useNavigate();
+  const [videoUrl, setVideoUrl] = useState("https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ");
+
+  useEffect(() => {
+    const fetchVideo = async () => {
+      try {
+        const res = await axiosInstance.get(`${api}/home-video`);
+        if (res.data.success && res.data.url) {
+          setVideoUrl(res.data.url);
+        }
+      } catch (error) {
+        console.error("Failed to fetch home video", error);
+      }
+    };
+    fetchVideo();
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -98,7 +114,7 @@ const HeroVideo = () => {
             <div className="w-full h-full rounded-2xl overflow-hidden shadow-inner">
               <iframe
                 className="w-full h-full"
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ"
+                src={videoUrl}
                 title="SocialSwap Info Video"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

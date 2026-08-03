@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, useMotionValue, useAnimationFrame } from 'framer-motion';
 
-const Carousel = ({ children }) => {
+const Carousel = ({ children, direction = 'left', speed = 1.0 }) => {
   const childCount = React.Children.count(children);
   const ITEM_WIDTH = 312; // 288 card + 24 gap
   const singleSetWidth = childCount * ITEM_WIDTH;
@@ -27,8 +27,11 @@ const Carousel = ({ children }) => {
     
     // Auto scroll when not interacting
     if (!isDragging && !isHovered) {
-      // 2.0 ensures exactly 2 pixels per frame at 60fps, which prevents subpixel jitter while being faster
-      currentX -= 2.0 * (delta / 16); 
+      if (direction === 'right') {
+        currentX += speed * (delta / 16);
+      } else {
+        currentX -= speed * (delta / 16);
+      }
     }
     
     // Always wrap if out of bounds (handles drag overshoots too)

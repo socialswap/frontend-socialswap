@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, useMotionValue, useAnimationFrame } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 const categories = [
@@ -37,29 +37,67 @@ const CategoryMarquee = () => {
   const bottomCategories = categories.slice(half);
 
   const MarqueeRow = ({ items, direction = 'left' }) => {
-    // Duplicate items to ensure smooth infinite scrolling
-    const scrollItems = [...items, ...items, ...items];
+    const [isDragging, setIsDragging] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+    const containerRef = useRef(null);
+    const [setWidth, setSetWidth] = useState(0);
+
+    // Duplicate 4 times to ensure a massive safe scroll buffer for dragging
+    const scrollItems = [...items, ...items, ...items, ...items];
+    const x = useMotionValue(0);
+
+    useEffect(() => {
+      if (containerRef.current) {
+        const singleW = containerRef.current.scrollWidth / 4;
+        setSetWidth(singleW);
+        x.set(-singleW * 2); // Start in the safe middle zone
+      }
+    }, [items, x]);
+
+    useAnimationFrame((t, delta) => {
+      if (setWidth === 0) return;
+      let currentX = x.get();
+      
+      // Auto scroll when not interacting
+      if (!isDragging && !isHovered) {
+        currentX += direction === 'left' ? -(delta / 16) * 1.2 : (delta / 16) * 1.2;
+      }
+      
+      // Infinite wrapping logic
+      if (currentX <= -setWidth * 3) {
+        currentX += setWidth;
+      } else if (currentX >= -setWidth) {
+        currentX -= setWidth;
+      }
+      
+      x.set(currentX);
+    });
+
     return (
-      <div className="flex overflow-hidden whitespace-nowrap mb-6 py-4">
+      <div 
+        className="flex overflow-hidden whitespace-nowrap mb-4 py-2"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         <motion.div
-          className="flex gap-8 px-4 items-center w-max"
-          animate={{
-            x: direction === 'left' ? ['0%', '-33.33%'] : ['-33.33%', '0%'],
-          }}
-          transition={{
-            repeat: Infinity,
-            ease: 'linear',
-            duration: 20, // Adjust speed here
-          }}
+          ref={containerRef}
+          className="flex gap-4 md:gap-6 px-2 items-center w-max cursor-grab active:cursor-grabbing"
+          style={{ x, touchAction: 'pan-y', willChange: 'transform' }}
+          drag="x"
+          dragConstraints={{ left: -setWidth * 3, right: 0 }}
+          dragElastic={0}
+          dragMomentum={false}
+          onDragStart={() => setIsDragging(true)}
+          onDragEnd={() => setIsDragging(false)}
         >
           {scrollItems.map((cat, idx) => (
             <div
               key={`${cat.name}-${idx}`}
               onClick={() => navigate(`/channels?category=${cat.name}`)}
-              className="flex flex-shrink-0 w-max items-center gap-4 bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/40 dark:border-white/10 shadow-card px-6 py-3 rounded-full cursor-pointer hover:border-purple-primary hover:shadow-[0_0_15px_rgba(110,75,255,0.3)] transition-all duration-300 transform hover:-translate-y-1"
+              className="flex flex-shrink-0 w-max items-center gap-3 bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/40 dark:border-white/10 shadow-sm px-5 py-2.5 rounded-full cursor-pointer hover:border-purple-primary hover:shadow-[0_0_15px_rgba(110,75,255,0.3)] transition-all duration-300 transform hover:-translate-y-1"
             >
-              <img src={cat.icon} alt={cat.name} className="w-10 h-10 object-contain drop-shadow-md" />
-              <span className="text-lg font-bold text-text-primary whitespace-nowrap">{cat.name}</span>
+              <img src={cat.icon} alt={cat.name} className="w-8 h-8 object-cover rounded-full bg-black/5 dark:bg-white/10 p-0.5 shadow-sm" />
+              <span className="text-sm md:text-base font-bold text-text-primary whitespace-nowrap">{cat.name}</span>
             </div>
           ))}
         </motion.div>

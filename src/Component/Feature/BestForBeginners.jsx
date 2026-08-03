@@ -123,7 +123,7 @@ const BestForBeginners = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <Carousel>
+              <Carousel direction="left" speed={1.0}>
                 {beginnerChannels.map((channel) => (
                   <ChannelCard key={channel?._id} channel={channel} />
                 ))}
