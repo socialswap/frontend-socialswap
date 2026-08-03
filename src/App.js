@@ -114,6 +114,18 @@ const AppContent = () => {
 
   React.useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
 
+  React.useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => {
+          console.log('[PWA] Service Worker registered with scope:', reg.scope);
+        })
+        .catch((err) => {
+          console.error('[PWA] Service Worker registration failed:', err);
+        });
+    }
+  }, []);
+
   const [showBanner, setShowBanner] = React.useState(false);
   const [showCookieBanner, setShowCookieBanner] = React.useState(false);
 
