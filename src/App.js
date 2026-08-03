@@ -128,6 +128,33 @@ const AppContent = () => {
 
   const [showBanner, setShowBanner] = React.useState(false);
   const [showCookieBanner, setShowCookieBanner] = React.useState(false);
+  const [unreadCount, setUnreadCount] = React.useState(0);
+
+  const fetchUnreadCount = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setUnreadCount(0);
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE}/chat/unread`, {
+        method: 'GET',
+        headers: { 'x-auth-token': token }
+      });
+      const data = await res.json();
+      if (data && data.success) {
+        setUnreadCount(data.unreadCount || 0);
+      }
+    } catch (err) {
+      console.error('Error fetching unread count:', err);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 5000); // Poll every 5 seconds
+    return () => clearInterval(interval);
+  }, [location.pathname]);
 
   React.useEffect(() => {
     if (!localStorage.getItem('cookieConsent')) {
@@ -244,15 +271,20 @@ const AppContent = () => {
         )}
 
         <Routes />
-        <MobileFooter />
+        <MobileFooter unreadCount={unreadCount} />
         {!isBlogPage && (
           <div className="fixed bottom-[5.5rem] md:bottom-8 right-4 md:right-8 z-[9999] flex flex-col gap-3 items-center">
             <div
               onClick={() => navigate('/user/chat')}
-              className="cursor-pointer w-10 h-10 bg-[#7C3AED] rounded-full flex justify-center items-center text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:scale-110 transition-transform"
+              className="relative cursor-pointer w-10 h-10 bg-[#7C3AED] rounded-full flex justify-center items-center text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:scale-110 transition-transform"
               title="Open Chat"
             >
               <MessageOutlined style={{ fontSize: '20px' }} />
+              {unreadCount > 0 && !(location.pathname.includes('/chat') || location.pathname.includes('/chats')) && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4.5 h-4.5 flex items-center justify-center border border-white dark:border-[#0d0b1a] animate-pulse">
+                  {unreadCount}
+                </span>
+              )}
             </div>
             <div className="hover:scale-110 transition-transform rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.15)] cursor-pointer">
               <WhatsappIcon
