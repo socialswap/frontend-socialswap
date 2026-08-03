@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Modal, message } from 'antd';
 import io from 'socket.io-client';
 import axiosInstance, { api } from '../../API/api';
@@ -35,7 +35,7 @@ const UserChat = () => {
   }
   const navigate = useNavigate();
   const location = useLocation();
-  const { playIncomingSound, playNotificationSound } = useChatSounds();
+  const { playIncomingSound } = useChatSounds();
   const [requestProcessed, setRequestProcessed] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState(null);
@@ -52,7 +52,29 @@ const UserChat = () => {
     };
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
-      <SEOHead title="Messages | SocialSwap" noIndex={true} />
+  }, []);
+
+  const fetchThread = useCallback(async () => {
+    try {
+      const res = await axiosInstance.get(`${api}/chat`);
+      if (res.data.success) {
+        setThread(res.data.thread);
+        setMessages(res.data.messages);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const fetchDeals = useCallback(async () => {
+    try {
+      const res = await axiosInstance.get(`${api}/deals`);
+      if (res.data.success) {
+        setDeals(res.data.deals);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   }, []);
 
   useEffect(() => {
@@ -67,7 +89,7 @@ const UserChat = () => {
     setSocket(newSocket);
     
     return () => newSocket.close();
-  }, []);
+  }, [userRole, navigate, fetchThread, fetchDeals]);
 
   useEffect(() => {
     if (socket && thread) {
@@ -96,7 +118,7 @@ const UserChat = () => {
         socket.off('message_updated');
       };
     }
-  }, [socket, thread]);
+  }, [socket, thread, currentUserId, playIncomingSound]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
@@ -120,28 +142,7 @@ const UserChat = () => {
     }
   }, [socket, thread, location.state, currentUserId, requestProcessed]);
 
-  const fetchThread = async () => {
-    try {
-      const res = await axiosInstance.get(`${api}/chat`);
-      if (res.data.success) {
-        setThread(res.data.thread);
-        setMessages(res.data.messages);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
-  const fetchDeals = async () => {
-    try {
-      const res = await axiosInstance.get(`${api}/deals`);
-      if (res.data.success) {
-        setDeals(res.data.deals);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !thread) return;
@@ -232,6 +233,7 @@ const UserChat = () => {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-[#f5f5f5] via-[#ffffff] to-[#fafafa] dark:bg-gradient-to-br dark:from-[#070312] dark:via-[#110824] dark:to-[#0D071C] pt-[100px] pb-10 px-4 sm:px-6 lg:px-8 font-sans">
+      <SEOHead title="Messages | SocialSwap" noIndex={true} />
       
       {/* Mobile Tab Navigation */}
       <div className="w-full max-w-7xl flex md:hidden mb-4 bg-white dark:bg-[#18112e] rounded-xl p-1 border border-gray-200 dark:border-purple-900/30 shadow-sm">

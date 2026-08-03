@@ -11,30 +11,30 @@ const AdminHomeVideo = () => {
   const [fetching, setFetching] = useState(true);
   const [currentVideo, setCurrentVideo] = useState('');
 
-  const fetchVideo = async () => {
-    try {
-      const res = await axiosInstance.get(`${api}/home-video`);
-      if (res.data.success) {
-        setCurrentVideo(res.data.url);
-        form.setFieldsValue({ url: res.data.url });
-      }
-    } catch (error) {
-      console.error('Error fetching home video:', error);
-      message.error('Failed to load current home video.');
-    } finally {
-      setFetching(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchVideo = async () => {
+      try {
+        const res = await axiosInstance.get(`${api}/home-video`);
+        if (res.data.success) {
+          setCurrentVideo(res.data.url);
+          form.setFieldsValue({ url: res.data.url });
+        }
+      } catch (error) {
+        console.error('Error fetching home video:', error);
+        message.error('Failed to load current home video.');
+      } finally {
+        setFetching(false);
+      }
+    };
     fetchVideo();
-  }, []);
+  }, [form]);
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
       // Basic extraction of video ID to form embed URL if full link is pasted
       let finalUrl = values.url;
+      // eslint-disable-next-line no-useless-escape
       const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
       const match = values.url.match(youtubeRegex);
       if (match && match[1]) {

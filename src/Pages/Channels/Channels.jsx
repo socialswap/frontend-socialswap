@@ -121,7 +121,7 @@ const Channels = () => {
       if (location.search) window.history.replaceState({}, document.title, location.pathname);
       return newFilters;
     });
-  }, [location.search]);
+  }, [location.search, location.pathname]);
 
   useEffect(() => {
     const fetchAllChannels = async () => {
@@ -230,15 +230,6 @@ const Channels = () => {
     return () => observer.disconnect();
   }, [filteredChannels.length]);
 
-  const toggleRangeFilter = (filterName, rangeValue) => {
-    setFilters(prev => {
-      const current = prev[filterName] || [];
-      const key = JSON.stringify(rangeValue);
-      const exists = current.some(r => JSON.stringify(r) === key);
-      return { ...prev, [filterName]: exists ? current.filter(r => JSON.stringify(r) !== key) : [...current, rangeValue] };
-    });
-  };
-
   const toggleFilter = (filterName, value) => {
     setFilters(prev => {
       const current = prev[filterName] || [];
@@ -250,11 +241,6 @@ const Channels = () => {
     setFilters({ category: [], subscribersRange: [], viewsRange: [], estimatedEarnings: [], priceRange: [], monetization: [], channelType: [] });
     setSearchTerm("");
     setSortBy("popularity");
-  };
-
-  const isRangeActive = (filterName, rangeValue) => {
-    const key = JSON.stringify(rangeValue);
-    return (filters[filterName] || []).some(r => JSON.stringify(r) === key);
   };
 
   const totalActive = Object.values(filters).reduce((sum, arr) => sum + arr.length, 0);

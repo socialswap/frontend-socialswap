@@ -301,7 +301,7 @@ const AdminChannels = () => {
               <img
                 key={index}
                 src={url}
-                alt={`Channel Image ${index + 1}`}
+                alt={`Screenshot ${index + 1}`}
                 style={{ width: '100px', marginRight: '10px' }}
               />
             ))}

@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { InputNumber, Select, Radio, Tooltip } from 'antd';
+import { InputNumber, Select, Radio } from 'antd';
 import { 
   CalculatorOutlined, 
   ArrowRightOutlined, 
   CheckCircleOutlined,
   ThunderboltOutlined,
-  DollarOutlined,
   SafetyCertificateOutlined,
   InfoCircleOutlined
 } from '@ant-design/icons';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import axiosInstance, { api } from '../../API/api';
 import SEOHead from '../../Component/SEO/SEOHead';
 
@@ -34,7 +34,6 @@ const FAQItem = ({ question, answer }) => {
 
 const ServiceDetail = () => {
   const { slug } = useParams();
-  const navigate = useNavigate();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);

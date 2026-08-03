@@ -1,14 +1,12 @@
 import React from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   UserOutlined,
   VideoCameraOutlined,
   TransactionOutlined,
   ShoppingOutlined,
-  LogoutOutlined,
-  MenuOutlined
+  LogoutOutlined
 } from '@ant-design/icons';
-import { Drawer, Button } from 'antd';
 import styled from 'styled-components';
 
 const LayoutContainer = styled.div`
@@ -171,8 +169,6 @@ const LogoutButton = styled.button`
 
 const ProfileLayout = ({ children }) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [drawerVisible, setDrawerVisible] = React.useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -195,7 +191,6 @@ const ProfileLayout = ({ children }) => {
           <NavItem 
             key={link.path} 
             to={link.path}
-            onClick={() => setDrawerVisible(false)}
           >
             {link.icon}
             {link.label}

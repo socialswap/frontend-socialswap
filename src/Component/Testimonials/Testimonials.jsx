@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Carousel } from 'antd';
+import { Carousel } from 'antd';
 import { StarFilled } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import axiosInstance, { api } from '../../API/api';
-
-const { Title } = Typography;
 
 const TestimonialCard = ({ testimonial }) => {
   return (
@@ -147,9 +145,9 @@ const Testimonials = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <Title level={2} className="text-text-primary text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-text-primary text-3xl md:text-4xl font-bold mb-4">
             What Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-primary to-fuchsia-500">Users Say</span>
-          </Title>
+          </h2>
           <div className="w-24 h-1.5 bg-gradient-to-r from-purple-primary to-fuchsia-500 mx-auto rounded-full"></div>
         </motion.div>
       </div>

@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { InputNumber, Select, Switch, Tooltip } from 'antd';
+import { InputNumber, Select, Switch } from 'antd';
 import { 
   SafetyCertificateOutlined, 
   ArrowRightOutlined, 
   CheckCircleOutlined,
   WarningOutlined,
   InfoCircleOutlined,
-  DollarOutlined,
   FundOutlined
 } from '@ant-design/icons';
 

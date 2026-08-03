@@ -1,5 +1,5 @@
 import React from 'react';
-import { Steps, Typography, Card, Button, Input } from 'antd';
+import { Steps, Typography, Card, Input } from 'antd';
 import { FormOutlined, MessageOutlined, CopyOutlined, ArrowRightOutlined, FileTextOutlined, TeamOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
@@ -39,15 +39,18 @@ const SellChannelSteps = () => {
           Click the "Continue" button, which will redirect you to our official channel dealers page.
           <br /><br />
           <a
-          href="https://wa.me/919423523291" target="_blank" style={{ backgroundColor: '#25D366', borderColor: '#25D366',color:'white', padding:'0.5rem', borderRadius:'0.5rem' }} rel="noopener noreferrer"  aria-label="Open WhatsApp to continue transfer"
-            type="primary"
-            icon={<ArrowRightOutlined />}
+            href="https://wa.me/919423523291" 
+            target="_blank" 
+            rel="noopener noreferrer"  
+            aria-label="Open WhatsApp to continue transfer"
             style={{
               backgroundImage: 'linear-gradient(90deg, #7B61FF, #B88DFF)',
+              color: 'white',
               border: 'none',
               boxShadow: '0 12px 30px rgba(110,75,255,0.25)',
-              padding:'0.5rem',
-              borderRadius:'8px'
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              display: 'inline-block'
             }}
           >
             Continue to Channel Dealers

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Modal, message, Form, Select, InputNumber } from 'antd';
 import io from 'socket.io-client';
 import axiosInstance, { api } from '../../API/api';
@@ -7,8 +7,6 @@ import { jwtDecode } from 'jwt-decode';
 import EmojiPicker from 'emoji-picker-react';
 import useChatSounds from '../../Utils/useChatSounds';
 import SEOHead from '../../Component/SEO/SEOHead';
-
-const { Option } = Select;
 
 const SOCKET_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND || 'http://localhost:8090';
 
@@ -22,17 +20,12 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
   const [searchChat, setSearchChat] = useState('');
   const [searchDeal, setSearchDeal] = useState('');
   const [channels, setChannels] = useState([]);
-  const [searchChannelTerm, setSearchChannelTerm] = useState('');
-  const [showChannelDropdown, setShowChannelDropdown] = useState(false);
   const [selectedDeal, setSelectedDeal] = useState(null);
   const [isDealModalVisible, setIsDealModalVisible] = useState(false);
 
   const [users, setUsers] = useState([]);
-  const [searchUserTerm, setSearchUserTerm] = useState('');
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
   
   const [socket, setSocket] = useState(null);
-  const [dealDetails, setDealDetails] = useState({ channelId: '', price: '', buyerId: '' });
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [form] = Form.useForm();
   const selectedSellerId = Form.useWatch('sellerId', form);
@@ -53,7 +46,6 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
     };
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
-      <SEOHead title="Admin Chat | SocialSwap" noIndex={true} />
   }, []);
   
   useEffect(() => {
@@ -96,6 +88,37 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
   }
   const navigate = useNavigate();
   const location = useLocation();
+
+  const fetchThreads = useCallback(async () => {
+    try {
+      const res = await axiosInstance.get(`${api}/admin/chats`);
+      if (res.data.success) setThreads(res.data.threads);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const fetchDeals = async () => {
+    try {
+      const res = await axiosInstance.get(`${api}/admin/deals`);
+      if (res.data.success) setDeals(res.data.deals);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchAvailableChannels = async () => {
+    // Only fetch globally if needed elsewhere, but we fetch by seller now
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const res = await axiosInstance.get(`${api}/users`);
+      if (res.data) setUsers(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     if (location.state?.prefillDeal) {
@@ -204,7 +227,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
       newSocket.off('message_updated');
       newSocket.close();
     };
-  }, []);
+  }, [currentUserId, playIncomingSound, playNotificationSound, fetchThreads]);
 
   // Keep activeThreadRef in sync so the socket closure can read the latest value
   useEffect(() => {
@@ -216,7 +239,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
       socket.emit('join_thread', activeThread._id);
       socket.emit('mark_read', { threadId: activeThread._id, userId: currentUserId });
     }
-  }, [activeThread, socket]);
+  }, [activeThread, socket, currentUserId]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -224,36 +247,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
     }
   }, [messages]);
 
-  const fetchThreads = async () => {
-    try {
-      const res = await axiosInstance.get(`${api}/admin/chats`);
-      if (res.data.success) setThreads(res.data.threads);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
-  const fetchDeals = async () => {
-    try {
-      const res = await axiosInstance.get(`${api}/admin/deals`);
-      if (res.data.success) setDeals(res.data.deals);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const fetchAvailableChannels = async () => {
-    // Only fetch globally if needed elsewhere, but we fetch by seller now
-  };
-
-  const fetchUsers = async () => {
-    try {
-      const res = await axiosInstance.get(`${api}/users`);
-      if (res.data) setUsers(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const loadThread = async (thread) => {
     try {
@@ -267,7 +261,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
     }
   };
 
-  const loadThreadByUserId = async (userId) => {
+  const loadThreadByUserId = useCallback(async (userId) => {
     try {
       const res = await axiosInstance.get(`${api}/admin/chats/user/${userId}`);
       if (res.data.success) {
@@ -278,13 +272,13 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [fetchThreads]);
 
   useEffect(() => {
     if (prefillUserId) {
       loadThreadByUserId(prefillUserId);
     }
-  }, [prefillUserId]);
+  }, [prefillUserId, loadThreadByUserId]);
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !activeThread) return;
@@ -386,6 +380,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
 
   return (
     <div className={`flex flex-col justify-center items-center bg-gradient-to-br from-[#f5f5f5] via-[#ffffff] to-[#fafafa] dark:bg-gradient-to-br dark:from-[#070312] dark:via-[#110824] dark:to-[#0D071C] font-sans ${isEmbedded ? 'w-full h-full p-0 bg-transparent dark:bg-transparent' : 'min-h-screen pt-[100px] pb-10 px-4 sm:px-6 lg:px-8'}`}>
+      <SEOHead title="Admin Chat | SocialSwap" noIndex={true} />
 
       {/* ── Live in-app notification toasts ─────────────────────────────────
           These fire immediately via global_notification socket event,

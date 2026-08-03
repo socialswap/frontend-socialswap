@@ -300,9 +300,7 @@ const GrowChannelTimeline = () => {
   const itemRefs = useRef([]);
   const containerRef = useRef(null);
 
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
+
 
   const handleOk = () => {
     form.submit();
@@ -354,7 +352,6 @@ const GrowChannelTimeline = () => {
     );
     itemRefs.current.forEach((el) => el && observer.observe(el));
     return () => observer.disconnect();
-      <SEOHead title="Grow Your Channel | SocialSwap" description="Expert tips and strategies to grow your YouTube channel." />
   }, []);
 
   const handleMouseMove = (e, index) => {
@@ -383,6 +380,7 @@ const GrowChannelTimeline = () => {
 
   return (
     <PageWrapper>
+      <SEOHead title="Grow Your Channel | SocialSwap" description="Expert tips and strategies to grow your YouTube channel." />
       <ParallaxLayer size={360} left="5%" top="12%" colorStart="#b5d6ff" colorEnd="#8fb5ff" opacity={0.25} duration={22} />
       <ParallaxLayer size={240} left="78%" top="20%" colorStart="#ffd6e7" colorEnd="#ff9fc0" opacity={0.22} duration={18} />
       <ParallaxLayer size={300} left="72%" top="68%" colorStart="#c6fff2" colorEnd="#8ef5e4" opacity={0.22} duration={26} />
