@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Youtube, PlusSquare, Server, MessageSquare, LogIn, User } from 'lucide-react';
 
-const MobileFooter = () => {
+const MobileFooter = ({ unreadCount = 0 }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -76,6 +76,11 @@ const MobileFooter = () => {
                   className="transition-all duration-200"
                   style={{ color: active ? 'var(--purple-primary)' : 'var(--text-secondary)' }}
                 />
+                {item.label === 'Chats' && unreadCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[8px] font-bold rounded-full w-4 h-4 flex items-center justify-center border border-[var(--bg-primary)] animate-pulse">
+                    {unreadCount}
+                  </span>
+                )}
               </div>
               <span 
                 className="text-[11px] font-medium tracking-wide transition-all duration-200"
