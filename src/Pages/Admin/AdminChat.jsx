@@ -147,6 +147,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
         if (isActiveThread) {
           // Admin is already looking at this chat → soft incoming ping
           playIncomingSound();
+          newSocket.emit('mark_read', { threadId: msgThreadId, userId: currentUserId });
         } else {
           // Message is for a different (or no) thread → alert notification
           playNotificationSound();
@@ -213,6 +214,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
   useEffect(() => {
     if (activeThread && socket) {
       socket.emit('join_thread', activeThread._id);
+      socket.emit('mark_read', { threadId: activeThread._id, userId: currentUserId });
     }
   }, [activeThread, socket]);
 

@@ -72,9 +72,11 @@ const UserChat = () => {
   useEffect(() => {
     if (socket && thread) {
       socket.emit('join_thread', thread._id);
+      socket.emit('mark_read', { threadId: thread._id, userId: currentUserId });
       
       socket.on('receive_message', (msg) => {
         setMessages((prev) => [...prev, msg]);
+        socket.emit('mark_read', { threadId: thread._id, userId: currentUserId });
 
         // Determine sender — play sound only for messages from the other side
         const senderId = msg.sender?._id || msg.sender;
