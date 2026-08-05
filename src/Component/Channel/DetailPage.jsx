@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { message, Image } from 'antd';
 import {
@@ -111,6 +111,23 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
   
   const [showShare, setShowShare] = useState(false);
   const [copied, setCopied] = useState(false);
+  const shareRef = useRef(null);
+
+  // Close share dropdown when clicking outside
+  useEffect(() => {
+    if (!showShare) return;
+    const handleClickOutside = (e) => {
+      if (shareRef.current && !shareRef.current.contains(e.target)) {
+        setShowShare(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [showShare]);
   const { username } = useParams();
   const navigate = useNavigate();
 
@@ -244,66 +261,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
             {/* Header Box (New YouTube Style Layout) */}
             <div className="bg-white/65 dark:bg-[#110C1F]/65 backdrop-blur-[20px] rounded-card p-6 shadow-card border border-white/60 dark:border-white/15 relative">
               
-              {/* Top Right Share & WhatsApp */}
-              <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
-                
-                {/* Regular Share Button */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowShare(v => !v)}
-                    className="w-9 h-9 flex items-center justify-center rounded-full bg-white/50 dark:bg-white/5 border border-white/60 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:text-[#6E4BFF] transition shadow-sm active:scale-95"
-                    title="Share this channel"
-                  >
-                    <ShareAltOutlined className="text-base" />
-                  </button>
 
-                  {/* Share Dropdown */}
-                  <AnimatePresence>
-                    {showShare && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 8 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 8 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute top-12 right-0 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-4 z-50"
-                      >
-                        <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Share this channel</p>
-                        
-                        {/* Copy Link */}
-                        <button
-                          onClick={() => {
-                            const url = `https://www.socialswap.in/channel/${channel.customUrl || channel._id}`;
-                            navigator.clipboard.writeText(url).then(() => {
-                              setCopied(true);
-                              message.success('Link copied!');
-                              setTimeout(() => setCopied(false), 2000);
-                            });
-                          }}
-                          className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition text-left"
-                        >
-                          <span className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-600">
-                            {copied ? <CheckOutlined /> : <CopyOutlined />}
-                          </span>
-                          <div>
-                            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{copied ? 'Copied!' : 'Copy Link'}</p>
-                            <p className="text-xs text-gray-400 truncate max-w-[150px]">/channel/{channel.customUrl || channel._id}</p>
-                          </div>
-                        </button>
-
-                        {/* Twitter/X */}
-                        <a
-                          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`🎬 ${channel.name} YouTube channel for sale! ${channel.subscriberCount?.toLocaleString()} subscribers. Check it out on SocialSwap 👇`)}&url=${encodeURIComponent(`https://www.socialswap.in/channel/${channel.customUrl || channel._id}`)}`}
-                          target="_blank" rel="noopener noreferrer"
-                          className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition mt-1"
-                        >
-                          <span className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center text-sky-600 font-bold text-sm">𝕏</span>
-                          <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">Share on X</p>
-                        </a>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
 
               <div className="flex flex-col md:flex-row items-center md:items-start gap-6 text-center md:text-left mt-2 md:mt-0">
                 
@@ -331,7 +289,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                   
                   {/* Handle, Subs, Videos */}
                   <div className="text-sm text-text-secondary mb-3 flex flex-wrap items-center justify-center md:justify-start gap-1">
-                    <span className="font-semibold text-text-primary">@{channel.customUrl ? channel.customUrl.split('/').pop().replace('https:', '').replace('http:', '') : channel.name.replace(/\s+/g, '')}</span>
+                    <span className="font-semibold text-text-primary">@{channel.customUrl ? channel.customUrl.split('/').pop().replace('https:', '').replace('http:', '').replace(/^@+/, '') : channel.name.replace(/\s+/g, '')}</span>
                     <span>•</span>
                     <span>{formatNumber(channel.subscriberCount)} subscribers</span>
                     <span>•</span>
@@ -371,42 +329,125 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                   </div>
                   
                   {/* Buttons */}
-                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                    {decodeToken()?.decoded?.role === 'admin' ? (
-                      <button onClick={() => {
-                        navigate('/admin/chats', { state: { prefillDeal: channel } });
-                      }} className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] shadow-[0_4px_15px_rgba(16,185,129,0.15)] hover:translate-y-[-3px] hover:scale-[1.03] text-white text-sm font-bold py-3 px-6 rounded-button transition-all flex items-center gap-2">
-                        <SafetyOutlined /> Make a Contract
+                  <div className="flex flex-col items-center md:items-start gap-3 w-full md:w-auto">
+                    {/* Row 1: Contract + Buy (mobile), just Contract (desktop) */}
+                    <div className="flex items-center justify-center md:justify-start gap-3 w-full flex-wrap">
+                      {decodeToken()?.decoded?.role === 'admin' ? (
+                        <button onClick={() => {
+                          navigate('/admin/chats', { state: { prefillDeal: channel } });
+                        }} className="flex-1 md:flex-none bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] shadow-[0_4px_15px_rgba(16,185,129,0.15)] hover:translate-y-[-3px] hover:scale-[1.03] text-white text-xs md:text-sm font-bold py-2.5 px-3 md:py-3 md:px-5 rounded-button transition-all flex items-center justify-center gap-1.5">
+                          <SafetyOutlined /> Make a Contract
+                        </button>
+                      ) : (
+                        <button onClick={() => {
+                          if (!localStorage.getItem('token')) {
+                            message.info('Please login to request an Escrow Deal.');
+                            navigate('/login');
+                            return;
+                          }
+                          navigate('/user/chat', { state: { requestDeal: channel } });
+                        }} className="flex-1 md:flex-none bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] shadow-[0_4px_15px_rgba(16,185,129,0.15)] hover:translate-y-[-3px] hover:scale-[1.03] text-white text-xs md:text-sm font-bold py-2.5 px-3 md:py-3 md:px-5 rounded-button transition-all flex items-center justify-center gap-1.5">
+                          <MessageOutlined /> Contact Admin to Buy
+                        </button>
+                      )}
+                      <button onClick={handleBuyNow} className="flex-1 md:flex-none bg-white/60 dark:bg-[#1C1438]/80 text-[#6E4BFF] dark:text-[#C6B4FF] border border-[#C6B4FF] dark:border-purple-600/40 text-xs md:text-sm font-bold py-2.5 px-3 md:py-3 md:px-5 rounded-button hover:bg-[#6E4BFF] hover:text-white transition-all shadow-sm">
+                        Buy ${channel.price || 0}
                       </button>
-                    ) : (
-                      <button onClick={() => {
-                        if (!localStorage.getItem('token')) {
-                          message.info('Please login to request an Escrow Deal.');
-                          navigate('/login');
-                          return;
-                        }
-                        navigate('/user/chat', { state: { requestDeal: channel } });
-                      }} className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] shadow-[0_4px_15px_rgba(16,185,129,0.15)] hover:translate-y-[-3px] hover:scale-[1.03] text-white text-sm font-bold py-3 px-6 rounded-button transition-all flex items-center gap-2">
-                        <MessageOutlined /> Contact Admin to Buy
+                    </div>
+                    {/* Row 2: Cart + WhatsApp + Share */}
+                    <div className="flex items-center justify-center md:justify-start gap-3 relative">
+                      <button onClick={handleAddToCart} className={`w-11 h-11 flex items-center justify-center rounded-button border transition active:scale-95 ${isInCart ? 'bg-purple-50 dark:bg-purple-900/30 text-[#6E4BFF] border-purple-200 dark:border-purple-800' : 'bg-white/50 dark:bg-white/5 text-gray-500 dark:text-gray-400 border-white/60 dark:border-white/10 hover:text-[#6E4BFF] hover:border-purple-200/50 shadow-sm'}`} title="Add to Cart">
+                        <ShoppingCartOutlined className="text-base" />
                       </button>
-                    )}
-                    <button onClick={handleBuyNow} className="bg-white/60 dark:bg-[#1C1438]/80 text-[#6E4BFF] dark:text-[#C6B4FF] border border-[#C6B4FF] dark:border-purple-600/40 text-sm font-bold py-3 px-6 rounded-button hover:bg-[#6E4BFF] hover:text-white transition-all shadow-sm">
-                      Buy ${channel.price || 0}
-                    </button>
-                    <button onClick={handleAddToCart} className={`w-11 h-11 flex items-center justify-center rounded-button border transition active:scale-95 ${isInCart ? 'bg-purple-50 dark:bg-purple-900/30 text-[#6E4BFF] border-purple-200 dark:border-purple-800' : 'bg-white/50 dark:bg-white/5 text-gray-500 dark:text-gray-400 border-white/60 dark:border-white/10 hover:text-[#6E4BFF] hover:border-purple-200/50 shadow-sm'}`} title="Add to Cart">
-                      <ShoppingCartOutlined className="text-base" />
-                    </button>
-                    {/* WhatsApp Chat Button */}
-                    <button
-                      onClick={() => {
-                        const msg = encodeURIComponent(`Hello, I'm interested in the "${channel.name}" channel on SocialSwap. Let's discuss details.`);
-                        window.open(`https://wa.me/+919423523291?text=${msg}`, '_blank');
-                      }}
-                      className="w-11 h-11 flex items-center justify-center rounded-button border border-green-200 dark:border-green-800/40 bg-green-500 text-white hover:bg-green-600 transition shadow-sm active:scale-95"
-                      title="Chat on WhatsApp"
-                    >
-                      <WhatsAppOutlined className="text-xl" />
-                    </button>
+                      {/* WhatsApp Chat Button */}
+                      <button
+                        onClick={() => {
+                          const msg = encodeURIComponent(`Hello, I'm interested in the "${channel.name}" channel on SocialSwap. Let's discuss details.`);
+                          window.open(`https://wa.me/+919423523291?text=${msg}`, '_blank');
+                        }}
+                        className="w-11 h-11 flex items-center justify-center rounded-button border border-green-200 dark:border-green-800/40 bg-green-500 text-white hover:bg-green-600 transition shadow-sm active:scale-95"
+                        title="Chat on WhatsApp"
+                      >
+                        <WhatsAppOutlined className="text-xl" />
+                      </button>
+                      {/* Share Button */}
+                      <div className="relative" ref={shareRef}>
+                        <button
+                          onClick={() => setShowShare(v => !v)}
+                          className="w-11 h-11 flex items-center justify-center rounded-button bg-white/50 dark:bg-white/5 border border-white/60 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:text-[#6E4BFF] hover:border-purple-200/50 transition shadow-sm active:scale-95"
+                          title="Share this channel"
+                        >
+                          <ShareAltOutlined className="text-base" />
+                        </button>
+                        {/* Share Dropdown — opens upward */}
+                        <AnimatePresence>
+                          {showShare && (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.9, y: 8 }}
+                              animate={{ opacity: 1, scale: 1, y: 0 }}
+                              exit={{ opacity: 0, scale: 0.9, y: 8 }}
+                              transition={{ duration: 0.15 }}
+                              className="absolute bottom-14 right-0 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-4 z-50"
+                            >
+                              <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Share this channel</p>
+
+                              {/* Copy Link */}
+                              <button
+                                onClick={() => {
+                                  const url = `https://www.socialswap.in/channel/${channel.customUrl || channel._id}`;
+                                  navigator.clipboard.writeText(url).then(() => {
+                                    setCopied(true);
+                                    message.success('Link copied!');
+                                    setTimeout(() => setCopied(false), 2000);
+                                  });
+                                }}
+                                className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition text-left"
+                              >
+                                <span className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-600">
+                                  {copied ? <CheckOutlined /> : <CopyOutlined />}
+                                </span>
+                                <div>
+                                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{copied ? 'Copied!' : 'Copy Link'}</p>
+                                  <p className="text-xs text-gray-400 truncate max-w-[150px]">/channel/{channel.customUrl || channel._id}</p>
+                                </div>
+                              </button>
+
+                              {/* WhatsApp Share */}
+                              <a
+                                href={`https://wa.me/?text=${encodeURIComponent(`🎬 ${channel.name} YouTube channel for sale! Check it out on SocialSwap 👇 https://www.socialswap.in/channel/${channel.customUrl || channel._id}`)}`}
+                                target="_blank" rel="noopener noreferrer"
+                                className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition mt-1"
+                              >
+                                <span className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center text-green-600">
+                                  <WhatsAppOutlined />
+                                </span>
+                                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">Share on WhatsApp</p>
+                              </a>
+
+                              {/* Facebook Share */}
+                              <a
+                                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://www.socialswap.in/channel/${channel.customUrl || channel._id}`)}`}
+                                target="_blank" rel="noopener noreferrer"
+                                className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition mt-1"
+                              >
+                                <span className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 font-bold text-sm">f</span>
+                                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">Share on Facebook</p>
+                              </a>
+
+                              {/* Twitter/X Share */}
+                              <a
+                                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`🎬 ${channel.name} YouTube channel for sale! ${channel.subscriberCount?.toLocaleString()} subscribers. Check it out on SocialSwap 👇`)}&url=${encodeURIComponent(`https://www.socialswap.in/channel/${channel.customUrl || channel._id}`)}`}
+                                target="_blank" rel="noopener noreferrer"
+                                className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition mt-1"
+                              >
+                                <span className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center text-sky-600 font-bold text-sm">𝕏</span>
+                                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">Share on X</p>
+                              </a>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -620,10 +661,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
 
             </div>
 
-            {/* Channel Price Calculator Button */}
-            <button className="w-full bg-btn-gradient hover:shadow-purple-glow-hover hover:translate-y-[-3px] hover:scale-[1.03] text-white font-bold py-3.5 px-4 rounded-button transition-all shadow-purple-glow-soft flex items-center justify-center gap-2 active:scale-95 text-sm">
-              Channel Price Calculator
-            </button>
+
 
             {/* Other channels from this seller */}
             {sellerChannels.length > 0 && (
