@@ -1107,3 +1107,55 @@ a:hover {
 [data-theme="light"] .hover-lift:hover {
   box-shadow: 0 20px 50px rgba(124, 77, 255, 0.12), 0 4px 12px rgba(0,0,0,0.05);
 }
+/* Admin Dashboard Tabs Horizontal Scroll */
+.admin-dashboard-tabs .ant-tabs-nav {
+  overflow: visible !important;
+  margin-bottom: 0 !important;
+}
+.admin-dashboard-tabs .ant-tabs-nav-wrap {
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+  overflow: auto !important;
+}
+.admin-dashboard-tabs .ant-tabs-nav-list {
+  flex-wrap: nowrap !important;
+  min-width: max-content;
+}
+.admin-dashboard-tabs .ant-tabs-nav-operations {
+  display: none !important;
+}
+
+/* Custom renderTabBar scroll container */
+.admin-tabs-scroll-bar {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+}
+.admin-tabs-scroll-bar::-webkit-scrollbar {
+  height: 5px;
+  display: block !important;
+}
+.admin-tabs-scroll-bar::-webkit-scrollbar-track {
+  background: rgba(110, 75, 255, 0.1);
+  border-radius: 9999px;
+}
+.admin-tabs-scroll-bar::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #7C3AED, #A855F7);
+  border-radius: 9999px;
+  cursor: grab;
+}
+.admin-tabs-scroll-bar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, #6D28D9, #9333EA);
+}
+.dark .admin-tabs-scroll-bar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+}
+.dark .admin-tabs-scroll-bar::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #8B5CF6, #C084FC);
+}
+

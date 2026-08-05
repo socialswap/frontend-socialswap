@@ -215,9 +215,7 @@ const AdminBlogs = ({ isEmbedded = false }) => {
       const imageUrl = form.getFieldValue(field);
       if (imageUrl) {
         message.loading({ content: 'Deleting image...', key: 'delete' });
-        await axiosInstance.delete(`${api}/admin/blogs/delete-image`, {
-          data: { imageUrl }
-        });
+        await axiosInstance.delete(`${api}/admin/blogs/delete-image?imageUrl=${encodeURIComponent(imageUrl)}`);
         form.setFieldsValue({ [field]: '' });
         message.success({ content: 'Image removed from server', key: 'delete' });
         setDummy(d => d + 1);

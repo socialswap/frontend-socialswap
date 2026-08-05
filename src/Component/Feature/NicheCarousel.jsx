@@ -58,13 +58,14 @@ const NicheCarousel = () => {
   const cardsRef = useRef([]);
   const tweenRef = useRef(null);
   const progressObj = useRef({ value: 0 });
-
-  // drag state
+  const labelRef = useRef(null);
+  const sublabelRef = useRef(null);
+  const activeIdxRef = useRef(0);
   const dragRef = useRef({
     isDragging: false,
     startX: 0,
     startProgress: 0,
-    moved: false, // track if actually dragged vs clicked
+    moved: false,
   });
 
   useEffect(() => {
@@ -81,7 +82,7 @@ const NicheCarousel = () => {
     return () => observer.disconnect();
   }, []);
 
-  const activeNiche = niches[activeIndex] || niches[0];
+  // activeNiche no longer needed — label updated via DOM ref
 
   // ─── GSAP horizontal ticker ─────────────────────────────────────────────────
   useGSAP(() => {
@@ -137,18 +138,13 @@ const NicheCarousel = () => {
             closestIdx  = i;
           }
 
-          // ── Arch curve: center stays, edges curve DOWN ─────────────────────
-          // normalizedX: 0 at center, ±1 at container edges
+          // Arch curve: center stays, edges curve DOWN
           const normalizedX = x / halfC;
-          const curveDepth  = isMob ? 40 : 90; // how far edges dip down (px)
+          const curveDepth  = isMob ? 40 : 90;
           const curveY      = curveDepth * (normalizedX * normalizedX);
-
-          // Slight tilt along the curve slope: dy/dx = 2 * curveDepth * normalizedX / halfC
-          const slope    = (2 * curveDepth * normalizedX) / halfC;
-          const rotation = Math.atan(slope) * (180 / Math.PI) * 0.6; // soften tilt
-
-          // Scale: center slightly bigger, edges slightly smaller
-          const scale = 1 - Math.abs(normalizedX) * 0.12;
+          const slope       = (2 * curveDepth * normalizedX) / halfC;
+          const rotation    = Math.atan(slope) * (180 / Math.PI) * 0.6;
+          const scale       = 1 - Math.abs(normalizedX) * 0.12;
 
           gsap.set(cards[i], {
             x,
@@ -161,7 +157,13 @@ const NicheCarousel = () => {
           });
         });
 
-        setActiveIndex(prev => (prev !== closestIdx ? closestIdx : prev));
+        // Update label via DOM directly — avoids React re-render every frame
+        if (closestIdx !== activeIdxRef.current) {
+          activeIdxRef.current = closestIdx;
+          const niche = niches[closestIdx];
+          if (labelRef.current) labelRef.current.textContent = niche.title;
+          if (sublabelRef.current) sublabelRef.current.textContent = `Explore top monetized ${niche.title.toLowerCase()} channels.`;
+        }
       },
     });
 
@@ -245,43 +247,44 @@ const NicheCarousel = () => {
         }}
       />
 
-      {/* Floating Reaction Elements */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-[5]">
-        <style>{`
-          @keyframes floatReaction {
-            0%   { transform: translateY(600px) scale(0.5); opacity: 0; }
-            15%  { opacity: 0.45; }
-            50%  { transform: translateY(0px) translateX(var(--sway-x,40px)) scale(1.2); opacity: 0.45; }
-            85%  { opacity: 0.45; }
-            100% { transform: translateY(-600px) scale(0.8); opacity: 0; }
-          }
-          .floating-reaction {
-            animation: floatReaction var(--duration) ease-in-out infinite;
-            animation-delay: var(--delay);
-            animation-fill-mode: both;
-            left: var(--left);
-            will-change: transform, opacity;
-            --sway-x: 35px;
-          }
-          .floating-reaction:nth-child(even) { --sway-x: -35px; }
-        `}</style>
-        {floatingElements.map((el, idx) => {
-          const Icon = el.icon;
-          const sz   = isMobile ? el.size * 1.3 : el.size * 2;
-          return (
-            <div
-              key={idx}
-              className="absolute bottom-0 floating-reaction opacity-0 select-none pointer-events-none"
-              style={{ '--duration': el.duration, '--delay': el.delay, '--left': el.left }}
-            >
-              <Icon size={sz} color={el.color}
-                fill={['#EF4444','#EAB308'].includes(el.color) ? el.color : 'transparent'}
-                className="opacity-40"
-              />
-            </div>
-          );
-        })}
-      </div>
+      {/* Floating Reaction Elements — hidden on mobile for performance */}
+      {!isMobile && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-[5]">
+          <style>{`
+            @keyframes floatReaction {
+              0%   { transform: translateY(600px) scale(0.5); opacity: 0; }
+              15%  { opacity: 0.45; }
+              50%  { transform: translateY(0px) translateX(var(--sway-x,40px)) scale(1.2); opacity: 0.45; }
+              85%  { opacity: 0.45; }
+              100% { transform: translateY(-600px) scale(0.8); opacity: 0; }
+            }
+            .floating-reaction {
+              animation: floatReaction var(--duration) ease-in-out infinite;
+              animation-delay: var(--delay);
+              animation-fill-mode: both;
+              left: var(--left);
+              will-change: transform;
+              --sway-x: 35px;
+            }
+            .floating-reaction:nth-child(even) { --sway-x: -35px; }
+          `}</style>
+          {floatingElements.slice(0, 8).map((el, idx) => {
+            const Icon = el.icon;
+            return (
+              <div
+                key={idx}
+                className="absolute bottom-0 floating-reaction opacity-0 select-none pointer-events-none"
+                style={{ '--duration': el.duration, '--delay': el.delay, '--left': el.left }}
+              >
+                <Icon size={el.size * 2} color={el.color}
+                  fill={['#EF4444','#EAB308'].includes(el.color) ? el.color : 'transparent'}
+                  className="opacity-40"
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* ── Ticker Cards ────────────────────────────────────────────── */}
       {/* Cards are positioned relative to the CENTER of this container via GSAP x */}
@@ -357,17 +360,17 @@ const NicheCarousel = () => {
         </div>
       </div>
 
-      {/* ── Active category label ────────────────────────────────────── */}
+      {/* ── Active category label — updated via DOM ref to avoid re-renders ── */}
       <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-40 text-center w-full px-4 pointer-events-none">
         <h2
-          key={activeNiche.title}
+          ref={labelRef}
           className="text-3xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent mb-1"
           style={{ backgroundImage: 'var(--btn-gradient)' }}
         >
-          {activeNiche.title}
+          {niches[0].title}
         </h2>
-        <p className="text-text-secondary text-sm md:text-base font-medium max-w-sm mx-auto">
-          Explore top monetized {activeNiche.title.toLowerCase()} channels.
+        <p ref={sublabelRef} className="text-text-secondary text-sm md:text-base font-medium max-w-sm mx-auto">
+          Explore top monetized {niches[0].title.toLowerCase()} channels.
         </p>
       </div>
     </div>
