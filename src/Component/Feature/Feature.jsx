@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance, { api } from '../../API/api';
+import axiosInstance, { api, cachedGet } from '../../API/api';
 import { message } from 'antd';
 import { FaCheckCircle, FaUsers, FaEye, FaChartLine, FaClock } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -310,7 +310,7 @@ const FeaturedListings = () => {
   useEffect(() => {
     const fetchFeaturedChannels = async () => {
       try {
-        const response = await axiosInstance.get(`${API_BASE_URL}/channels/demanding`);
+        const response = await cachedGet(`${API_BASE_URL}/channels/demanding`);
         setFeaturedChannels(response?.data);
         setFilteredChannels(response?.data);
         setLoading(false);
@@ -358,9 +358,13 @@ const FeaturedListings = () => {
           {/* Badge */}
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="inline-block mb-4 px-6 py-2 rounded-full bg-white/45 dark:bg-[#110C1F]/45 border border-white/40 dark:border-white/10 backdrop-blur-[18px]"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase mb-4 border backdrop-blur-[18px] shadow-sm"
+            style={{
+              background: 'rgba(16, 185, 129, 0.1)',
+              borderColor: 'rgba(16, 185, 129, 0.2)',
+            }}
           >
-            <span className="text-sm font-semibold bg-gradient-to-r from-purple-primary to-accent-pink bg-clip-text text-transparent">
+            <span style={{ color: '#10B981' }}>
               🔥 Trending Now
             </span>
           </motion.div>
@@ -451,10 +455,29 @@ const FeaturedListings = () => {
               className="flex gap-6 overflow-hidden"
             >
               {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="animate-pulse rounded-card min-w-[300px] h-96 bg-white/30 dark:bg-[#110C1F]/30 border border-white/20 dark:border-white/10"
-                />
+                <div key={i} className="relative rounded-card overflow-hidden bg-white/20 dark:bg-[#110C1F]/20 backdrop-blur-[18px] border border-white/20 dark:border-white/5 animate-pulse min-w-[300px] mx-3" style={{ minHeight: '540px' }}>
+                  <div className="relative h-48 bg-gray-300 dark:bg-gray-700/50"></div>
+                  <div className="p-5">
+                    <div className="h-5 bg-gray-300 dark:bg-gray-700/50 rounded w-3/4 mb-3"></div>
+                    <div className="flex gap-2 mb-3">
+                      <div className="h-6 w-16 bg-gray-300 dark:bg-gray-700/50 rounded-full"></div>
+                      <div className="h-6 w-16 bg-gray-300 dark:bg-gray-700/50 rounded-full"></div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700/50">
+                      {[1, 2, 3].map(j => (
+                        <div key={j} className="flex flex-col gap-1">
+                          <div className="h-3 w-10 bg-gray-300 dark:bg-gray-700/50 rounded"></div>
+                          <div className="h-4 w-12 bg-gray-300 dark:bg-gray-700/50 rounded"></div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex justify-between items-center mb-6">
+                      <div className="h-8 w-24 bg-gray-300 dark:bg-gray-700/50 rounded"></div>
+                      <div className="h-6 w-20 bg-gray-300 dark:bg-gray-700/50 rounded-full"></div>
+                    </div>
+                    <div className="h-12 w-full bg-gray-300 dark:bg-gray-700/50 rounded-xl"></div>
+                  </div>
+                </div>
               ))}
             </motion.div>
           ) : error ? (

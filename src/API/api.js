@@ -45,4 +45,15 @@ axiosInstance.interceptors.response.use(
   }
 );
 
+export const apiCache = new Map();
+
+export const cachedGet = async (url, config = {}) => {
+  if (apiCache.has(url)) {
+    return Promise.resolve(apiCache.get(url));
+  }
+  const response = await axiosInstance.get(url, config);
+  apiCache.set(url, response);
+  return response;
+};
+
 export default axiosInstance;

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axiosInstance, { api as API_BASE_URL } from '../../API/api';
+import axiosInstance, { api as API_BASE_URL, cachedGet } from '../../API/api';
 import Carousel from './Carousel';
-import ChannelCard from '../ChannelCard';
+import ChannelCard, { ChannelCardSkeleton } from '../ChannelCard';
 
 const BestForBeginners = () => {
   const [beginnerChannels, setBeginnerChannels] = useState([]);
@@ -12,7 +12,7 @@ const BestForBeginners = () => {
   useEffect(() => {
     const fetchChannels = async () => {
       try {
-        const response = await axiosInstance.get(`${API_BASE_URL}/channels`);
+        const response = await cachedGet(`${API_BASE_URL}/channels`);
         const payload = response?.data ?? {};
         
         // Sort by price ascending and take top 8 for "Beginners"
@@ -92,10 +92,9 @@ const BestForBeginners = () => {
               className="flex gap-6 overflow-hidden"
             >
               {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="animate-pulse rounded-2xl min-w-[300px] h-96 bg-bg-card border border-border-color/20"
-                />
+                <div key={i} className="mx-3">
+                  <ChannelCardSkeleton />
+                </div>
               ))}
             </motion.div>
           ) : error ? (

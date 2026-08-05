@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Carousel } from 'antd';
 import { StarFilled } from '@ant-design/icons';
 import { motion } from 'framer-motion';
-import axiosInstance, { api } from '../../API/api';
+import axiosInstance, { api, cachedGet } from '../../API/api';
 
 const TestimonialCard = ({ testimonial }) => {
   return (
@@ -84,6 +84,27 @@ const TestimonialCard = ({ testimonial }) => {
   );
 };
 
+const TestimonialSkeleton = () => (
+  <div className="px-2 py-4">
+    <div className="w-full max-w-[450px] h-[360px] rounded-[32px] p-1.5 bg-gray-200/20 dark:bg-[#231252]/50 mx-auto animate-pulse">
+      <div className="w-full h-full border-2 border-gray-300/20 rounded-[24px] p-5 flex relative overflow-hidden backdrop-blur-md">
+        <div className="w-[30%] flex items-center justify-center relative z-10">
+          <div className="w-24 h-24 rounded-full bg-gray-300/50 dark:bg-gray-700/50"></div>
+        </div>
+        <div className="w-[70%] pl-8 pr-2 flex flex-col justify-center relative z-10 space-y-4">
+          <div className="h-4 bg-gray-300/50 dark:bg-gray-700/50 rounded w-1/2"></div>
+          <div className="h-6 bg-gray-300/50 dark:bg-gray-700/50 rounded w-3/4"></div>
+          <div className="space-y-2 mt-4">
+             <div className="h-3 bg-gray-300/50 dark:bg-gray-700/50 rounded"></div>
+             <div className="h-3 bg-gray-300/50 dark:bg-gray-700/50 rounded"></div>
+             <div className="h-3 bg-gray-300/50 dark:bg-gray-700/50 rounded w-5/6"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 const Testimonials = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -91,7 +112,7 @@ const Testimonials = () => {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const response = await axiosInstance.get(`${api}/testimonials?limit=10&t=${Date.now()}`);
+        const response = await cachedGet(`${api}/testimonials?limit=10`);
         setTestimonials(response.data.data);
       } catch (error) {
         console.error('Failed to fetch testimonials', error);
@@ -101,8 +122,6 @@ const Testimonials = () => {
     };
     fetchTestimonials();
   }, []);
-
-  if (loading || testimonials.length === 0) return null;
 
   const carouselSettings = {
     dots: true, // Show dots for navigation in card-by-card mode
@@ -154,11 +173,17 @@ const Testimonials = () => {
 
       {/* Draggable Carousel Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 testimonials-carousel">
-        <Carousel {...carouselSettings}>
-          {testimonials.map((testimonial) => (
-            <TestimonialCard key={testimonial._id} testimonial={testimonial} />
-          ))}
-        </Carousel>
+        {loading ? (
+          <div className="flex gap-4 overflow-hidden justify-center">
+            {[1, 2, 3].map(i => <TestimonialSkeleton key={i} />)}
+          </div>
+        ) : testimonials.length > 0 ? (
+          <Carousel {...carouselSettings}>
+            {testimonials.map((testimonial) => (
+              <TestimonialCard key={testimonial._id} testimonial={testimonial} />
+            ))}
+          </Carousel>
+        ) : null}
       </div>
     </section>
   );
