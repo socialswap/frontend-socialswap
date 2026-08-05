@@ -70,8 +70,8 @@ const LazyWrapper = ({ children, minHeight = '50vh', index = 0 }) => {
     <div ref={ref} style={{ minHeight }} className="w-full relative transition-all duration-500">
       {shouldLoad ? (
         <Suspense fallback={
-          <div className="w-full h-full flex items-center justify-center p-10">
-            <div className="w-12 h-12 border-4 border-purple-primary/20 border-t-purple-primary rounded-full animate-spin"></div>
+          <div className="w-full h-full p-4 flex items-center justify-center">
+             <div className="w-full max-w-7xl h-[calc(100%-2rem)] min-h-[400px] bg-white/10 dark:bg-white/5 rounded-[32px] animate-pulse"></div>
           </div>
         }>
           {children}

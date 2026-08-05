@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Carousel } from 'antd';
 import { ArrowRightOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
-import axiosInstance, { api } from '../../API/api';
+import axiosInstance, { api, cachedGet } from '../../API/api';
 
 // Custom Arrow Components for the Carousel
 const SlickArrowLeft = ({ currentSlide, slideCount, ...props }) => (
@@ -37,7 +37,7 @@ const ServicesSlider = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res = await axiosInstance.get(`${api}/services`);
+        const res = await cachedGet(`${api}/services`);
         if (res.data.success) {
           setServices(res.data.services);
         }
@@ -97,7 +97,12 @@ const ServicesSlider = () => {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
               }}
-              className="inline-block py-1 px-3 rounded-full bg-purple-primary/10 text-purple-primary font-semibold text-sm mb-4 border border-purple-primary/20"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase mb-4 border shadow-sm"
+              style={{
+                background: 'rgba(16, 185, 129, 0.1)',
+                color: '#10B981',
+                borderColor: 'rgba(16, 185, 129, 0.2)',
+              }}
             >
               Premium Services
             </motion.span>
@@ -142,9 +147,26 @@ const ServicesSlider = () => {
           className="relative px-2"
         >
           {loading ? (
-            <div className="flex gap-6">
+            <div className="flex gap-6 overflow-hidden">
               {[1, 2, 3].map(i => (
-                <div key={i} className="flex-1 h-[175px] bg-white/30 dark:bg-[#110C1F]/30 rounded-[24px] animate-pulse border border-white/20 dark:border-white/10" />
+                <div key={i} className="relative group flex items-center min-h-[175px] overflow-hidden rounded-[24px] bg-white/30 dark:bg-[#110C1F]/30 backdrop-blur-[20px] border border-white/40 dark:border-white/10 p-4 gap-4 sm:gap-6 w-full h-full text-left animate-pulse">
+                  <div className="relative w-28 h-28 sm:w-32 sm:h-32 shrink-0 rounded-[24px] bg-gray-300 dark:bg-gray-700/50"></div>
+                  <div className="flex-1 flex flex-col justify-between py-1 h-full space-y-3">
+                    <div>
+                      <div className="h-2 w-16 bg-gray-300 dark:bg-gray-700/50 rounded mb-2"></div>
+                      <div className="h-4 w-32 bg-gray-300 dark:bg-gray-700/50 rounded mb-2"></div>
+                      <div className="h-3 w-full bg-gray-300 dark:bg-gray-700/50 rounded"></div>
+                      <div className="h-3 w-2/3 bg-gray-300 dark:bg-gray-700/50 rounded mt-1"></div>
+                    </div>
+                    <div className="flex justify-between items-end">
+                      <div className="space-y-1">
+                        <div className="h-2 w-12 bg-gray-300 dark:bg-gray-700/50 rounded"></div>
+                        <div className="h-4 w-20 bg-gray-300 dark:bg-gray-700/50 rounded"></div>
+                      </div>
+                      <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700/50"></div>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           ) : services.length === 0 ? (

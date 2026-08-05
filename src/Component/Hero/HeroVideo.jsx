@@ -2,21 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PlayCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance, { api } from '../../API/api';
+import axiosInstance, { api, cachedGet } from '../../API/api';
 
 const HeroVideo = () => {
   const navigate = useNavigate();
   const [videoUrl, setVideoUrl] = useState("https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchVideo = async () => {
       try {
-        const res = await axiosInstance.get(`${api}/home-video`);
+        const res = await cachedGet(`${api}/home-video`);
         if (res.data.success && res.data.url) {
           setVideoUrl(res.data.url);
         }
       } catch (error) {
         console.error("Failed to fetch home video", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchVideo();
@@ -66,20 +69,25 @@ const HeroVideo = () => {
           >
             <motion.span 
               variants={itemVariants}
-              className="inline-block py-1.5 px-4 rounded-full bg-purple-primary/10 text-purple-primary font-bold text-xs uppercase tracking-wider mb-3 md:mb-4 border border-purple-primary/20 shadow-sm"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs font-semibold tracking-wide uppercase mb-3 md:mb-4 border shadow-sm"
+              style={{
+                background: '#E6F8F1', // Solid light mint green (matches the look of the reference pill over white)
+                color: '#059669', // Darker emerald green for perfect contrast
+                borderColor: 'rgba(16, 185, 129, 0.3)',
+              }}
             >
               India's #1 Marketplace
             </motion.span>
             <motion.h1 
               variants={itemVariants}
-              className="text-2xl sm:text-4xl md:text-5xl font-extrabold mb-3 md:mb-6 leading-tight text-text-primary tracking-tight"
+              className="text-2xl sm:text-4xl md:text-5xl font-extrabold mb-3 md:mb-6 leading-tight text-white drop-shadow-md tracking-tight"
             >
               Turn Your Channel <br />
-              Into <span className="bg-clip-text text-transparent" style={{ backgroundImage: 'var(--btn-gradient)' }}>Real Value</span>
+              Into <span className="bg-clip-text text-transparent" style={{ backgroundImage: 'var(--btn-gradient)', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.3))' }}>Real Value</span>
             </motion.h1>
             <motion.p 
               variants={itemVariants}
-              className="text-sm md:text-lg text-text-secondary mb-6 md:mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed font-normal"
+              className="text-sm md:text-lg text-white/90 drop-shadow-sm mb-6 md:mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed font-normal"
             >
               SocialSwap offers the safest, fastest, and most reliable way to buy and sell monetized YouTube channels with 100% Escrow Protection.
             </motion.p>
@@ -111,14 +119,20 @@ const HeroVideo = () => {
           >
             {/* Main Info Video Focus */}
             <div className="w-full h-full rounded-2xl overflow-hidden shadow-inner">
-              <iframe
-                className="w-full h-full"
-                src={videoUrl}
-                title="SocialSwap Info Video"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
+              {loading ? (
+                <div className="w-full h-full bg-gray-200/50 dark:bg-gray-800/50 animate-pulse flex items-center justify-center">
+                  <PlayCircleOutlined className="text-4xl text-gray-400 dark:text-gray-600" />
+                </div>
+              ) : (
+                <iframe
+                  className="w-full h-full"
+                  src={videoUrl}
+                  title="SocialSwap Info Video"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              )}
             </div>
           </motion.div>
         </div>

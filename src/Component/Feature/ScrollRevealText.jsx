@@ -127,11 +127,11 @@ const HorizontalScrollFeatures = () => {
           style={{ opacity: headerOpacity, y: headerY }}
         >
           <span
-            className="inline-block py-1.5 px-5 rounded-full font-semibold text-sm border tracking-widest uppercase"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase border shadow-sm"
             style={{
-              background: 'rgba(124,58,237,0.08)',
-              color: 'var(--purple-primary)',
-              borderColor: 'rgba(124,58,237,0.2)',
+              background: 'rgba(16, 185, 129, 0.1)',
+              color: '#10B981',
+              borderColor: 'rgba(16, 185, 129, 0.2)',
             }}
           >
             Why SocialSwap

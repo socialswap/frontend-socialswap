@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axiosInstance, { api as API_BASE_URL } from '../../API/api';
+import axiosInstance, { api as API_BASE_URL, cachedGet } from '../../API/api';
 import Carousel from './Carousel';
-import ChannelCard from '../ChannelCard';
+import ChannelCard, { ChannelCardSkeleton } from '../ChannelCard';
 
 const TopChannelsCarousel = () => {
   const [topChannels, setTopChannels] = useState([]);
@@ -12,7 +12,7 @@ const TopChannelsCarousel = () => {
   useEffect(() => {
     const fetchTopChannels = async () => {
       try {
-        const response = await axiosInstance.get(`${API_BASE_URL}/channels`);
+        const response = await cachedGet(`${API_BASE_URL}/channels`);
         const payload = response?.data ?? {};
         const list = Array.isArray(payload?.channels)
           ? payload.channels
@@ -57,9 +57,9 @@ const TopChannelsCarousel = () => {
             }}
             className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase mb-4"
             style={{
-              background: 'rgba(124, 58, 237, 0.1)',
-              color: 'var(--purple-primary)',
-              border: '1px solid rgba(124, 58, 237, 0.2)',
+              background: 'rgba(16, 185, 129, 0.1)',
+              color: '#10B981',
+              border: '1px solid rgba(16, 185, 129, 0.2)',
             }}
           >
             Curated Selection
@@ -94,10 +94,9 @@ const TopChannelsCarousel = () => {
               className="flex gap-6 overflow-hidden"
             >
               {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="animate-pulse rounded-2xl min-w-[300px] h-96 bg-bg-card border border-border-color/20"
-                />
+                <div key={i} className="mx-3">
+                  <ChannelCardSkeleton />
+                </div>
               ))}
             </motion.div>
           ) : error ? (

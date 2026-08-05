@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import Cropper from 'react-easy-crop';
 import {
   Youtube, Link, Tag, FileText, IndianRupee,
   Users, Video, TrendingUp, Eye, Globe,
@@ -65,6 +66,14 @@ export default function UploadChannel() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [dashboardFile, setDashboardFile] = useState(null);
+  const [dashboardPreview, setDashboardPreview] = useState('');
+  const [rawDashboardImageSrc, setRawDashboardImageSrc] = useState(null);
+  const [originalDashboardFileName, setOriginalDashboardFileName] = useState('');
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
   const { id } = useParams();
   const isEditMode = !!id;
@@ -108,6 +117,9 @@ export default function UploadChannel() {
         setExistingImages(data.imageUrls);
         setImagePreviews(data.imageUrls);
       }
+      if (data.dashboardImage) {
+        setDashboardPreview(data.dashboardImage);
+      }
     } catch (err) {
       setError('Failed to fetch channel details for editing.');
     }
@@ -137,6 +149,54 @@ export default function UploadChannel() {
     setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     if (fieldErrors[name]) {
       setFieldErrors(prev => { const n = { ...prev }; delete n[name]; return n; });
+    }
+  };
+
+  const handleDashboardFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      setRawDashboardImageSrc(reader.result);
+      setOriginalDashboardFileName(file.name);
+      setIsCropModalOpen(true);
+    };
+  };
+
+  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  const saveCroppedImage = async () => {
+    if (!croppedAreaPixels || !rawDashboardImageSrc) return;
+    try {
+      setLoading(true);
+      // Crop on canvas
+      const croppedBlob = await getCroppedImgBlob(rawDashboardImageSrc, croppedAreaPixels);
+      
+      // Convert to file object
+      const baseName = originalDashboardFileName.replace(/\.[^/.]+$/, "");
+      const rawFile = new File([croppedBlob], `${baseName}.jpg`, { type: 'image/jpeg' });
+      
+      // Compress and convert to WebP using existing helper
+      const webpFile = await compressAndConvertToWebP(rawFile);
+      
+      setDashboardFile(webpFile);
+      setDashboardPreview(URL.createObjectURL(webpFile));
+      setIsCropModalOpen(false);
+      setRawDashboardImageSrc(null);
+      
+      // Clear errors
+      if (fieldErrors.dashboardImage) {
+        setFieldErrors(prev => { const n = { ...prev }; delete n.dashboardImage; return n; });
+      }
+    } catch (err) {
+      console.error('Error saving cropped image:', err);
+      setError('Failed to crop and process image.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -247,6 +307,9 @@ export default function UploadChannel() {
       if (!form.contactNumber.trim()) errors.contactNumber = 'Contact number is required';
     }
     if (step === 3) {
+      if (!dashboardFile && !dashboardPreview) {
+        errors.dashboardImage = 'YouTube Dashboard Image is required';
+      }
       const totalScreenshots = existingImages.length + images.length;
       if (totalScreenshots < 2) errors.images = 'At least 2 channel screenshots required';
       if (totalScreenshots > 10) errors.images = 'Maximum 10 channel screenshots allowed';
@@ -276,6 +339,9 @@ export default function UploadChannel() {
     images.forEach(img => {
       formData.append('images', img);
     });
+    if (dashboardFile) {
+      formData.append('dashboardImage', dashboardFile);
+    }
     if (isEditMode) {
       formData.append('existingImages', JSON.stringify(existingImages));
     }
@@ -368,14 +434,16 @@ export default function UploadChannel() {
               <React.Fragment key={s.id}>
                 <div className="flex items-center gap-2 shrink-0">
                   <div className={`w-9 h-9 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
-                    isDone ? 'border-emerald-500 bg-emerald-500/20 text-emerald-400'
-                    : isActive ? 'border-purple-500 bg-purple-500/20 text-purple-400'
-                    : 'border-gray-200 dark:border-white/15 bg-gray-100 dark:bg-white/5 text-gray-400 dark:text-white/30'
+                    isDone ? 'border-emerald-500 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                    : isActive ? 'border-purple-500 bg-purple-500/20 text-purple-600 dark:text-purple-400'
+                    : 'border-gray-300 dark:border-white/15 bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-white/30'
                   }`}>
                     {isDone ? <CheckCircle size={15} /> : <Icon size={15} />}
                   </div>
                   <span className={`text-xs font-semibold hidden sm:block transition-colors duration-300 ${
-                    isDone ? 'text-emerald-400' : isActive ? 'text-purple-400' : 'text-gray-400 dark:text-white/30'
+                    isDone ? 'text-emerald-600 dark:text-emerald-400' 
+                    : isActive ? 'text-purple-600 dark:text-purple-400' 
+                    : 'text-gray-500 dark:text-white/30'
                   }`}>{s.label}</span>
                 </div>
                 {i < steps.length - 1 && (
@@ -670,34 +738,146 @@ export default function UploadChannel() {
                 </div>
               )}
 
-              {/* Banner Upload removed */}
-
-                  {/* Channel Screenshots */}
-                  <div>
-                    <p className="text-xs font-semibold text-gray-500 dark:text-white/50 mb-2">
-                      Channel Screenshots <span className="font-normal text-gray-400 dark:text-white/30">(2–10 images required)</span>
-                    </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-2">
-                      {imagePreviews.map((src, i) => (
-                        <div key={i} className="relative rounded-xl overflow-hidden aspect-video bg-gray-100 dark:bg-white/5">
-                          <img src={src} alt={`Screenshot ${i + 1}`} className="w-full h-full object-cover" />
-                          <button
-                            onClick={() => removeImage(i)}
-                            className="absolute top-1.5 right-1.5 w-6 h-6 bg-black/60 hover:bg-red-500 rounded-full flex items-center justify-center text-gray-900 dark:text-white transition-colors"
-                          ><X size={12} /></button>
-                        </div>
-                      ))}
-                      {(existingImages.length + images.length) < 10 && (
-                        <label className={`flex flex-col items-center justify-center gap-1.5 aspect-video border-2 border-dashed rounded-xl cursor-pointer transition-all text-xs font-medium
-                          ${fieldErrors.images ? 'border-red-500/40 text-red-400' : 'border-gray-300 dark:border-white/[0.12] hover:border-purple-500 hover:bg-purple-500/[0.06] text-gray-400 dark:text-white/30 hover:text-purple-400'}`}>
-                          <Upload size={18} />
-                          <span>Add Image</span>
-                          <input type="file" accept="image/*" multiple onChange={handleImages} className="hidden" />
+              {/* YouTube Dashboard Image (Mandatory) */}
+              <div className="mb-8">
+                <p className="text-xs font-semibold text-black dark:text-white/50 mb-2 flex items-center gap-1">
+                  YouTube Dashboard Image <span className="text-red-500">*</span>
+                  <span className="font-normal text-gray-400 dark:text-white/30">(Mandatory snapshot showing subscriber count & monetization tab)</span>
+                </p>
+                
+                <div className="max-w-md">
+                  {dashboardPreview ? (
+                    <div className="relative rounded-2xl overflow-hidden aspect-video bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 group shadow-md">
+                      <img src={dashboardPreview} alt="Dashboard Preview" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                        <label className="px-4 py-2 bg-white text-black font-semibold text-xs rounded-xl cursor-pointer hover:bg-gray-100 transition-colors shadow-lg">
+                          Change
+                          <input type="file" accept="image/*" onChange={handleDashboardFileChange} className="hidden" />
                         </label>
-                      )}
+                        <button
+                          onClick={() => { setDashboardFile(null); setDashboardPreview(''); }}
+                          className="px-4 py-2 bg-red-600 text-white font-semibold text-xs rounded-xl hover:bg-red-700 transition-colors shadow-lg"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
-                    {fieldErrors.images && <p className="text-red-400 text-xs mt-1">{fieldErrors.images}</p>}
+                  ) : (
+                    <label className={`flex flex-col items-center justify-center gap-3 aspect-video border-2 border-dashed rounded-2xl cursor-pointer transition-all text-xs font-medium py-8 bg-gray-50/50 dark:bg-white/[0.02]
+                      ${fieldErrors.dashboardImage ? 'border-red-500/40 text-red-400 bg-red-500/[0.02]' : 'border-gray-300 dark:border-white/[0.12] hover:border-purple-500 hover:bg-purple-500/[0.04] text-gray-500 dark:text-white/30 hover:text-purple-400'}`}>
+                      <div className="w-10 h-10 rounded-full bg-purple-500/10 text-purple-400 flex items-center justify-center">
+                        <Upload size={20} />
+                      </div>
+                      <div className="text-center px-4">
+                        <span className="font-semibold text-gray-700 dark:text-white/70 block mb-1 text-sm">Upload YouTube Dashboard screenshot</span>
+                        <span className="text-gray-400 dark:text-white/20 text-[10px]">Crop, compress & convert to webp automatically</span>
+                      </div>
+                      <input type="file" accept="image/*" onChange={handleDashboardFileChange} className="hidden" />
+                    </label>
+                  )}
+                </div>
+                {fieldErrors.dashboardImage && <p className="text-red-400 text-xs mt-1.5 flex items-center gap-1"><AlertCircle size={12} /> {fieldErrors.dashboardImage}</p>}
+              </div>
+
+              {/* Channel Screenshots */}
+              <div>
+                <p className="text-xs font-semibold text-black dark:text-white/50 mb-2">
+                  Channel Screenshots <span className="font-normal text-gray-400 dark:text-white/30">(2–10 images required)</span>
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-2">
+                  {imagePreviews.map((src, i) => (
+                    <div key={i} className="relative rounded-xl overflow-hidden aspect-video bg-gray-100 dark:bg-white/5">
+                      <img src={src} alt={`Screenshot ${i + 1}`} className="w-full h-full object-cover" />
+                      <button
+                        onClick={() => removeImage(i)}
+                        className="absolute top-1.5 right-1.5 w-6 h-6 bg-black/60 hover:bg-red-500 rounded-full flex items-center justify-center text-gray-900 dark:text-white transition-colors"
+                      ><X size={12} /></button>
+                    </div>
+                  ))}
+                  {(existingImages.length + images.length) < 10 && (
+                    <label className={`flex flex-col items-center justify-center gap-1.5 aspect-video border-2 border-dashed rounded-xl cursor-pointer transition-all text-xs font-medium
+                      ${fieldErrors.images ? 'border-red-500/40 text-red-400' : 'border-gray-300 dark:border-white/[0.12] hover:border-purple-500 hover:bg-purple-500/[0.06] text-gray-400 dark:text-white/30 hover:text-purple-400'}`}>
+                      <Upload size={18} />
+                      <span>Add Image</span>
+                      <input type="file" accept="image/*" multiple onChange={handleImages} className="hidden" />
+                    </label>
+                  )}
+                </div>
+                {fieldErrors.images && <p className="text-red-400 text-xs mt-1">{fieldErrors.images}</p>}
+              </div>
+
+              {/* ── Cropper Modal ── */}
+              {isCropModalOpen && rawDashboardImageSrc && (
+                <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+                  <div className="bg-[#150f24] border border-white/10 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+                    {/* Header */}
+                    <div className="p-5 border-b border-white/5 flex justify-between items-center bg-[#1c152e]">
+                      <h4 className="font-bold text-white flex items-center gap-2">
+                        <Sparkles size={16} className="text-purple-400" /> Crop Dashboard Image
+                      </h4>
+                      <button
+                        onClick={() => { setIsCropModalOpen(false); setRawDashboardImageSrc(null); }}
+                        className="text-white/70 hover:text-white text-lg transition-colors p-1"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    
+                    {/* Cropper Container */}
+                    <div className="relative flex-1 bg-black/60 min-h-[300px] sm:min-h-[400px]">
+                      <Cropper
+                        image={rawDashboardImageSrc}
+                        crop={crop}
+                        zoom={zoom}
+                        aspect={16 / 9}
+                        onCropChange={setCrop}
+                        onCropComplete={onCropComplete}
+                        onZoomChange={setZoom}
+                      />
+                    </div>
+                    
+                    {/* Controls & Footer */}
+                    <div className="p-5 bg-[#150f24] border-t border-white/5 flex flex-col gap-4">
+                      {/* Zoom Slider */}
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-white/55 font-medium shrink-0">Zoom:</span>
+                        <input
+                          type="range"
+                          value={zoom}
+                          min={1}
+                          max={3}
+                          step={0.1}
+                          aria-label="Zoom"
+                          onChange={(e) => setZoom(Number(e.target.value))}
+                          className="flex-1 accent-purple-500 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <span className="text-xs text-white/70 font-semibold w-8 text-right">{Math.round(zoom * 100)}%</span>
+                      </div>
+                      
+                      {/* Actions */}
+                      <div className="flex justify-end gap-3 mt-1">
+                        <button
+                          onClick={() => { setIsCropModalOpen(false); setRawDashboardImageSrc(null); }}
+                          className="px-5 py-2 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white text-xs font-semibold rounded-xl transition-all"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={saveCroppedImage}
+                          disabled={loading}
+                          className="px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white text-xs font-bold rounded-xl hover:opacity-90 disabled:opacity-50 transition-all flex items-center gap-1.5 shadow-lg shadow-purple-600/20"
+                        >
+                          {loading ? (
+                            <><Loader2 size={13} className="animate-spin" /> Processing...</>
+                          ) : (
+                            <><CheckCircle size={13} /> Crop & Save</>
+                          )}
+                        </button>
+                      </div>
+                    </div>
                   </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -741,7 +921,7 @@ export default function UploadChannel() {
 function Field({ label, icon, error, children }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="flex items-center gap-1.5 text-[0.72rem] font-semibold text-text-secondary uppercase tracking-wide">
+      <label className="flex items-center gap-1.5 text-[0.72rem] font-semibold text-black dark:text-text-secondary uppercase tracking-wide">
         <span className="text-purple-400">{icon}</span>{label}
       </label>
       <div className={`[&_input]:w-full [&_select]:w-full [&_textarea]:w-full
@@ -773,13 +953,51 @@ function Toggle({ label, name, checked, onChange }) {
     <label className="flex items-center gap-3 cursor-pointer select-none group">
       <div
         className={`relative w-11 h-6 rounded-full border transition-all duration-300 shrink-0 ${
-          checked ? 'bg-purple-600 border-purple-500' : 'bg-gray-200 dark:bg-white/10 border-gray-200 dark:border-white/15'
+          checked ? 'bg-purple-600 border-purple-500' : 'bg-gray-300 dark:bg-white/10 border-gray-300 dark:border-white/15'
         }`}
         onClick={() => onChange({ target: { name, type: 'checkbox', checked: !checked } })}
       >
         <div className={`absolute top-[3px] left-[3px] w-4 h-4 rounded-full bg-white transition-transform duration-300 ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
       </div>
-      <span className="text-sm text-gray-600 dark:text-white/60 group-hover:text-gray-700 dark:text-white/80 transition-colors font-medium">{label}</span>
+      <span className="text-sm text-black dark:text-white/60 group-hover:text-gray-900 dark:group-hover:text-white/80 transition-colors font-medium">{label}</span>
     </label>
   );
 }
+
+/**
+ * Canvas utility to crop image source client-side.
+ */
+const getCroppedImgBlob = (imageSrc, pixelCrop) => {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.src = imageSrc;
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      canvas.width = pixelCrop.width;
+      canvas.height = pixelCrop.height;
+
+      ctx.drawImage(
+        image,
+        pixelCrop.x,
+        pixelCrop.y,
+        pixelCrop.width,
+        pixelCrop.height,
+        0,
+        0,
+        pixelCrop.width,
+        pixelCrop.height
+      );
+
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('Canvas is empty'));
+          return;
+        }
+        resolve(blob);
+      }, 'image/jpeg', 0.9);
+    };
+    image.onerror = (err) => reject(err);
+  });
+};

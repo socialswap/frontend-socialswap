@@ -4,7 +4,7 @@ import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-
 import { MessageOutlined } from '@ant-design/icons';
 import Header from './Component/Header/Header';
 import MobileFooter from './Component/Header/MobileFooter';
-import { WhatsappIcon } from 'react-share';
+import { FaWhatsapp } from 'react-icons/fa';
 import Footer from './Component/Footer/Footer';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8090/api';
@@ -286,10 +286,14 @@ const AppContent = () => {
                 </span>
               )}
             </div>
-            <div className="hover:scale-110 transition-transform rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.15)] cursor-pointer">
-              <WhatsappIcon
-                onClick={handleMakeOffer} size={40} round
-              />
+            <div
+              onClick={handleMakeOffer}
+              className="relative cursor-pointer w-11 h-11 bg-gradient-to-tr from-[#25D366] to-[#128C7E] rounded-full flex justify-center items-center text-white shadow-[0_4px_15px_rgba(37,211,102,0.4)] hover:shadow-[0_6px_20px_rgba(37,211,102,0.6)] hover:scale-110 transition-all duration-300"
+              title="Chat on WhatsApp"
+            >
+              <FaWhatsapp size={26} />
+              {/* Subtle ping animation behind the button */}
+              <span className="absolute inset-0 rounded-full bg-[#25D366] opacity-30 animate-ping pointer-events-none" style={{ animationDuration: '3s' }}></span>
             </div>
           </div>
         )}

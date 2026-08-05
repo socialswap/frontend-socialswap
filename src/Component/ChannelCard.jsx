@@ -74,7 +74,7 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
     navigate(`/channel/${slug}`);
   };
 
-  const banner = channel.logoUrl || channel.bannerUrl || channel.imageUrls?.[0] || '/images/yt.png';
+  const banner = channel.dashboardImage || channel.logoUrl || channel.bannerUrl || channel.imageUrls?.[0] || '/images/yt.png';
   const avatar = channel.avatar || channel.logoUrl || channel.imageUrls?.[0];
 
   const hasDiscount = channel.discount && channel.discount > 0;
@@ -96,7 +96,7 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
       }}
     >
       {/* Banner Section with Interactive Overlay */}
-      <div className="relative h-20 overflow-hidden">
+      <div className="relative h-32 overflow-hidden">
         <motion.img
           src={banner}
           alt={channel.name}
@@ -332,5 +332,39 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
     </motion.div>
   );
 };
+
+export const ChannelCardSkeleton = () => (
+  <div 
+    className="relative rounded-card overflow-hidden bg-white/20 dark:bg-[#110C1F]/20 backdrop-blur-[18px] border border-white/20 dark:border-white/5 animate-pulse min-w-[300px]"
+    style={{ minHeight: '420px' }}
+  >
+    <div className="relative h-32 overflow-hidden bg-gray-300 dark:bg-gray-700/50"></div>
+    <div className="p-4">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700/50 shrink-0"></div>
+        <div className="flex-1 space-y-2">
+          <div className="h-4 bg-gray-300 dark:bg-gray-700/50 rounded w-3/4"></div>
+          <div className="h-3 bg-gray-300 dark:bg-gray-700/50 rounded w-1/4"></div>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="h-12 bg-gray-200 dark:bg-gray-800/50 rounded-lg"></div>
+        ))}
+      </div>
+      <div className="flex justify-between items-end mb-6">
+        <div className="space-y-2 w-1/2">
+          <div className="h-3 bg-gray-200 dark:bg-gray-800/50 rounded w-1/2"></div>
+          <div className="h-6 bg-gray-300 dark:bg-gray-700/50 rounded w-3/4"></div>
+        </div>
+        <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700/50"></div>
+      </div>
+      <div className="flex gap-2">
+        <div className="flex-1 h-9 bg-gray-300 dark:bg-gray-700/50 rounded-button"></div>
+        <div className="flex-1 h-9 bg-gray-300 dark:bg-gray-700/50 rounded-button"></div>
+      </div>
+    </div>
+  </div>
+);
 
 export default ChannelCard;

@@ -181,7 +181,7 @@ const NicheCarousel = () => {
     dragRef.current.isDragging = true;
     dragRef.current.moved      = false;
     dragRef.current.startX     = clientX;
-    dragRef.current.startProgress = progressObj.current.value;
+    dragRef.current.startProgress = tweenRef.current ? tweenRef.current.progress() : progressObj.current.value;
     if (tweenRef.current) tweenRef.current.pause();
   };
 
@@ -196,8 +196,11 @@ const NicheCarousel = () => {
     const progressDelta = deltaX / totalW;
     let newProgress = (dragRef.current.startProgress + progressDelta) % 1;
     if (newProgress < 0) newProgress += 1;
-    progressObj.current.value = newProgress;
-    if (tweenRef.current) tweenRef.current.vars.onUpdate();
+    
+    // Update the GSAP tween's internal progress directly instead of manually mutating
+    if (tweenRef.current) {
+      tweenRef.current.progress(newProgress);
+    }
   };
 
   const handleDragEnd = () => {

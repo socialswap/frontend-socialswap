@@ -2,10 +2,13 @@ import React, { Suspense, lazy } from 'react';
 import { useRoutes, Navigate } from 'react-router-dom';
 
 import HomePage from '../Pages/LandingPage/HomePage';
+import BlogSection from '../Pages/Blogs/Blogs';
+import BlogDetail from '../Pages/Blogs/BlogDetail';
 
+import DetailPageWrapper from '../Component/Channel/DetailPageWrapper';
 const Stats = lazy(() => import('../Component/Stats/Stats'));
 const FeaturedListings = lazy(() => import('../Component/Feature/Feature'));
-const DetailPageWrapper = lazy(() => import('../Component/Channel/DetailPageWrapper'));
+
 const CartPage = lazy(() => import('../Component/Cart/Cart'));
 const NotFoundPage = lazy(() => import('../Component/PageNotFound/PageNotFound'));
 const Login = lazy(() => import('../Pages/Seller/Login'));
@@ -14,7 +17,7 @@ const ChannelList = lazy(() => import('../Pages/Channels/Channels'));
 const AdminDashboard = lazy(() => import('../Pages/Admin/AdminDashboard'));
 const UnauthorizedComponent = lazy(() => import('../Component/UnAuthorized/UnAuthorized'));
 const ChannelTransactionSteps = lazy(() => import('../Component/Steps/Steps/ChannelSteps/ChannelSteps'));
-const BlogSection = lazy(() => import('../Pages/Blogs/Blogs'));
+
 const UserProfile = lazy(() => import('../Component/Profile/Profile'));
 const PublicUserProfile = lazy(() => import('../Pages/Profile/PublicUserProfile'));
 const GrowYourChannel = lazy(() => import('../Pages/GrowYourChannel/GrowYourChannel'));
@@ -31,7 +34,7 @@ const PrivacyPolicy = lazy(() => import('../ExternalPages/PrivacyPolicy'));
 const TermsAndConditions = lazy(() => import('../ExternalPages/TermsAndConditions'));
 const RefundAndReturnPolicy = lazy(() => import('../ExternalPages/RefundPolicy'));
 const ShippingAndCancellationPolicy = lazy(() => import('../ExternalPages/Cancellation'));
-const BlogDetail = lazy(() => import('../Pages/Blogs/BlogDetail'));
+
 const UserChat = lazy(() => import('../Pages/Chat/UserChat'));
 const AdminChat = lazy(() => import('../Pages/Admin/AdminChat'));
 const ProfileLayout = lazy(() => import('../Component/Profile/ProfileLayout'));
@@ -128,7 +131,7 @@ const Routes = () => {
   ];
 
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-bg-primary w-full animate-pulse"></div>}>
       {useRoutes(routes)}
     </Suspense>
   );

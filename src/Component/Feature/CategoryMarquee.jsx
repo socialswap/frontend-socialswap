@@ -122,7 +122,12 @@ const CategoryMarquee = () => {
             hidden: { opacity: 0, scale: 0.8 },
             visible: { opacity: 1, scale: 1, transition: { type: 'spring', bounce: 0.5 } }
           }}
-          className="inline-block py-1 px-4 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-bold text-sm mb-4 border border-purple-200 dark:border-purple-500/30 shadow-sm"
+          className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase mb-4 border shadow-sm"
+          style={{
+            background: 'rgba(16, 185, 129, 0.1)',
+            color: '#10B981',
+            borderColor: 'rgba(16, 185, 129, 0.2)',
+          }}
         >
           Find Your Niche
         </motion.span>
