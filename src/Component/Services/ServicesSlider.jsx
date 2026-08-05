@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Carousel } from 'antd';
 import { ArrowRightOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
-import axiosInstance, { api, cachedGet } from '../../API/api';
+import axiosInstance, { api, cachedGet, apiCache } from '../../API/api';
 
 // Custom Arrow Components for the Carousel
 const SlickArrowLeft = ({ currentSlide, slideCount, ...props }) => (
@@ -30,9 +30,14 @@ const SlickArrowRight = ({ currentSlide, slideCount, ...props }) => (
   </button>
 );
 
+const SERVICES_URL = `${api}/services`;
+
 const ServicesSlider = () => {
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [services, setServices] = useState(() => {
+    const cached = apiCache.get(SERVICES_URL);
+    return cached?.data?.services || [];
+  });
+  const [loading, setLoading] = useState(() => !apiCache.has(SERVICES_URL));
 
   useEffect(() => {
     const fetchServices = async () => {

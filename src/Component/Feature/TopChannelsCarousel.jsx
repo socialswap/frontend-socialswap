@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axiosInstance, { api as API_BASE_URL, cachedGet } from '../../API/api';
+import axiosInstance, { api as API_BASE_URL, cachedGet, apiCache } from '../../API/api';
 import Carousel from './Carousel';
 import ChannelCard, { ChannelCardSkeleton } from '../ChannelCard';
 
+const CHANNELS_URL = `${API_BASE_URL}/channels`;
+
+const getInitialChannels = () => {
+  const cached = apiCache.get(CHANNELS_URL);
+  if (!cached) return [];
+  const payload = cached?.data ?? {};
+  const list = Array.isArray(payload?.channels) ? payload.channels
+    : Array.isArray(payload) ? payload : [];
+  return list.slice(0, 8);
+};
+
 const TopChannelsCarousel = () => {
-  const [topChannels, setTopChannels] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [topChannels, setTopChannels] = useState(() => getInitialChannels());
+  const [loading, setLoading] = useState(() => !apiCache.has(CHANNELS_URL));
   const [error, setError] = useState(null);
 
   useEffect(() => {

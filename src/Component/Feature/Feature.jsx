@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance, { api, cachedGet } from '../../API/api';
+import axiosInstance, { api, cachedGet, apiCache } from '../../API/api';
 import { message } from 'antd';
 import { FaCheckCircle, FaUsers, FaEye, FaChartLine, FaClock } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -297,10 +297,18 @@ export const ChannelCard = ({ channel }) => {
   );
 };
 
+const DEMANDING_URL = `${API_BASE_URL}/channels/demanding`;
+
 const FeaturedListings = () => {
-  const [featuredChannels, setFeaturedChannels] = useState([]);
-  const [filteredChannels, setFilteredChannels] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [featuredChannels, setFeaturedChannels] = useState(() => {
+    const cached = apiCache.get(DEMANDING_URL);
+    return cached?.data || [];
+  });
+  const [filteredChannels, setFilteredChannels] = useState(() => {
+    const cached = apiCache.get(DEMANDING_URL);
+    return cached?.data || [];
+  });
+  const [loading, setLoading] = useState(() => !apiCache.has(DEMANDING_URL));
   const [error, setError] = useState(null);
   const [activeFilter, setActiveFilter] = useState('All');
   const navigate = useNavigate();

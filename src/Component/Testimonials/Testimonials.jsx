@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Carousel } from 'antd';
 import { StarFilled } from '@ant-design/icons';
 import { motion } from 'framer-motion';
-import axiosInstance, { api, cachedGet } from '../../API/api';
+import axiosInstance, { api, cachedGet, apiCache } from '../../API/api';
+
+const TESTIMONIALS_URL = `${api}/testimonials?limit=10`;
 
 const TestimonialCard = ({ testimonial }) => {
   return (
@@ -106,8 +108,11 @@ const TestimonialSkeleton = () => (
 );
 
 const Testimonials = () => {
-  const [testimonials, setTestimonials] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [testimonials, setTestimonials] = useState(() => {
+    const cached = apiCache.get(TESTIMONIALS_URL);
+    return cached?.data?.data || [];
+  });
+  const [loading, setLoading] = useState(() => !apiCache.has(TESTIMONIALS_URL));
 
   useEffect(() => {
     const fetchTestimonials = async () => {

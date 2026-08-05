@@ -1,12 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axiosInstance, { api as API_BASE_URL, cachedGet } from '../../API/api';
+import axiosInstance, { api as API_BASE_URL, cachedGet, apiCache } from '../../API/api';
 import Carousel from './Carousel';
 import ChannelCard, { ChannelCardSkeleton } from '../ChannelCard';
 
+const BFB_URL = `${API_BASE_URL}/channels`;
+
+const getSortedBeginnersFromCache = () => {
+  const cached = apiCache.get(BFB_URL);
+  if (!cached) return [];
+  const payload = cached?.data ?? {};
+  return (payload.channels || [])
+    .filter(ch => ch.status === 'Available' && ch.price)
+    .sort((a, b) => {
+      const pA = parseFloat((a.price || '0').replace(/[^0-9.-]+/g, ''));
+      const pB = parseFloat((b.price || '0').replace(/[^0-9.-]+/g, ''));
+      return pA - pB;
+    })
+    .slice(0, 8);
+};
+
 const BestForBeginners = () => {
-  const [beginnerChannels, setBeginnerChannels] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [beginnerChannels, setBeginnerChannels] = useState(() => getSortedBeginnersFromCache());
+  const [loading, setLoading] = useState(() => !apiCache.has(BFB_URL));
   const [error, setError] = useState(null);
 
   useEffect(() => {
