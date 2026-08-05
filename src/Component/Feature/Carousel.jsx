@@ -23,21 +23,25 @@ const Carousel = ({ children, direction = 'left', speed = 1.0 }) => {
   useAnimationFrame((t, delta) => {
     if (singleSetWidth === 0) return;
     
+    // Cap delta to prevent massive jumps when tab resumes or scroll unpauses
+    const safeDelta = Math.min(delta, 50);
     let currentX = x.get();
     
     // Auto scroll when not interacting
     if (!isDragging && !isHovered) {
       if (direction === 'right') {
-        currentX += speed * (delta / 16);
+        currentX += speed * (safeDelta / 16);
       } else {
-        currentX -= speed * (delta / 16);
+        currentX -= speed * (safeDelta / 16);
       }
     }
     
     // Always wrap if out of bounds (handles drag overshoots too)
-    if (currentX <= -singleSetWidth * 2) {
+    // Safely wrap with while loop in case of multiple set overshoots
+    while (currentX <= -singleSetWidth * 2) {
       currentX += singleSetWidth;
-    } else if (currentX >= -singleSetWidth) {
+    }
+    while (currentX >= -singleSetWidth) {
       currentX -= singleSetWidth;
     }
 
