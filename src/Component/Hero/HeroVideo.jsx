@@ -2,12 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PlayCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance, { api, cachedGet } from '../../API/api';
+import axiosInstance, { api, cachedGet, apiCache } from '../../API/api';
+
+const HOME_VIDEO_URL = `${api}/home-video`;
 
 const HeroVideo = () => {
   const navigate = useNavigate();
-  const [videoUrl, setVideoUrl] = useState("https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ");
-  const [loading, setLoading] = useState(true);
+  const [videoUrl, setVideoUrl] = useState(() => {
+    const cached = apiCache.get(HOME_VIDEO_URL);
+    return cached?.data?.url || "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ";
+  });
+  const [loading, setLoading] = useState(() => !apiCache.has(HOME_VIDEO_URL));
 
   useEffect(() => {
     const fetchVideo = async () => {
