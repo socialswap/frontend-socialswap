@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import axiosInstance from '../../API/api';
 import {
   Table,
@@ -49,6 +49,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('users');
   const [openChatUserId, setOpenChatUserId] = useState(null);
   const [form] = Form.useForm();
+  const tabScrollRef = useRef(null);
 
   const [isDarkMode, setIsDarkMode] = useState(
     document.documentElement.classList.contains('dark') || 
@@ -387,6 +388,13 @@ const AdminDashboard = () => {
     >
       <SEOHead title="Admin Dashboard | SocialSwap" noIndex={true} />
       <div className="max-w-7xl mx-auto mt-20 px-4 pb-8 sm:px-6 lg:px-8">
+        <div className="flex justify-end mb-2">
+          <Tooltip title="Refresh">
+            <Button icon={<ReloadOutlined />} onClick={fetchUsers} loading={loading}>
+              Refresh
+            </Button>
+          </Tooltip>
+        </div>
       <Tabs 
         activeKey={activeTab}
         onChange={setActiveTab}
@@ -394,13 +402,21 @@ const AdminDashboard = () => {
         destroyInactiveTabPane={true}
         size="large"
         className="admin-dashboard-tabs"
-        tabBarExtraContent={
-          <Tooltip title="Refresh">
-            <Button icon={<ReloadOutlined />} onClick={fetchUsers} loading={loading}>
-              Refresh
-            </Button>
-          </Tooltip>
-        }
+        renderTabBar={(props, DefaultTabBar) => (
+          <div
+            ref={tabScrollRef}
+            style={{
+              overflowX: 'auto',
+              overflowY: 'hidden',
+              paddingBottom: '6px',
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#7C3AED #f0ebff',
+            }}
+            className="admin-tabs-scroll-bar"
+          >
+            <DefaultTabBar {...props} style={{ width: 'max-content', marginBottom: 0 }} />
+          </div>
+        )}
       />
 
       <Modal

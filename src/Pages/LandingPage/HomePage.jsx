@@ -53,7 +53,7 @@ const LazyWrapper = ({ children, minHeight = '50vh', index = 0 }) => {
   const [forceLoad, setForceLoad] = React.useState(false);
   const { ref, inView } = useInView({
     triggerOnce: true,
-    rootMargin: '1500px 0px', // Load aggressively if scrolled fast
+    rootMargin: '800px 0px',
   });
 
   React.useEffect(() => {
@@ -67,7 +67,7 @@ const LazyWrapper = ({ children, minHeight = '50vh', index = 0 }) => {
   const shouldLoad = inView || forceLoad;
 
   return (
-    <div ref={ref} style={{ minHeight }} className="w-full relative transition-all duration-500">
+    <div ref={ref} style={{ minHeight }} className="w-full relative">
       {shouldLoad ? (
         <Suspense fallback={
           <div className="w-full h-full p-4 flex items-center justify-center">
@@ -83,26 +83,25 @@ const LazyWrapper = ({ children, minHeight = '50vh', index = 0 }) => {
 
 const HomePage = () => {
   useEffect(() => {
+    // Lenis smooth scroll — disabled on mobile (native scroll is faster)
+    if (window.innerWidth < 768) return;
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      direction: 'vertical',
-      gestureDirection: 'vertical',
       smooth: true,
-      mouseMultiplier: 1,
       smoothTouch: false,
-      touchMultiplier: 2,
-      infinite: false,
     });
 
+    let rafId;
     function raf(time) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      rafId = requestAnimationFrame(raf);
     }
-
-    requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
 
     return () => {
+      cancelAnimationFrame(rafId);
       lenis.destroy();
     };
   }, []);

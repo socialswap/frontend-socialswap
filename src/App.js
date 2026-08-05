@@ -208,10 +208,10 @@ const AppContent = () => {
 
   return (
     <div className="relative min-h-screen">
-      {/* 🟣 Global Floating Ambient Gradient Blobs for Glassmorphism Theme */}
-      <div className="fixed top-[-100px] left-[-100px] w-[600px] h-[600px] bg-[#B69BFF]/35 dark:bg-[#7B61FF]/20 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="fixed bottom-[-100px] right-[-100px] w-[650px] h-[650px] bg-[#FFD7B5]/35 dark:bg-[#F4B6D2]/15 rounded-full blur-[150px] pointer-events-none z-0" />
-      <div className="fixed top-[35%] left-[25%] w-[550px] h-[550px] bg-[#F4B6D2]/25 dark:bg-[#C6B4FF]/15 rounded-full blur-[160px] pointer-events-none z-0" />
+      {/* Global Floating Ambient Blobs — desktop only to prevent mobile GPU overdraw */}
+      <div className="hidden md:block fixed top-[-100px] left-[-100px] w-[600px] h-[600px] bg-[#B69BFF]/35 dark:bg-[#7B61FF]/20 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="hidden md:block fixed bottom-[-100px] right-[-100px] w-[650px] h-[650px] bg-[#FFD7B5]/35 dark:bg-[#F4B6D2]/15 rounded-full blur-[150px] pointer-events-none z-0" />
+      <div className="hidden md:block fixed top-[35%] left-[25%] w-[550px] h-[550px] bg-[#F4B6D2]/25 dark:bg-[#C6B4FF]/15 rounded-full blur-[160px] pointer-events-none z-0" />
 
       <div className="relative z-10">
         <Header />
