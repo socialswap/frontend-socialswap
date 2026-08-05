@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Drawer, Badge, notification } from 'antd';
+import { Drawer, Badge } from 'antd';
 import io from 'socket.io-client';
 import { jwtDecode } from 'jwt-decode';
 import { 
@@ -94,7 +94,7 @@ const Header = () => {
         return () => socket.close();
       }
     }
-  }, [isLoggedIn, navigate]);
+  }, [isLoggedIn, navigate, playNotificationSound]);
 
   const [userAvatar, setUserAvatar] = useState(null);
 

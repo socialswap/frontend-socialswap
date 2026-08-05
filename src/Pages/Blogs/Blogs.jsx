@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Empty, Spin } from 'antd';
-import { ArrowRightOutlined } from '@ant-design/icons';
+import { Empty, Spin } from 'antd';
 import axiosInstance, { api } from '../../API/api';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEOHead from '../../Component/SEO/SEOHead';
-
-const { Paragraph } = Typography;
 
 const blogListSchema = {
   '@context': 'https://schema.org',

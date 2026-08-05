@@ -4,7 +4,6 @@ import {
   ShoppingCartOutlined,
   DollarOutlined,
   ThunderboltOutlined,
-  BulbOutlined,
   RobotOutlined
 } from '@ant-design/icons';
 import { motion } from 'framer-motion';
@@ -351,7 +350,6 @@ const ChannelTransactionSteps = () => {
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     return () => observer.disconnect();
-      <SEOHead title="How It Works | SocialSwap" description="Learn how to buy or sell a YouTube channel securely on SocialSwap." />
   }, []);
   const whatsappLink = 'https://wa.me/919423523291';
 
@@ -455,6 +453,7 @@ const ChannelTransactionSteps = () => {
 
   return (
     <div className="mt-24 md:mt-40">
+      <SEOHead title="How It Works | SocialSwap" description="Learn how to buy or sell a YouTube channel securely on SocialSwap." />
       <Card style={{ maxWidth: 1100, margin: '0 auto' }} className={`${dark ? 'bg-[#0b0b10] border-white/10' : 'bg-transparent'} rounded-3xl overflow-visible`}>
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           <div className="flex flex-col items-center gap-5">

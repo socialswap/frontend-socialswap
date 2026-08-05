@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Spin, Result } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LoadingOutlined } from '@ant-design/icons';
@@ -15,11 +15,7 @@ const DetailPageWrapper = () => {
   const { username } = useParams();  // changed from :id to :username
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchChannelDetails();
-  }, [username]);
-
-  const fetchChannelDetails = async () => {
+  const fetchChannelDetails = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -32,7 +28,11 @@ const DetailPageWrapper = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [username]);
+
+  useEffect(() => {
+    fetchChannelDetails();
+  }, [fetchChannelDetails]);
 
   // Build SEO metadata dynamically from channel data
   const buildChannelSEO = (ch) => {

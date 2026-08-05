@@ -23,8 +23,7 @@ import {
   ConfigProvider,
   theme,
 } from 'antd';
-import { PictureOutlined, ReloadOutlined, UserOutlined, TeamOutlined, SafetyCertificateOutlined, SearchOutlined, DeleteOutlined, EyeOutlined, FileTextOutlined, MessageOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { ReloadOutlined, UserOutlined, TeamOutlined, SafetyCertificateOutlined, SearchOutlined, DeleteOutlined, EyeOutlined, MessageOutlined } from '@ant-design/icons';
 import { api } from '../../API/api';
 import AdminChannels from './AdminChannels';
 import AdminTransactions from './AdminTransactions';
@@ -41,7 +40,6 @@ const { Option } = Select;
 const { Title, Text } = Typography;
 
 const AdminDashboard = () => {
-  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -65,7 +63,6 @@ const AdminDashboard = () => {
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
     return () => observer.disconnect();
-      <SEOHead title="Admin Dashboard | SocialSwap" noIndex={true} />
   }, []);
 
   useEffect(() => {
@@ -388,6 +385,7 @@ const AdminDashboard = () => {
         }
       }}
     >
+      <SEOHead title="Admin Dashboard | SocialSwap" noIndex={true} />
       <div className="max-w-7xl mx-auto mt-20 px-4 pb-8 sm:px-6 lg:px-8">
       <Tabs 
         activeKey={activeTab}

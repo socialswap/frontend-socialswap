@@ -4,5 +4,12 @@
     { "source": "/userprofile/:username", "destination": "/api/og" },
     { "source": "/blogs/:slug", "destination": "/api/og" },
     { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "redirects": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "https://backend-socialswap.onrender.com/api/sitemap.xml",
+      "permanent": false
+    }
   ]
 }

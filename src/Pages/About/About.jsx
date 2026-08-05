@@ -13,7 +13,6 @@ const { Title, Paragraph, Text } = Typography;
 // Glassmorphism theme constants
 const primaryColor = '#6E4BFF';
 const backgroundColor = 'transparent';
-const surfaceColor = 'rgba(255,255,255,0.45)';
 const surfaceAltColor = 'rgba(255,255,255,0.25)';
 const textColor = 'var(--text-primary)';
 const subTextColor = 'var(--text-secondary)';

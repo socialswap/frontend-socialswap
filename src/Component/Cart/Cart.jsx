@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Empty, message, Skeleton, Button, Popconfirm, ConfigProvider, theme } from 'antd';
-import { DeleteOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-import { Link, useNavigate } from 'react-router-dom';
+import { Typography, Empty, message, Skeleton, Button, ConfigProvider, theme } from 'antd';
+import { ShoppingCartOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 import axiosInstance, { api } from '../../API/api';
 import {jwtDecode} from 'jwt-decode';
 import ChannelCard from '../ChannelCard';
@@ -43,7 +43,6 @@ const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [paymentLoading, setPaymentLoading] = useState(false);
-  const navigate = useNavigate();
 
   const [isDarkMode, setIsDarkMode] = useState(
     document.documentElement.classList.contains('dark') || 
@@ -58,7 +57,6 @@ const CartPage = () => {
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
     return () => observer.disconnect();
-      <SEOHead title="Your Cart | SocialSwap" noIndex={true} />
   }, []);
 
   const formatCurrency = (value = 0) =>
@@ -235,6 +233,7 @@ const CartPage = () => {
         }
       }}
     >
+      <SEOHead title="Your Cart | SocialSwap" noIndex={true} />
       <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-[#07030F] dark:via-[#0F0A1D] dark:to-[#07030F] pt-28 pb-16 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -58,9 +58,7 @@ export default function UploadChannel() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState(initialForm);
-  const [banner, setBanner] = useState(null);
   const [images, setImages] = useState([]);
-  const [bannerPreview, setBannerPreview] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -71,18 +69,7 @@ export default function UploadChannel() {
   const { id } = useParams();
   const isEditMode = !!id;
 
-  useEffect(() => {
-    if (isEditMode) {
-      fetchChannelDetails();
-    }
-  }, [id]);
-
-  // Scroll to top when step changes
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [step]);
-
-  const fetchChannelDetails = async () => {
+  const fetchChannelDetails = useCallback(async () => {
     try {
       const res = await axiosInstance.get(`${api}/channels/${id}`);
       const data = res.data;
@@ -117,9 +104,6 @@ export default function UploadChannel() {
         sold: data.sold || false
       });
 
-      if (data.bannerUrl) {
-        setBannerPreview(data.bannerUrl);
-      }
       if (data.imageUrls) {
         setExistingImages(data.imageUrls);
         setImagePreviews(data.imageUrls);
@@ -127,7 +111,20 @@ export default function UploadChannel() {
     } catch (err) {
       setError('Failed to fetch channel details for editing.');
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (isEditMode) {
+      fetchChannelDetails();
+    }
+  }, [isEditMode, fetchChannelDetails]);
+
+  // Scroll to top when step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step]);
+
+
 
   // ── YouTube Auto-fill State ──────────────────────────────────
   const [fetchInput, setFetchInput] = useState('');
@@ -188,20 +185,7 @@ export default function UploadChannel() {
     setFetchError('');
   };
 
-  const handleBanner = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setLoading(true);
-    try {
-      const webpFile = await compressAndConvertToWebP(file, 0.8);
-      setBanner(webpFile);
-      setBannerPreview(URL.createObjectURL(webpFile));
-    } catch (err) {
-      console.error('Error compressing banner:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   const handleImages = async (e) => {
     const files = Array.from(e.target.files);
@@ -343,7 +327,7 @@ export default function UploadChannel() {
             </button>
             {!isEditMode && (
               <button
-                onClick={() => { setSuccess(false); setStep(0); setForm(initialForm); setBanner(null); setImages([]); setBannerPreview(null); setImagePreviews([]); }}
+                onClick={() => { setSuccess(false); setStep(0); setForm(initialForm); setImages([]); setImagePreviews([]); }}
                 className="px-5 py-2.5 bg-gray-50 dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 text-gray-600 dark:text-white/70 font-medium rounded-xl text-sm hover:bg-gray-200 dark:bg-white/10 transition-colors"
               >
                 List Another

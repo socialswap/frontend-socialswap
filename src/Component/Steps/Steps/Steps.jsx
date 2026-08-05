@@ -1,5 +1,5 @@
 import React from 'react';
-import { Steps, Typography, Card, Button } from 'antd';
+import { Steps, Typography, Card } from 'antd';
 import { ShoppingCartOutlined, ShoppingOutlined, CreditCardOutlined, CheckCircleOutlined, MailOutlined, WhatsAppOutlined, CustomerServiceOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph, Text } = Typography;

@@ -2,13 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, Button, List, message, Spin, Modal, Form, Input, Switch } from 'antd';
 import { 
   UserOutlined, 
-  SettingOutlined, 
-  ShoppingOutlined, 
-  DashboardOutlined,
   LockOutlined,
   QuestionCircleOutlined,
-  LogoutOutlined,
-  TransactionOutlined,
   BellOutlined,
   CameraOutlined,
   PhoneOutlined,
@@ -17,7 +12,6 @@ import {
 import styled from 'styled-components';
 import axios from 'axios';
 import axiosInstance, { api } from '../../API/api';
-import { useNavigate } from 'react-router-dom';
 import { subscribeToPush, unsubscribeFromPush } from '../../App';
 import imageCompression from 'browser-image-compression';
 import SEOHead from '../SEO/SEOHead';
@@ -266,7 +260,7 @@ const UserProfile = () => {
   const fileInputRef = useRef(null);
   const [passwordForm] = Form.useForm();
   const [profileForm] = Form.useForm();
-  const navigate = useNavigate();
+
 
   // Notification toggle state — checks REAL subscription, not just browser permission
   const [notifEnabled, setNotifEnabled] = useState(false);

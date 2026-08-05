@@ -4,11 +4,6 @@ import {
   CalculatorOutlined, 
   SearchOutlined, 
   DollarOutlined, 
-  LineChartOutlined, 
-  BulbOutlined, 
-  CalendarOutlined, 
-  SwapOutlined, 
-  ThunderboltOutlined,
   ToolOutlined,
   ArrowRightOutlined
 } from '@ant-design/icons';
