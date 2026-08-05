@@ -1,5 +1,4 @@
 import React, { Suspense, useEffect } from 'react';
-import { useInView } from 'react-intersection-observer';
 import Lenis from 'lenis';
 import SEOHead from '../../Component/SEO/SEOHead';
 import NicheCarousel from '../../Component/Feature/NicheCarousel';
@@ -48,38 +47,19 @@ const orgSchema = {
   },
 };
 
-// LazyWrapper ensures components are fetched/rendered efficiently
-const LazyWrapper = ({ children, minHeight = '50vh', index = 0 }) => {
-  const [forceLoad, setForceLoad] = React.useState(false);
-  const { ref, inView } = useInView({
-    triggerOnce: true,
-    rootMargin: '800px 0px',
-  });
-
-  React.useEffect(() => {
-    // Automatically load in the background, staggered to prevent freezing
-    const timer = setTimeout(() => {
-      setForceLoad(true);
-    }, 1000 + (index * 600)); 
-    return () => clearTimeout(timer);
-  }, [index]);
-
-  const shouldLoad = inView || forceLoad;
-
-  return (
-    <div ref={ref} style={{ minHeight }} className="w-full relative">
-      {shouldLoad ? (
-        <Suspense fallback={
-          <div className="w-full h-full p-4 flex items-center justify-center">
-             <div className="w-full max-w-7xl h-[calc(100%-2rem)] min-h-[400px] bg-white/10 dark:bg-white/5 rounded-[32px] animate-pulse"></div>
-          </div>
-        }>
-          {children}
-        </Suspense>
-      ) : null}
+// Static skeleton fallback — only shown during initial JS chunk download
+const SectionShell = ({ height = '60vh' }) => (
+  <div className="w-full" style={{ minHeight: height }}>
+    <div className="w-full h-full mx-auto px-4 py-10">
+      <div className="w-48 h-6 bg-white/10 dark:bg-white/5 rounded-full mx-auto mb-6 animate-pulse" />
+      <div className="flex gap-4 overflow-hidden">
+        {[1,2,3].map(i => (
+          <div key={i} className="flex-1 min-h-[300px] bg-white/10 dark:bg-white/5 rounded-[24px] animate-pulse" />
+        ))}
+      </div>
     </div>
-  );
-};
+  </div>
+);
 
 const HomePage = () => {
   useEffect(() => {
@@ -106,7 +86,7 @@ const HomePage = () => {
     };
   }, []);
 
-  // Pre-fetch below-the-fold components in the background
+  // Pre-fetch all JS chunks in background shortly after first render
   useEffect(() => {
     const timer = setTimeout(() => {
       HeroVideo.preload();
@@ -117,7 +97,7 @@ const HomePage = () => {
       Testimonials.preload();
       ContactForm.preload();
       FAQSection.preload();
-    }, 1500); // Wait 1.5s so initial load isn't affected
+    }, 800);
     return () => clearTimeout(timer);
   }, []);
 
@@ -139,50 +119,46 @@ const HomePage = () => {
         ]}
       />
       
-      {/* 1. Niche Carousel Hero (Loads immediately for LCP optimization) */}
+      {/* 1. Niche Carousel Hero — always rendered immediately */}
       <NicheCarousel />
 
       <div className="max-w-[100%] mx-auto w-full">
         
-        {/* 2. Hero with Information Video */}
-        <LazyWrapper minHeight="70vh" index={1}>
+        {/* All sections are permanently mounted once loaded.
+            Suspense fallback only shows during initial JS chunk download.
+            Components self-manage loading states via apiCache. */}
+
+        <Suspense fallback={<SectionShell height="70vh" />}>
           <HeroVideo />
-        </LazyWrapper>
+        </Suspense>
 
-        {/* 3. Highly Valuable / Top Rated channels */}
-        <LazyWrapper minHeight="60vh" index={2}>
+        <Suspense fallback={<SectionShell height="60vh" />}>
           <TopChannelsCarousel />
-        </LazyWrapper>
+        </Suspense>
 
-        {/* 4. Best for Beginners normal channels */}
-        <LazyWrapper minHeight="60vh" index={3}>
+        <Suspense fallback={<SectionShell height="60vh" />}>
           <BestForBeginners />
-        </LazyWrapper>
+        </Suspense>
 
-        {/* 5. Explore Channels Category (Dual Marquee) */}
-        <LazyWrapper minHeight="40vh" index={4}>
+        <Suspense fallback={<SectionShell height="40vh" />}>
           <CategoryMarquee />
-        </LazyWrapper>
+        </Suspense>
 
-        {/* 6. Explore Services */}
-        <LazyWrapper minHeight="60vh" index={5}>
+        <Suspense fallback={<SectionShell height="60vh" />}>
           <ServicesSlider />
-        </LazyWrapper>
+        </Suspense>
 
-        {/* 7. Testimonials */}
-        <LazyWrapper minHeight="50vh" index={6}>
+        <Suspense fallback={<SectionShell height="50vh" />}>
           <Testimonials />
-        </LazyWrapper>
+        </Suspense>
 
-        {/* 8. Contact Us / Custom Service Form */}
-        <LazyWrapper minHeight="80vh" index={7}>
+        <Suspense fallback={<SectionShell height="80vh" />}>
           <ContactForm />
-        </LazyWrapper>
+        </Suspense>
 
-        {/* 9. FAQ Section */}
-        <LazyWrapper minHeight="60vh" index={8}>
+        <Suspense fallback={<SectionShell height="60vh" />}>
           <FAQSection />
-        </LazyWrapper>
+        </Suspense>
         
         {/* 10. Footer is already rendered in App.js at the bottom of routes */}
       </div>
