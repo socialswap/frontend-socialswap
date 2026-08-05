@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, useMotionValue, useAnimationFrame } from 'framer-motion';
 
 const categories = [
   { name: 'Gaming', icon: '/images/gaming.PNG' },
@@ -28,117 +29,83 @@ const categories = [
   { name: 'Real Estate', icon: '/images/home.PNG' },
 ];
 
-// Pure CSS marquee row — no JS animation loop, GPU-composited via translate3d
 const MarqueeRow = ({ items, direction = 'left' }) => {
   const navigate = useNavigate();
-  const [isPaused, setIsPaused] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const dragStartX = useRef(0);
-  const dragStartOffset = useRef(0);
-  const offsetRef = useRef(0);
-  const trackRef = useRef(null);
-  const rafRef = useRef(null);
-  const animPausedRef = useRef(false);
+  const containerRef = useRef(null);
+  const [contentWidth, setContentWidth] = useState(0);
+  const x = useMotionValue(0);
 
-  // Scroll items duplicated for seamless loop
-  const scrollItems = [...items, ...items];
-
-  // For drag: pause CSS animation and manually control translate
-  const pauseCSS = useCallback(() => {
-    if (!trackRef.current || animPausedRef.current) return;
-    const style = window.getComputedStyle(trackRef.current);
-    const matrix = new DOMMatrix(style.transform);
-    offsetRef.current = matrix.m41; // current translateX
-    trackRef.current.style.animationPlayState = 'paused';
-    trackRef.current.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
-    animPausedRef.current = true;
-  }, []);
-
-  const resumeCSS = useCallback(() => {
-    if (!trackRef.current || !animPausedRef.current) return;
-    trackRef.current.style.transform = '';
-    trackRef.current.style.animationPlayState = 'running';
-    animPausedRef.current = false;
-  }, []);
-
-  const onMouseEnter = () => { setIsPaused(true); pauseCSS(); };
-  const onMouseLeave = () => { if (!isDragging) { setIsPaused(false); resumeCSS(); } };
-
-  const onPointerDown = (e) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
-    pauseCSS();
-    setIsDragging(true);
-    dragStartX.current = e.clientX;
-    dragStartOffset.current = offsetRef.current;
-  };
-
-  const onPointerMove = (e) => {
-    if (!isDragging) return;
-    const delta = e.clientX - dragStartX.current;
-    const newOffset = dragStartOffset.current + delta;
-    offsetRef.current = newOffset;
-    if (trackRef.current) {
-      trackRef.current.style.transform = `translate3d(${newOffset}px, 0, 0)`;
+  // Measure single set width on mount
+  useEffect(() => {
+    if (containerRef.current) {
+      // Divide by 4 because we render 4 copies for seamless drag
+      setContentWidth(containerRef.current.scrollWidth / 4);
+      // Start in the middle safe zone
+      x.set(-(containerRef.current.scrollWidth / 4));
     }
-  };
+  }, [x]);
 
-  const onPointerUp = (e) => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    if (!isPaused) resumeCSS();
-  };
+  // Framer motion animation loop for marquee
+  useAnimationFrame((t, delta) => {
+    if (contentWidth === 0) return;
+    const safeDelta = Math.min(delta, 50);
+    const speed = 0.8; // px per frame
+    let currentX = x.get();
 
-  const handleClick = (catName) => {
-    // Only navigate if not a drag
-    if (Math.abs(offsetRef.current - dragStartOffset.current) < 5) {
-      navigate(`/channels?category=${catName}`);
+    if (!isDragging && !isHovered) {
+      if (direction === 'left') {
+        currentX -= speed * (safeDelta / 16);
+      } else {
+        currentX += speed * (safeDelta / 16);
+      }
     }
-  };
 
-  const animName = direction === 'left' ? 'marquee-left' : 'marquee-right';
-  const duration = `${items.length * 3}s`;
+    // Wrap around boundaries
+    while (currentX <= -contentWidth * 2) {
+      currentX += contentWidth;
+    }
+    while (currentX >= -contentWidth) {
+      currentX -= contentWidth;
+    }
+
+    x.set(currentX);
+  });
+
+  // Duplicate items 4 times for infinite drag buffer
+  const scrollItems = [...items, ...items, ...items, ...items];
 
   return (
     <div
-      className="flex overflow-hidden whitespace-nowrap mb-4 py-2 touch-pan-y"
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
+      className="flex overflow-hidden whitespace-nowrap mb-4 py-2"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <style>{`
-        @keyframes marquee-left {
-          from { transform: translate3d(0, 0, 0); }
-          to   { transform: translate3d(-50%, 0, 0); }
-        }
-        @keyframes marquee-right {
-          from { transform: translate3d(-50%, 0, 0); }
-          to   { transform: translate3d(0, 0, 0); }
-        }
-      `}</style>
-      <div
-        ref={trackRef}
-        className="flex gap-4 md:gap-6 px-2 items-center w-max"
-        style={{
-          animation: `${animName} ${duration} linear infinite`,
-          willChange: 'transform',
-          cursor: isDragging ? 'grabbing' : 'grab',
-        }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+      <motion.div
+        ref={containerRef}
+        className="flex gap-4 md:gap-6 px-2 items-center w-max cursor-grab active:cursor-grabbing"
+        style={{ x, touchAction: 'pan-y' }}
+        drag="x"
+        dragConstraints={{ left: -contentWidth * 3, right: 0 }}
+        dragElastic={0}
+        dragMomentum={true}
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={() => setIsDragging(false)}
       >
         {scrollItems.map((cat, idx) => (
           <div
             key={`${cat.name}-${idx}`}
-            onPointerUp={() => handleClick(cat.name)}
+            onClick={() => {
+              if (!isDragging) navigate(`/channels?category=${cat.name}`);
+            }}
             className="flex flex-shrink-0 w-max items-center gap-3 bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/40 dark:border-white/10 shadow-sm px-5 py-2.5 rounded-full hover:border-purple-primary hover:shadow-[0_0_15px_rgba(110,75,255,0.3)] transition-colors duration-200 select-none"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            <img src={cat.icon} alt={cat.name} className="w-8 h-8 object-cover rounded-full bg-black/5 dark:bg-white/10 p-0.5 shadow-sm" />
-            <span className="text-sm md:text-base font-bold text-text-primary whitespace-nowrap">{cat.name}</span>
+            <img src={cat.icon} alt={cat.name} className="w-8 h-8 object-cover rounded-full bg-black/5 dark:bg-white/10 p-0.5 shadow-sm pointer-events-none" />
+            <span className="text-sm md:text-base font-bold text-text-primary whitespace-nowrap pointer-events-none">{cat.name}</span>
           </div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 };

@@ -87,7 +87,7 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
       onHoverEnd={() => setIsHovered(false)}
       whileHover={{ y: -6, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="relative rounded-card overflow-hidden bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] cursor-pointer group border border-white/40 dark:border-white/10"
+      className="relative h-full flex flex-col rounded-card overflow-hidden bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] cursor-pointer group border border-white/40 dark:border-white/10"
       style={{
         boxShadow: isHovered 
           ? '0 30px 70px rgba(120, 90, 255, 0.25)' 
@@ -128,21 +128,7 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
 
         {/* Top Right Badges */}
         <div className="absolute top-3 right-3 flex flex-col gap-2">
-          {isPremium && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", delay: 0.2 }}
-            >
-              <Tag
-                icon={<FireOutlined />}
-                color="gold"
-                className="font-semibold shadow-lg"
-              >
-                Premium
-              </Tag>
-            </motion.div>
-          )}
+
           {hasDiscount && (
             <motion.div
               initial={{ scale: 0 }}
@@ -168,17 +154,18 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
       </div>
 
       {/* Channel Info */}
-      <div className="p-2.5">
-        {/* Avatar & Info Row */}
-        <div className="flex items-center gap-2 mb-2">
-          <div className="relative">
-            <img
-              src={avatar}
-              alt="avatar"
-              className="w-8 h-8 rounded-full border-2 border-white/40 dark:border-white/10 object-cover"
-            />
-          </div>
-          <div className="flex-1">
+      <div className="p-2.5 flex-1 flex flex-col justify-between">
+        <div className="flex-1">
+          {/* Avatar & Info Row */}
+          <div className="flex items-center gap-2 mb-2">
+            <div className="relative">
+              <img
+                src={avatar}
+                alt="avatar"
+                className="w-8 h-8 rounded-full border-2 border-white/40 dark:border-white/10 object-cover"
+              />
+            </div>
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
               <p className="text-sm font-bold text-[#312E4A] dark:text-white line-clamp-1">
                 {channel.name}
@@ -187,15 +174,33 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
                 <CheckCircleFilled className="text-blue-500 text-xs flex-shrink-0" />
               )}
             </div>
-            {channel.monetized && (
-              <Tag
-                color="green"
-                className="rounded text-[10px] py-0 px-1 mt-0.5 border-none bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400"
-              >
-                ✓ Monetized
-              </Tag>
-            )}
+            <div className="min-h-[24px]">
+              {channel.monetized && (
+                <Tag
+                  color="green"
+                  className="rounded text-[10px] py-0 px-1 mt-1 border-none bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+                >
+                  ✓ Monetized
+                </Tag>
+              )}
+            </div>
           </div>
+          {isPremium && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", delay: 0.2 }}
+              className="flex-shrink-0"
+            >
+              <Tag
+                icon={<FireOutlined />}
+                color="gold"
+                className="font-semibold m-0 text-[10px] py-0.5 shadow-sm"
+              >
+                Premium
+              </Tag>
+            </motion.div>
+          )}
         </div>
 
         {/* Stats Grid with Icons */}
@@ -251,6 +256,7 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
               <span>{channel.recentViews > 100 ? `${channel.recentViews} views` : 'Recently viewed'}</span>
             </div>
           )}
+        </div>
         </div>
 
         <div className="flex justify-between items-center">
