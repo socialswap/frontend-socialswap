@@ -146,8 +146,8 @@ const MyChannels = () => {
                 >
                   {/* Banner */}
                   <div className="relative h-28 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-[#1a0f2e] dark:to-[#2d1b5e] overflow-hidden border-b border-white/40 dark:border-white/5">
-                    {ch.bannerUrl
-                      ? <img src={ch.bannerUrl} alt="Banner" className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500" />
+                    {ch.dashboardImage || ch.bannerUrl
+                      ? <img src={ch.dashboardImage || ch.bannerUrl} alt="Banner" className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500" />
                       : <div className="w-full h-full flex items-center justify-center text-purple-300 dark:text-white/10"><Youtube size={32} /></div>
                     }
                     {/* Status Badge */}
@@ -163,7 +163,7 @@ const MyChannels = () => {
                   </div>
 
                   {/* Body */}
-                  <div className="p-4 flex flex-col gap-3.5">
+                  <div className="p-4 flex flex-col gap-3.5 flex-1">
                     {/* Title row */}
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-full bg-white dark:bg-[#110C1F] border-2 border-white dark:border-white/10 shadow-md flex items-center justify-center text-purple-500 shrink-0 overflow-hidden">
@@ -227,7 +227,7 @@ const MyChannels = () => {
                     </div>
 
                     {/* Footer */}
-                    <div className="flex items-center gap-3 flex-wrap pt-1 border-t border-slate-100 dark:border-white/[0.05]">
+                    <div className="mt-auto flex items-center gap-3 flex-wrap pt-2 border-t border-slate-100 dark:border-white/[0.05]">
                       {ch.country && (
                         <span className="flex items-center gap-1 text-[0.68rem] text-slate-400 dark:text-white/30">
                           <Globe size={11} /> {ch.country}

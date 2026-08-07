@@ -22,9 +22,9 @@ const Footer = () => {
 
   const socialLinks = [
     { href: 'https://youtube.com/@shubhzlord?si=BiP10uT0YN3Zm0nq', Icon: FaYoutube, label: 'YouTube' },
-    { href: 'https://www.instagram.com/socialswap.in?igsh=ZDhwNWtpczNjcDlp&utm_source=qr', Icon: FaInstagram, label: 'Instagram' },
+    { href: 'https://www.instagram.com/socialswapofficial?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==', Icon: FaInstagram, label: 'Instagram' },
     { href: 'https://wa.me/919423523291', Icon: FaWhatsapp, label: 'WhatsApp' },
-    { href: 'https://twitter.com', Icon: FaXTwitter, label: 'X (Twitter)' },
+    { href: 'https://x.com/Socialswaphq', Icon: FaXTwitter, label: 'X (Twitter)' },
   ];
 
   return (
@@ -37,19 +37,19 @@ const Footer = () => {
             <h4 className="text-text-primary font-extrabold tracking-wider uppercase mb-6 text-[15px]">Company</h4>
             <ul className="space-y-3">
               <li>
-                <Link to="/about" className="hover:text-purple-primary transition-colors font-medium">About Us</Link>
+                <Link to="/about" className="text-text-primary hover:text-purple-primary transition-colors font-medium">About Us</Link>
               </li>
               <li>
-                <button onClick={handleMakeOffer} className="hover:text-purple-primary transition-colors uppercase font-medium cursor-pointer">Contact</button>
+                <button onClick={handleMakeOffer} className="text-text-primary hover:text-purple-primary transition-colors font-medium cursor-pointer text-left">Contact</button>
               </li>
               <li>
-                <Link to="/privacy-policy" className="hover:text-purple-primary transition-colors font-medium">Privacy Policy</Link>
+                <Link to="/privacy-policy" className="text-text-primary hover:text-purple-primary transition-colors font-medium">Privacy Policy</Link>
               </li>
               <li>
-                <Link to="/terms-and-conditions" className="hover:text-purple-primary transition-colors font-medium">Terms</Link>
+                <Link to="/terms-and-conditions" className="text-text-primary hover:text-purple-primary transition-colors font-medium">Terms</Link>
               </li>
               <li>
-                <Link to="/refund-policy" className="hover:text-purple-primary transition-colors font-medium">Refund Policy</Link>
+                <Link to="/refund-policy" className="text-text-primary hover:text-purple-primary transition-colors font-medium">Refund Policy</Link>
               </li>
             </ul>
           </div>
@@ -88,7 +88,7 @@ const Footer = () => {
             <h4 className="text-text-primary font-extrabold tracking-wider uppercase mb-6 text-[15px]">Contact</h4>
             <div className="space-y-4">
               <p><span className="font-bold text-text-primary">PHONE:</span> +91 9423523291</p>
-              <p><span className="font-bold text-text-primary">E-MAIL:</span> support@socialswap.in</p>
+              <p><span className="font-bold text-text-primary">E-MAIL:</span> official@socialswap.in</p>
               
               <div className="pt-3">
                 <p className="font-bold text-text-primary uppercase tracking-wider mb-3">On Social Media:</p>

@@ -69,10 +69,10 @@ const ShippingAndCancellationPolicy = () => {
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-gray-800">How to Cancel an Order</h3>
           <p className="text-gray-600">
-            You may cancel your order by contacting our customer service team at <span className="font-semibold">support@socialswap.in</span> as long as the order has not been processed or shipped. To cancel an order:
+            You may cancel your order by contacting our customer service team at <span className="font-semibold">official@socialswap.in</span> as long as the order has not been processed or shipped. To cancel an order:
           </p>
           <ol className="list-decimal pl-6 space-y-2 text-gray-600">
-            <li>Send an email to <span className="font-semibold">support@socialswap.in</span> with your order number and cancellation request.</li>
+            <li>Send an email to <span className="font-semibold">official@socialswap.in</span> with your order number and cancellation request.</li>
             <li>If the order has not yet been processed, we will confirm the cancellation and process your refund.</li>
             <li>If the order has already been shipped, it cannot be cancelled. However, you can return the item once it is delivered.</li>
           </ol>
@@ -117,8 +117,8 @@ const ShippingAndCancellationPolicy = () => {
         </p>
         <p className="text-gray-600">
           <span className="font-semibold">Email: </span>
-          <a href="mailto:support@socialswap.in" className="text-blue-600 hover:text-blue-800 underline">
-            support@socialswap.in
+          <a href="mailto:official@socialswap.in" className="text-blue-600 hover:text-blue-800 underline">
+            official@socialswap.in
           </a>
         </p>
       </section>

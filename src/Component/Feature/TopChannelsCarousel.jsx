@@ -4,7 +4,7 @@ import axiosInstance, { api as API_BASE_URL, cachedGet, apiCache } from '../../A
 import Carousel from './Carousel';
 import ChannelCard, { ChannelCardSkeleton } from '../ChannelCard';
 
-const CHANNELS_URL = `${API_BASE_URL}/channels`;
+const CHANNELS_URL = `${API_BASE_URL}/channels/demanding?limit=8`;
 
 const getInitialChannels = () => {
   const cached = apiCache.get(CHANNELS_URL);
@@ -12,7 +12,7 @@ const getInitialChannels = () => {
   const payload = cached?.data ?? {};
   const list = Array.isArray(payload?.channels) ? payload.channels
     : Array.isArray(payload) ? payload : [];
-  return list.slice(0, 8);
+  return list;
 };
 
 const TopChannelsCarousel = () => {
@@ -23,14 +23,14 @@ const TopChannelsCarousel = () => {
   useEffect(() => {
     const fetchTopChannels = async () => {
       try {
-        const response = await cachedGet(`${API_BASE_URL}/channels`);
+        const response = await cachedGet(CHANNELS_URL);
         const payload = response?.data ?? {};
         const list = Array.isArray(payload?.channels)
           ? payload.channels
           : Array.isArray(payload)
           ? payload
           : [];
-        setTopChannels(list.slice(0, 8));
+        setTopChannels(list);
         setLoading(false);
       } catch (err) {
         setError('Unable to load channels right now.');
@@ -84,15 +84,6 @@ const TopChannelsCarousel = () => {
           >
             Highly Valuable / Top Rated Channels
           </motion.h2>
-          <motion.p 
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
-            }}
-            className="text-text-secondary max-w-2xl mx-auto"
-          >
-            Fresh inventory updated daily — discover vetted channels ready for acquisition, presented in the same immersive carousel experience as our Most Demanding list.
-          </motion.p>
         </motion.div>
 
         <AnimatePresence mode="wait">

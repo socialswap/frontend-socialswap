@@ -378,9 +378,9 @@ const Header = () => {
             >
               {/* Sliding background thumb */}
               <motion.div
-                className="absolute top-1 bottom-1 w-[26px] rounded-full shadow-sm"
+                className="absolute top-1 bottom-1 w-[26px] rounded-full shadow-md shadow-purple-500/30"
                 style={{ 
-                  backgroundColor: isOverDarkHero ? 'rgba(255,255,255,0.25)' : (theme === 'dark' ? '#332b4d' : '#FFFFFF'),
+                  backgroundColor: '#6E4BFF',
                 }}
                 initial={false}
                 animate={{ x: theme === 'light' ? 0 : 34 }}
@@ -392,7 +392,7 @@ const Header = () => {
                 <SunOutlined 
                   style={{ 
                     fontSize: '14px',
-                    color: isOverDarkHero ? '#FFFFFF' : (theme === 'light' ? '#1F2937' : '#9CA3AF'),
+                    color: theme === 'light' ? '#FFFFFF' : '#9CA3AF',
                     transition: 'color 0.3s'
                   }} 
                 />
@@ -403,7 +403,7 @@ const Header = () => {
                 <MoonOutlined 
                   style={{ 
                     fontSize: '14px',
-                    color: isOverDarkHero ? '#FFFFFF' : (theme === 'dark' ? '#FFFFFF' : '#9CA3AF'),
+                    color: theme === 'dark' ? '#FFFFFF' : '#9CA3AF',
                     transition: 'color 0.3s'
                   }} 
                 />
@@ -536,16 +536,21 @@ const Header = () => {
             ))}
 
             <div className="text-xs font-bold uppercase tracking-wider mt-6 mb-2 ml-2" style={{ color: 'var(--text-muted)' }}>More Options</div>
-            {moreOptions.map((item) => (
-              <button
-                key={item.path}
-                onClick={() => handleNavigation(item.path)}
-                className="text-left py-2.5 px-4 rounded-xl w-full transition-all hover:bg-bg-secondary/50 font-medium mb-1"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                {item.label}
-              </button>
-            ))}
+            {moreOptions.map((item) => {
+              const active = isActiveRoute(item.path);
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => handleNavigation(item.path)}
+                  className={`text-left py-2.5 px-4 rounded-xl w-full transition-all mb-1 ${
+                    active ? 'bg-bg-secondary font-bold shadow-sm' : 'hover:bg-bg-secondary/50 font-medium'
+                  }`}
+                  style={{ color: active ? 'var(--text-primary)' : 'var(--text-secondary)' }}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
           </nav>
 
           <div className="p-4 border-t border-border mt-auto">

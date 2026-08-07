@@ -3,59 +3,99 @@ import SEOHead from '../Component/SEO/SEOHead';
 
 const RefundAndReturnPolicy = () => {
   return (
-    <div className="max-w-4xl mx-auto p-8 mt-20">
+    <div className="min-h-screen pt-28 pb-16 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
       <SEOHead title="Refund Policy | SocialSwap" />
-      <h1 className="text-4xl font-bold mb-6">Refund Policy</h1>
       
-      <div className="space-y-6 text-gray-700 leading-relaxed">
-        <p className="text-justify">
-          By using SocialSwap.in and engaging in any transaction through our platform, you agree to this Refund Policy.
-        </p>
+      {/* Background Glow */}
+      <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden flex justify-center">
+        <div className="absolute top-[-10%] w-[600px] h-[600px] rounded-full bg-purple-600/10 blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] w-[600px] h-[600px] rounded-full bg-pink-500/10 blur-[120px]"></div>
+      </div>
 
-        <p className="text-justify font-semibold text-red-600">
-          All payments made to SocialSwap are final and non-refundable under any circumstances once a transaction is completed.
-        </p>
-
-        <p className="text-justify">
-          SocialSwap is not responsible for and will not issue refunds to buyers if the purchased YouTube channel is deleted, hacked, demonetised, receives copyright strikes, community guideline strikes, or is affected by reused or ineligible content after transfer.
-        </p>
-
-        <p className="text-justify">
-          Similarly, SocialSwap will not make any payment or compensation to channel owners if a channel provided to us for sale is deleted, hacked, or receives strikes, policy violations, or reuse warnings while in or after our possession.
-        </p>
-
-        <p className="text-justify">
-          Once ownership or access is transferred, SocialSwap bears no liability for any future issues related to the channel's performance, safety, or compliance with YouTube's terms.
-        </p>
-
-        <p className="text-justify">
-          Both buyers and sellers understand and agree that it is their sole responsibility to protect their channels, adhere to YouTube policies, and secure their accounts from third-party attacks or recovery attempts by previous owners.
-        </p>
-
-        <p className="text-justify">
-          SocialSwap acts solely as a mediator and cannot reverse, cancel, or refund any completed transaction. By continuing to use our services, you acknowledge and accept this no-refund policy in full.
-        </p>
-
-        <p className="text-justify font-semibold">
-          All matters related to refunds or disputes shall be governed by the laws of India and fall under the exclusive jurisdiction of the courts in Pune, Maharashtra.
-        </p>
-
-        <section className="mt-8 pt-6 border-t">
-          <h2 className="text-2xl font-semibold mb-3">Contact Information</h2>
-          <p>
-            If you have any questions about this Refund Policy, please contact us at:
+      <div className="w-full max-w-4xl relative">
+        <h1 className="text-4xl md:text-5xl font-extrabold mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-[#6E4BFF] to-[#F4B6D2]">
+          Refund Policy
+        </h1>
+        
+        <div className="backdrop-blur-2xl bg-white/40 dark:bg-[#110C1F]/60 border border-white/40 dark:border-white/10 rounded-3xl p-8 md:p-12 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] text-text-secondary">
+          
+          <p className="text-lg mb-8 font-medium text-text-primary">
+            Effective Date: This Refund Policy governs purchases and sales completed through SocialSwap.
           </p>
-          <p className="mt-2">
-            <span className="font-semibold">Email: </span>
-            <a href="mailto:shubham@socialswap.in" className="text-blue-600 hover:text-blue-800 underline">
-              shubham@socialswap.in
-            </a>
-          </p>
-          <p>
-            <span className="font-semibold">Phone: </span>
-            +91 9423523291
-          </p>
-        </section>
+
+          <div className="space-y-8">
+            
+            <section>
+              <h2 className="text-xl md:text-2xl font-bold mb-3 text-text-primary">General Policy</h2>
+              <p className="leading-relaxed">
+                SocialSwap operates as an escrow-based marketplace facilitating YouTube channel transactions. Except where required by applicable law, completed transactions are final.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl md:text-2xl font-bold mb-3 text-text-primary">Before Completion</h2>
+              <p className="leading-relaxed">
+                If a transaction cannot proceed because the seller fails verification, cannot transfer ownership, or SocialSwap cancels the transaction due to fraud, policy violations, or security concerns before completion, any eligible buyer funds held by SocialSwap may be refunded after review.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl md:text-2xl font-bold mb-3 text-text-primary">After Completion</h2>
+              <p className="leading-relaxed">
+                Once SocialSwap has successfully transferred the agreed channel ownership or access to the buyer and the transaction is marked complete, payments are non-refundable except where required by applicable law.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl md:text-2xl font-bold mb-3 text-text-primary">No Refund Situations</h2>
+              <p className="leading-relaxed">
+                Refunds will generally not be provided for changes in channel performance, subscriber loss, view fluctuations, demonetization, copyright or community guideline actions occurring after transfer, account recovery attempts by previous owners after completion where SocialSwap has fulfilled its contractual obligations, changes to YouTube policies, buyer remorse, or business decisions.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl md:text-2xl font-bold mb-3 text-text-primary">Seller Payments</h2>
+              <p className="leading-relaxed">
+                Seller payouts are released only after SocialSwap verifies the agreed transfer conditions. If fraud, ownership disputes, inaccurate listing information, or policy violations are discovered, SocialSwap may delay, suspend, or cancel payouts while investigating.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl md:text-2xl font-bold mb-3 text-text-primary">Chargebacks</h2>
+              <p className="leading-relaxed">
+                Unauthorized or fraudulent chargebacks may result in suspension of accounts, recovery actions, and reporting to payment providers or authorities where appropriate.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl md:text-2xl font-bold mb-3 text-text-primary">Disputes</h2>
+              <p className="leading-relaxed">
+                Users should report disputes promptly through the SocialSwap support team. SocialSwap may request documents, communications, and identity verification before reaching a decision.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl md:text-2xl font-bold mb-3 text-text-primary">Limitation</h2>
+              <p className="leading-relaxed">
+                Nothing in this policy limits any non-waivable rights available under applicable law. SocialSwap reserves the right to amend this policy by publishing an updated version on its website.
+              </p>
+            </section>
+
+          </div>
+
+          <div className="mt-12 pt-8 border-t border-white/30 dark:border-white/10">
+            <h2 className="text-xl md:text-2xl font-bold mb-4 text-text-primary">Contact Us</h2>
+            <div className="flex flex-col gap-2">
+              <p className="flex items-center gap-2">
+                <span className="font-semibold text-text-primary">Email: </span>
+                <a href="mailto:official@socialswap.in" className="text-[#6E4BFF] hover:text-[#8A6CFF] transition-colors underline underline-offset-4">
+                  official@socialswap.in
+                </a>
+              </p>
+            </div>
+          </div>
+          
+        </div>
       </div>
     </div>
   );

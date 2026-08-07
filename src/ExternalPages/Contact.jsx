@@ -13,7 +13,7 @@ const ContactUs = () => {
         </p>
         <p className="text-[16px] leading-[1.6] mb-4">
           <strong>Email:</strong>{' '}
-          <a href="mailto:contact@socialswap.in" className="text-[#007bff] no-underline hover:underline">contact@socialswap.in</a>
+          <a href="mailto:official@socialswap.in" className="text-[#007bff] no-underline hover:underline">official@socialswap.in</a>
         </p>
         <p className="text-[16px] leading-[1.6] mb-4">
           Or give us a call at <strong>+91 8010803291</strong>.

@@ -131,9 +131,6 @@ const CategoryMarquee = () => {
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-3 tracking-tight">
           Explore Categories
         </h2>
-        <p className="text-gray-600 dark:text-gray-300 text-lg md:text-xl max-w-2xl mx-auto">
-          From gaming and tech to lifestyle and finance, we have thousands of verified YouTube channels categorized just for you.
-        </p>
       </div>
 
       <div className="relative z-10 max-w-[100vw] mx-auto">

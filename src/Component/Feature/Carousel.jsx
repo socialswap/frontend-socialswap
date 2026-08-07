@@ -62,7 +62,7 @@ const Carousel = ({ children, direction = 'left', speed = 1.0 }) => {
         drag="x"
         dragConstraints={{ left: -singleSetWidth * 3, right: 0 }} 
         dragElastic={0}
-        dragMomentum={false}
+        dragMomentum={true}
         onDragStart={() => setIsDragging(true)}
         onDragEnd={() => setIsDragging(false)}
       >

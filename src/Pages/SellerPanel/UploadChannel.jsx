@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import Cropper from 'react-easy-crop';
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 import {
   Youtube, Link, Tag, FileText, IndianRupee,
   Users, Video, TrendingUp, Eye, Globe,
@@ -71,9 +72,9 @@ export default function UploadChannel() {
   const [rawDashboardImageSrc, setRawDashboardImageSrc] = useState(null);
   const [originalDashboardFileName, setOriginalDashboardFileName] = useState('');
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [crop, setCrop] = useState();
+  const [completedCrop, setCompletedCrop] = useState(null);
+  const imageRef = React.useRef(null);
 
   const { id } = useParams();
   const isEditMode = !!id;
@@ -165,16 +166,16 @@ export default function UploadChannel() {
     };
   };
 
-  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  }, []);
-
   const saveCroppedImage = async () => {
-    if (!croppedAreaPixels || !rawDashboardImageSrc) return;
+    if (!completedCrop || !imageRef.current) return;
+    if (completedCrop.width === 0 || completedCrop.height === 0) {
+      setError('Please select an area to crop.');
+      return;
+    }
     try {
       setLoading(true);
       // Crop on canvas
-      const croppedBlob = await getCroppedImgBlob(rawDashboardImageSrc, croppedAreaPixels);
+      const croppedBlob = await getCroppedImgBlob(imageRef.current, completedCrop);
       
       // Convert to file object
       const baseName = originalDashboardFileName.replace(/\.[^/.]+$/, "");
@@ -367,7 +368,7 @@ export default function UploadChannel() {
   // ── Success Screen ──────────────────────────────────────────
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-[#0d0b1a] flex items-center justify-center px-5 pt-24">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#0d0b1a] flex items-center justify-center px-3 sm:px-5 pt-24">
       <SEOHead title="Upload Channel | SocialSwap" noIndex={true} />
         <motion.div
           className="bg-white dark:bg-white/[0.04] shadow-sm dark:shadow-none backdrop-blur-2xl border border-emerald-500/20 rounded-3xl p-10 text-center max-w-md w-full"
@@ -406,7 +407,7 @@ export default function UploadChannel() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent flex items-start justify-center px-5 pt-24 pb-12">
+    <div className="min-h-screen bg-transparent flex items-start justify-center px-3 sm:px-5 pt-24 pb-12">
       <div className="w-full max-w-3xl flex flex-col gap-7">
 
         {/* ── Page Header ── */}
@@ -457,7 +458,7 @@ export default function UploadChannel() {
         {/* ── Form Card ── */}
         <motion.div
           key={step}
-          className="bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/40 dark:border-white/10 rounded-card p-8 shadow-card"
+          className="bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] border border-white/40 dark:border-white/10 rounded-card p-4 sm:p-8 shadow-card"
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
@@ -479,7 +480,7 @@ export default function UploadChannel() {
               </h3>
 
               {/* ── Auto-fill from YouTube Widget ── */}
-              <div className="mb-6 rounded-card border border-purple-500/30 bg-white/40 dark:bg-purple-950/20 backdrop-blur-md p-5">
+              <div className="mb-6 rounded-card border border-purple-500/30 bg-white/40 dark:bg-purple-950/20 backdrop-blur-md p-4 sm:p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Sparkles size={15} className="text-purple-400" />
                   <span className="text-sm font-bold text-text-primary">Auto-fill from YouTube</span>
@@ -496,7 +497,7 @@ export default function UploadChannel() {
                     onChange={e => { setFetchInput(e.target.value); setFetchError(''); }}
                     onKeyDown={e => e.key === 'Enter' && fetchChannelInfo()}
                     placeholder="YouTube Link, ID, or @handle"
-                    className="flex-1 min-w-0 bg-white/60 dark:bg-white/[0.06] border border-white/40 dark:border-white/10 rounded-input px-3.5 py-2.5 text-sm text-text-primary placeholder-text-secondary outline-none focus:border-purple-500 transition-all"
+                    className="flex-1 min-w-0 bg-white/60 dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 rounded-input px-3.5 py-2.5 text-sm text-text-primary placeholder-text-secondary outline-none focus:border-purple-500 transition-all"
                   />
                   <button
                     onClick={fetchChannelInfo}
@@ -740,9 +741,9 @@ export default function UploadChannel() {
 
               {/* YouTube Dashboard Image (Mandatory) */}
               <div className="mb-8">
-                <p className="text-xs font-semibold text-black dark:text-white/50 mb-2 flex items-center gap-1">
-                  YouTube Dashboard Image <span className="text-red-500">*</span>
-                  <span className="font-normal text-gray-400 dark:text-white/30">(Mandatory snapshot showing subscriber count & monetization tab)</span>
+                <p className="text-sm font-semibold text-black dark:text-white/50 mb-2 flex items-center gap-1">
+                  YouTube studio Dashboard Image <span className="text-red-500">*</span>
+                  <span className="font-normal text-gray-400 dark:text-white/30">(showing front page of yt studio dashboard)</span>
                 </p>
                 
                 <div className="max-w-md">
@@ -769,7 +770,7 @@ export default function UploadChannel() {
                         <Upload size={20} />
                       </div>
                       <div className="text-center px-4">
-                        <span className="font-semibold text-gray-700 dark:text-white/70 block mb-1 text-sm">Upload YouTube Dashboard screenshot</span>
+                        <span className="font-semibold text-gray-700 dark:text-white/70 block mb-1 text-sm">Upload front page of your YouTube studio</span>
                         <span className="text-gray-400 dark:text-white/20 text-[10px]">Crop, compress & convert to webp automatically</span>
                       </div>
                       <input type="file" accept="image/*" onChange={handleDashboardFileChange} className="hidden" />
@@ -781,8 +782,8 @@ export default function UploadChannel() {
 
               {/* Channel Screenshots */}
               <div>
-                <p className="text-xs font-semibold text-black dark:text-white/50 mb-2">
-                  Channel Screenshots <span className="font-normal text-gray-400 dark:text-white/30">(2–10 images required)</span>
+                <p className="text-sm font-semibold text-black dark:text-white/50 mb-2">
+                  Channel Screenshots <span className="font-normal text-gray-400 dark:text-white/30">(mandatory screenshots of earn section, analytics in last 28 days, lifetime, latest vdos, Audience page, etc)</span>
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-2">
                   {imagePreviews.map((src, i) => (
@@ -824,36 +825,27 @@ export default function UploadChannel() {
                     </div>
                     
                     {/* Cropper Container */}
-                    <div className="relative flex-1 bg-black/60 min-h-[300px] sm:min-h-[400px]">
-                      <Cropper
-                        image={rawDashboardImageSrc}
+                    <div className="relative flex-1 bg-black/60 min-h-[300px] sm:min-h-[400px] flex items-center justify-center p-4 overflow-auto">
+                      <ReactCrop
                         crop={crop}
-                        zoom={zoom}
-                        aspect={16 / 9}
-                        onCropChange={setCrop}
-                        onCropComplete={onCropComplete}
-                        onZoomChange={setZoom}
-                      />
+                        onChange={(c) => setCrop(c)}
+                        onComplete={(c) => setCompletedCrop(c)}
+                      >
+                        <img 
+                          ref={imageRef} 
+                          src={rawDashboardImageSrc} 
+                          alt="Crop me" 
+                          style={{ maxHeight: '60vh', objectFit: 'contain' }}
+                          onLoad={() => {
+                            setCrop({ unit: '%', width: 90, height: 90, x: 5, y: 5 });
+                          }}
+                        />
+                      </ReactCrop>
                     </div>
                     
                     {/* Controls & Footer */}
                     <div className="p-5 bg-[#150f24] border-t border-white/5 flex flex-col gap-4">
-                      {/* Zoom Slider */}
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs text-white/55 font-medium shrink-0">Zoom:</span>
-                        <input
-                          type="range"
-                          value={zoom}
-                          min={1}
-                          max={3}
-                          step={0.1}
-                          aria-label="Zoom"
-                          onChange={(e) => setZoom(Number(e.target.value))}
-                          className="flex-1 accent-purple-500 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
-                        />
-                        <span className="text-xs text-white/70 font-semibold w-8 text-right">{Math.round(zoom * 100)}%</span>
-                      </div>
-                      
+
                       {/* Actions */}
                       <div className="flex justify-end gap-3 mt-1">
                         <button
@@ -967,37 +959,34 @@ function Toggle({ label, name, checked, onChange }) {
 /**
  * Canvas utility to crop image source client-side.
  */
-const getCroppedImgBlob = (imageSrc, pixelCrop) => {
+const getCroppedImgBlob = (image, pixelCrop) => {
   return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.src = imageSrc;
-    image.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+    const canvas = document.createElement('canvas');
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    const ctx = canvas.getContext('2d');
 
-      canvas.width = pixelCrop.width;
-      canvas.height = pixelCrop.height;
+    canvas.width = pixelCrop.width * scaleX;
+    canvas.height = pixelCrop.height * scaleY;
 
-      ctx.drawImage(
-        image,
-        pixelCrop.x,
-        pixelCrop.y,
-        pixelCrop.width,
-        pixelCrop.height,
-        0,
-        0,
-        pixelCrop.width,
-        pixelCrop.height
-      );
+    ctx.drawImage(
+      image,
+      pixelCrop.x * scaleX,
+      pixelCrop.y * scaleY,
+      pixelCrop.width * scaleX,
+      pixelCrop.height * scaleY,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
 
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          reject(new Error('Canvas is empty'));
-          return;
-        }
-        resolve(blob);
-      }, 'image/jpeg', 0.9);
-    };
-    image.onerror = (err) => reject(err);
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error('Canvas is empty'));
+        return;
+      }
+      resolve(blob);
+    }, 'image/jpeg', 0.9);
   });
 };

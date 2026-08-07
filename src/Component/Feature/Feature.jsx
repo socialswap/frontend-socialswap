@@ -393,10 +393,6 @@ const FeaturedListings = () => {
               background: 'var(--btn-gradient)',
             }}
           />
-
-          <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-            Unmatched channels—superior performance and customer satisfaction in one.
-          </p>
         </motion.div>
 
         {/* Filter Tabs */}
