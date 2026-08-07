@@ -9,7 +9,7 @@ import {
   PhoneOutlined,
   ShareAltOutlined
 } from '@ant-design/icons';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import axios from 'axios';
 import axiosInstance, { api } from '../../API/api';
 import { subscribeToPush, unsubscribeFromPush } from '../../App';
@@ -150,6 +150,13 @@ const ProfileHeader = styled.div`
     font-size: 0.95rem;
     font-weight: 500;
   }
+  
+  .user-email {
+    color: var(--text-secondary);
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+    font-weight: 400;
+  }
 `;
 
 const EditButton = styled(Button)`
@@ -204,50 +211,142 @@ const StyledList = styled(List)`
     cursor: pointer;
     border-radius: 16px;
     margin: 12px 0;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--border);
+    background: var(--bg-card);
     backdrop-filter: blur(12px);
     transition: all 0.3s ease;
     
-    .dark & {
-      background: rgba(255, 255, 255, 0.03);
-      border-color: rgba(255, 255, 255, 0.06);
-      
-      &:hover {
-        background: rgba(168, 85, 247, 0.1);
-        box-shadow: 0 8px 20px rgba(168, 85, 247, 0.2);
-        border-color: rgba(168, 85, 247, 0.3);
-      }
-
-      .ant-list-item-meta-title {
-        color: #f3f4f6;
-      }
-      
-      .ant-list-item-meta-description {
-        color: #9ca3af;
-      }
-    }
-
-    &:hover {
-      background: rgba(124, 58, 237, 0.08);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.15);
-      border-color: rgba(124, 58, 237, 0.3);
-    }
-
     .ant-list-item-meta-title {
-      margin: 0;
+      color: var(--text-primary) !important;
       font-weight: 600;
-      color: #1f2937;
+      font-size: 1.05rem;
     }
     
     .ant-list-item-meta-description {
-      color: #6b7280;
+      color: var(--text-secondary) !important;
     }
     
+    .ant-list-item-meta-avatar {
+      color: var(--text-primary) !important;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .ant-list-item-meta-avatar .anticon {
+      color: var(--text-primary) !important;
+    }
+
+    &:hover {
+      background: var(--bg-glass);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card);
+      border-color: var(--primary);
+    }
+    
+    .dark & {
+       background: rgba(25, 20, 45, 0.6);
+    }
+    .dark &:hover {
+       background: rgba(110, 75, 255, 0.15);
+       border-color: var(--primary);
+    }
+
     .ant-list-item-action {
       margin-left: 16px;
     }
+  }
+`;
+
+const GlobalModalStyle = createGlobalStyle`
+  .profile-modal .ant-modal-content {
+    background: var(--bg-secondary) !important;
+    backdrop-filter: blur(24px) saturate(150%);
+    border: 1px solid var(--border) !important;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  }
+  .profile-modal .ant-modal-header {
+    background: transparent !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+  .profile-modal .ant-modal-title {
+    color: var(--text-primary) !important;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  .profile-modal .ant-modal-close {
+    color: var(--text-secondary) !important;
+    top: 20px;
+    right: 24px;
+  }
+  /* Fix Labels */
+  .profile-modal .ant-form-item-label > label,
+  .profile-modal label {
+    color: var(--text-primary) !important;
+    font-weight: 500;
+  }
+  /* Fix Inputs and affix wrappers */
+  .profile-modal .ant-input, 
+  .profile-modal .ant-input-password,
+  .profile-modal .ant-input-affix-wrapper {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-primary) !important;
+    border-radius: 12px !important;
+    padding: 8px 14px !important;
+    transition: all 0.3s ease;
+  }
+  /* Ensure inner input of affix wrapper is transparent */
+  .profile-modal .ant-input-affix-wrapper > input.ant-input {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    color: var(--text-primary) !important;
+  }
+  /* Focus states */
+  .profile-modal .ant-input:focus, 
+  .profile-modal .ant-input-password:focus-within,
+  .profile-modal .ant-input-affix-wrapper:focus-within,
+  .profile-modal .ant-input-affix-wrapper-focused {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 2px rgba(110, 75, 255, 0.2) !important;
+    background: var(--bg-primary) !important;
+  }
+  .profile-modal .ant-input-prefix {
+    color: var(--primary);
+    margin-right: 10px;
+  }
+  /* Buttons */
+  .profile-modal .ant-btn-primary {
+    background: var(--btn-gradient) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    height: 44px;
+    font-weight: 600;
+    padding: 0 24px;
+    color: #fff !important;
+    box-shadow: 0 8px 16px rgba(110, 75, 255, 0.25) !important;
+  }
+  .profile-modal .ant-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px rgba(110, 75, 255, 0.35) !important;
+  }
+  .profile-modal .ant-btn-default {
+    background: transparent !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-primary) !important;
+    border-radius: 12px !important;
+    height: 44px;
+    padding: 0 24px;
+  }
+  .profile-modal .ant-btn-default:hover {
+    border-color: var(--primary) !important;
+    color: var(--primary) !important;
   }
 `;
 
@@ -490,14 +589,13 @@ const UserProfile = () => {
       title: 'Help & Support',
       icon: <QuestionCircleOutlined />,
       onClick: () => handleMakeOffer(),
-      action: null
     }
   ];
 
   if (loading) {
     return (
       <StyledCard>
-      <SEOHead title="My Profile | SocialSwap" noIndex={true} />
+        <SEOHead title="My Profile | SocialSwap" noIndex={true} />
         <Spin size="large" />
       </StyledCard>
     );
@@ -505,9 +603,10 @@ const UserProfile = () => {
 
   return (
     <>
+      <GlobalModalStyle />
       <StyledCard bordered={false}>
         <ProfileHeader>
-          <span className="header-text">Profile</span>
+          <div className="header-text block mb-4">Profile</div>
           <div className="avatar-container m-auto flex items-center justify-center">
             <div className="relative inline-block">
               <Spin spinning={uploadingAvatar}>
@@ -530,6 +629,7 @@ const UserProfile = () => {
           </div>
           <h3 className="username">{user?.name || 'User Name'}</h3>
           <p className="user-handle">@{user?.username || 'username'}</p>
+          {user?.email && <p className="user-email">{user.email}</p>}
           <div className="flex items-center justify-center gap-3 mt-4">
             <EditButton onClick={() => setIsEditProfileModalVisible(true)} style={{ marginTop: 0 }}>
               Edit Profile
@@ -564,6 +664,7 @@ const UserProfile = () => {
         visible={isEditProfileModalVisible}
         onCancel={() => setIsEditProfileModalVisible(false)}
         footer={null}
+        wrapClassName="profile-modal"
       >
         <Form 
           form={profileForm}
@@ -624,6 +725,7 @@ const UserProfile = () => {
           passwordForm.resetFields();
         }}
         footer={null}
+        wrapClassName="profile-modal"
       >
         <Form 
           form={passwordForm}

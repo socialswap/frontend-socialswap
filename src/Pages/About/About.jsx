@@ -7,17 +7,18 @@ import {
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import SEOHead from '../../Component/SEO/SEOHead';
+import GlobalFAQSection from '../../Component/FAQ/FAQSection';
 
 const { Title, Paragraph, Text } = Typography;
 
 // Glassmorphism theme constants
-const primaryColor = '#6E4BFF';
+const primaryColor = 'var(--primary, #6E4BFF)';
 const backgroundColor = 'transparent';
-const surfaceAltColor = 'rgba(255,255,255,0.25)';
+const surfaceAltColor = 'var(--bg-card)';
 const textColor = 'var(--text-primary)';
 const subTextColor = 'var(--text-secondary)';
-const accentNeon = '#F4B6D2';
-const accentPurple = '#8A6CFF';
+const accentNeon = 'var(--accent-pink, #F4B6D2)';
+const accentPurple = 'var(--purple-secondary, #8A6CFF)';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -33,23 +34,7 @@ const Section = styled.div`
   margin-bottom: 80px;
 `;
 
-const CurvedDivider = styled.div`
-  position: relative;
-  height: 80px;
-  margin: 24px 0 8px 0;
-  overflow: hidden;
-  &:before {
-    content: '';
-    position: absolute;
-    left: -10%;
-    right: -10%;
-    top: 0;
-    height: 120%;
-    background: radial-gradient(120% 80px at 50% 0%, rgba(255,0,0,0.08), transparent 60%),
-                linear-gradient(180deg, transparent 0%, ${surfaceAltColor} 100%);
-    transform: translateY(-60%) skewY(-3deg);
-  }
-`;
+
 
 const HeroSection = styled(Section)`
   text-align: center;
@@ -62,8 +47,8 @@ const HeroGlass = styled.div`
   padding: 32px 28px;
   border-radius: 16px;
   backdrop-filter: saturate(160%) blur(8px);
-  background: linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0.45));
-  border: 1px solid rgba(255,255,255,0.7);
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
   box-shadow: 0 25px 60px rgba(0,0,0,0.12);
   z-index: 1;
 `;
@@ -111,8 +96,8 @@ const TrustBadge = styled.div`
   gap: 8px;
   padding: 8px 12px;
   border-radius: 999px;
-  border: 1px solid #efefef;
-  background: #fff;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
   color: ${subTextColor};
   font-weight: 600;
   box-shadow: 0 6px 16px rgba(0,0,0,0.05);
@@ -122,13 +107,13 @@ const StatsSection = styled(Section)`
   background-color: ${surfaceAltColor};
   padding: 40px 24px;
   border-radius: 8px;
-  border: 1px solid #eeeeee;
+  border: 1px solid var(--border);
   box-shadow: 0 8px 24px rgba(0,0,0,0.06);
 `;
 
 const AwardBar = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   align-items: stretch;
   @media (max-width: 992px) {
@@ -145,8 +130,8 @@ const AwardItem = styled.div`
   gap: 14px;
   padding: 16px 18px;
   border-radius: 12px;
-  background: linear-gradient(180deg, #ffffff, #fbfbfb);
-  border: 1px solid #f0f0f0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   box-shadow: 0 8px 20px rgba(0,0,0,0.05);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   will-change: transform;
@@ -226,8 +211,8 @@ const StepCard = styled.div`
   position: relative;
   padding: 18px 16px;
   border-radius: 14px;
-  background: #ffffff;
-  border: 1px solid #efefef;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   box-shadow: 0 10px 24px rgba(0,0,0,0.06);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   will-change: transform;
@@ -269,36 +254,38 @@ const StepDesc = styled.div`
 
 const CTASection = styled(Section)`
   text-align: center;
-  background-color: ${surfaceAltColor};
-  padding: 48px 24px;
-  border-radius: 8px;
-  border: 1px solid #eeeeee;
+  background-color: var(--bg-glass, rgba(255,255,255,0.03));
+  padding: 64px 24px;
+  border-radius: 24px;
+  border: 1px solid var(--border);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
   &:before {
     content: '';
     position: absolute;
-    inset: -200%;
+    inset: -150%;
     background: conic-gradient(from 0deg, ${primaryColor}, ${accentNeon}, ${accentPurple}, ${primaryColor});
-    animation: rotateBorder 6s linear infinite;
-    filter: blur(30px);
-    opacity: 0.25;
+    animation: rotateBorder 8s linear infinite;
+    filter: blur(50px);
+    opacity: 0.15;
   }
   &:after {
     content: '';
     position: absolute;
-    inset: 2px;
-    border-radius: 8px;
-    background: ${surfaceAltColor};
+    inset: 1px;
+    border-radius: 23px;
+    background: var(--bg-card);
     z-index: 1;
   }
 `;
 
 const StyledButton = styled(Button)`
-  height: 48px;
-  padding: 0 24px;
+  height: 52px;
+  padding: 0 32px;
   font-size: 16px;
-  border-radius: 4px;
+  font-weight: 600;
+  border-radius: 9999px;
   border-width: 2px;
   &:not(.ant-btn-primary) {
     color: ${textColor};
@@ -306,8 +293,9 @@ const StyledButton = styled(Button)`
     background-color: transparent;
   }
   &.ant-btn-primary {
-    background: linear-gradient(90deg, ${primaryColor}, ${accentPurple});
+    background: var(--btn-gradient, linear-gradient(90deg, ${primaryColor}, ${accentPurple}));
     border-color: transparent;
+    color: white;
   }
   position: relative;
   overflow: hidden;
@@ -326,8 +314,9 @@ const StyledButton = styled(Button)`
     left: 150%;
   }
   &:hover {
-    box-shadow: 0 10px 24px rgba(255,0,0,0.18), 0 0 0 3px rgba(255,0,0,0.12);
+    box-shadow: 0 10px 24px rgba(110,75,255,0.25);
     transform: translateY(-2px);
+    border-color: ${primaryColor};
   }
   &:active {
     transform: translateY(0px) scale(0.98);
@@ -358,8 +347,8 @@ const HelpWidget = styled.button`
   gap: 10px;
   padding: 12px 14px;
   border-radius: 999px;
-  border: 1px solid #efefef;
-  background: #ffffff;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
   color: ${textColor};
   font-weight: 700;
   box-shadow: 0 14px 28px rgba(0,0,0,0.12);
@@ -509,12 +498,11 @@ const AboutPage = () => {
           </Paragraph>
           <TrustedRibbon>
             <span style={{ width: 8, height: 8, borderRadius: 999, background: primaryColor, display: 'inline-block' }} />
-            Trusted by 500+ creators worldwide
+            Trusted by Top creators worldwide
           </TrustedRibbon>
         </HeroGlass>
       </HeroSection>
 
-      <CurvedDivider />
 
       <Section>
         <Title level={2} style={{ textAlign: 'center', marginBottom: '32px', color: textColor }}>Why Choose SocialSwap?</Title>
@@ -532,7 +520,7 @@ const AboutPage = () => {
         <TrustStrip>
           <TrustBadge><SafetyOutlined style={{ color: primaryColor }} /> Secure Escrow</TrustBadge>
           <TrustBadge><CheckCircleOutlined style={{ color: primaryColor }} /> Verified Sellers</TrustBadge>
-          <TrustBadge><GlobalOutlined style={{ color: primaryColor }} /> 21 Countries</TrustBadge>
+
           <TrustBadge><TeamOutlined style={{ color: primaryColor }} /> 5000+ Customers</TrustBadge>
         </TrustStrip>
       </Section>
@@ -557,15 +545,7 @@ const AboutPage = () => {
               <AwardLabel>Happy Customers</AwardLabel>
             </AwardText>
           </AwardItem>
-          <AwardItem>
-            <AwardIcon>
-              <GlobalOutlined style={{ color: primaryColor, fontSize: 22 }} />
-            </AwardIcon>
-            <AwardText>
-              <AwardNum><CountUp to={21} /></AwardNum>
-              <AwardLabel>Countries Served</AwardLabel>
-            </AwardText>
-          </AwardItem>
+
           <AwardItem>
             <AwardIcon>
               <RocketOutlined style={{ color: primaryColor, fontSize: 22 }} />
@@ -624,28 +604,14 @@ const AboutPage = () => {
 
       <Section>
         <Title level={2} style={{ textAlign: 'center', marginBottom: '16px', color: textColor }}>Our Mission</Title>
-        <Paragraph style={{ fontSize: '16px', textAlign: 'center', maxWidth: '800px', margin: '0 auto', color: subTextColor }}>
+        <Paragraph style={{ fontSize: '18px', textAlign: 'center', lineHeight: '1.6', maxWidth: '760px', margin: '0 auto', color: subTextColor }}>
           At SocialSwap, we're passionate about fostering the growth of digital content and entrepreneurship. 
           Our mission is to create a trusted ecosystem where content creators can monetize their hard work, 
           and visionary entrepreneurs can acquire established channels to expand their online presence.
         </Paragraph>
       </Section>
 
-      <FAQSection>
-        <Title level={2} style={{ textAlign: 'center', marginBottom: '32px', color: textColor }}>Frequently Asked Questions</Title>
-        <List
-          itemLayout="vertical"
-          dataSource={faqItems}
-          renderItem={item => (
-            <List.Item style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }} onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-4px)')} onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0px)')}>
-              <List.Item.Meta
-                title={<Text strong style={{ fontSize: '18px', color: textColor }}>{item.question}</Text>}
-                description={<Paragraph style={{ color: subTextColor }}>{item.answer}</Paragraph>}
-              />
-            </List.Item>
-          )}
-        />
-      </FAQSection>
+      <GlobalFAQSection />
 
       <CTASection>
       <Title level={2} style={{ marginBottom: '16px', color: textColor, position: 'relative', zIndex: 2 }}>
@@ -672,10 +638,7 @@ const AboutPage = () => {
         </StyledButton>
       </div>
     </CTASection>
-    <HelpWidget onClick={() => navigate('/contact')}>
-      <span style={{ width: 10, height: 10, borderRadius: 999, background: primaryColor, display: 'inline-block', boxShadow: '0 0 0 6px rgba(255,0,0,0.08)' }} />
-      Have questions? Chat with us
-    </HelpWidget>
+
     </PageContainer>
   );
 };

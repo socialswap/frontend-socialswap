@@ -107,7 +107,7 @@ const ContactForm = () => {
                   </div>
                   <div>
                     <h4 className="text-xs md:text-sm font-semibold text-text-muted uppercase tracking-wider mb-0 md:mb-1">Email</h4>
-                    <p className="text-sm md:text-base text-text-primary font-medium">support@socialswap.in</p>
+                    <p className="text-sm md:text-base text-text-primary font-medium">official@socialswap.in</p>
                   </div>
                 </div>
                 

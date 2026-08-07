@@ -143,7 +143,9 @@ const PublicUserProfile = () => {
 
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-semibold">
                   <span className="flex items-center gap-1.5">
-                    <CalendarOutlined /> Joined {new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                    <CalendarOutlined /> Joined {
+                      new Date(user.createdAt || parseInt(user._id.substring(0, 8), 16) * 1000).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                    }
                   </span>
                   <span className="hidden sm:inline">•</span>
                   <span className="flex items-center gap-1.5">

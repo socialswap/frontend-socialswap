@@ -297,7 +297,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                   </div>
 
                   <div className="text-text-secondary text-sm mb-4 leading-relaxed bg-white/50 dark:bg-white/5 border border-white/40 dark:border-white/10 rounded-input p-3 inline-block text-left w-full">
-                     <span className="font-semibold text-text-primary">Category:</span> {channel.category || 'Premium'} • 
+                     • <span className="font-semibold text-text-primary">Category:</span> {channel.category || 'Premium'} • 
                      {channel.monetized && <span> <span className="font-semibold text-text-primary ml-1">Monetized:</span> Yes •</span>} 
                      <span className="font-semibold text-[#111827] dark:text-white ml-1">Views:</span> {formatNumber(channel.viewCount)} 
                   </div>
@@ -322,7 +322,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                       })()}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-button bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white text-xs font-bold transition shadow-md shadow-red-500/20 active:scale-95"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-button bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white text-xs font-bold transition shadow-md shadow-red-500/20 active:scale-95 whitespace-nowrap"
                     >
                       <YoutubeOutlined className="text-sm" /> View on YouTube
                     </a>
@@ -335,7 +335,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                       {decodeToken()?.decoded?.role === 'admin' ? (
                         <button onClick={() => {
                           navigate('/admin/chats', { state: { prefillDeal: channel } });
-                        }} className="flex-1 md:flex-none bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] shadow-[0_4px_15px_rgba(16,185,129,0.15)] hover:translate-y-[-3px] hover:scale-[1.03] text-white text-xs md:text-sm font-bold py-2.5 px-3 md:py-3 md:px-5 rounded-button transition-all flex items-center justify-center gap-1.5">
+                        }} className="flex-1 md:flex-1 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] shadow-[0_4px_15px_rgba(16,185,129,0.15)] hover:translate-y-[-3px] hover:scale-[1.03] text-white text-xs md:text-sm font-bold py-2.5 px-3 md:py-3 md:px-5 rounded-button transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
                           <SafetyOutlined /> Make a Contract
                         </button>
                       ) : (
@@ -346,11 +346,11 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                             return;
                           }
                           navigate('/user/chat', { state: { requestDeal: channel } });
-                        }} className="flex-1 md:flex-none bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] shadow-[0_4px_15px_rgba(16,185,129,0.15)] hover:translate-y-[-3px] hover:scale-[1.03] text-white text-xs md:text-sm font-bold py-2.5 px-3 md:py-3 md:px-5 rounded-button transition-all flex items-center justify-center gap-1.5">
-                          <MessageOutlined /> Contact Admin to Buy
+                        }} className="flex-1 md:flex-1 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] shadow-[0_4px_15px_rgba(16,185,129,0.15)] hover:translate-y-[-3px] hover:scale-[1.03] text-white text-xs md:text-sm font-bold py-2.5 px-3 md:py-3 md:px-5 rounded-button transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
+                          <MessageOutlined /> Contact Admin
                         </button>
                       )}
-                      <button onClick={handleBuyNow} className="flex-1 md:flex-none bg-white/60 dark:bg-[#1C1438]/80 text-[#6E4BFF] dark:text-[#C6B4FF] border border-[#C6B4FF] dark:border-purple-600/40 text-xs md:text-sm font-bold py-2.5 px-3 md:py-3 md:px-5 rounded-button hover:bg-[#6E4BFF] hover:text-white transition-all shadow-sm">
+                      <button onClick={handleBuyNow} className="flex-1 md:flex-1 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 hover:shadow-[0_0_20px_rgba(169,85,247,0.4)] shadow-[0_4px_15px_rgba(169,85,247,0.15)] hover:translate-y-[-3px] hover:scale-[1.03] text-white text-xs md:text-sm font-bold py-2.5 px-3 md:py-3 md:px-5 rounded-button transition-all flex items-center justify-center whitespace-nowrap">
                         Buy ${channel.price || 0}
                       </button>
                     </div>
@@ -567,24 +567,20 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                     </div>
                   )}
                   <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
-                    <span className="text-text-secondary">Gender of viewers:</span>
-                    <span className="font-bold text-text-primary">-</span>
-                  </div>
-                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
-                    <span className="text-text-secondary">Age of viewers:</span>
-                    <span className="font-bold text-text-primary">-</span>
-                  </div>
-                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
-                    <span className="text-text-secondary">Last upload date:</span>
-                    <span className="font-bold text-text-primary">-</span>
-                  </div>
-                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
                     <span className="text-text-secondary">Channel creation year:</span>
                     <span className="font-bold text-text-primary">{channel.joinedDate ? new Date(channel.joinedDate).getFullYear() : '-'}</span>
                   </div>
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Copyright Strikes:</span>
+                    <span className="font-bold text-text-primary">{channel.copyrightStrike || '0'}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
+                    <span className="text-text-secondary">Community Strikes:</span>
+                    <span className="font-bold text-text-primary">{channel.communityStrike || '0'}</span>
+                  </div>
                   <div className="flex justify-between pb-1">
-                    <span className="text-text-secondary">Advanced features enabled:</span>
-                    <span className="font-bold text-text-primary">-</span>
+                    <span className="text-text-secondary">Organic Growth:</span>
+                    <span className="font-bold text-text-primary">{channel.organicGrowth ? 'Yes' : 'No'}</span>
                   </div>
                 </div>
               </div>
@@ -594,32 +590,20 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                 <h3 className="text-lg font-bold text-text-primary mb-4">Metrics</h3>
                 <div className="space-y-3 text-xs md:text-sm">
                   <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
-                    <span className="text-text-secondary">RPM:</span>
-                    <span className="font-bold text-text-primary">-</span>
-                  </div>
-                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
                     <span className="text-text-secondary">Revenue Monthly:</span>
                     <span className="font-bold text-text-primary">₹{formatNumber(channel.estimatedEarnings)}</span>
-                  </div>
-                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
-                    <span className="text-text-secondary">Revenue last year:</span>
-                    <span className="font-bold text-text-primary">-</span>
                   </div>
                   <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
                     <span className="text-text-secondary">Views Last 48h:</span>
                     <span className="font-bold text-text-primary">{formatNumber(channel.recentViews)}</span>
                   </div>
                   <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
-                    <span className="text-text-secondary">Views Last 28 days:</span>
-                    <span className="font-bold text-text-primary">-</span>
-                  </div>
-                  <div className="flex justify-between border-b border-white/20 dark:border-white/10 pb-3">
-                    <span className="text-text-secondary">Views Last Year:</span>
-                    <span className="font-bold text-text-primary">-</span>
+                    <span className="text-text-secondary">Avg Views/Video:</span>
+                    <span className="font-bold text-text-primary">{formatNumber(channel.averageViewsPerVideo)}</span>
                   </div>
                   <div className="flex justify-between pb-1">
-                    <span className="text-text-secondary">Watch time (hours) last 90 days:</span>
-                    <span className="font-bold text-text-primary">{formatNumber(channel.watchTimeHours)}</span>
+                    <span className="text-text-secondary">Watch time (last 90 days):</span>
+                    <span className="font-bold text-text-primary">{formatNumber(channel.watchTimeHours)} hrs</span>
                   </div>
                 </div>
               </div>

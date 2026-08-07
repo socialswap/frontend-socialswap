@@ -4,7 +4,7 @@ import axiosInstance, { api as API_BASE_URL, cachedGet, apiCache } from '../../A
 import Carousel from './Carousel';
 import ChannelCard, { ChannelCardSkeleton } from '../ChannelCard';
 
-const BFB_URL = `${API_BASE_URL}/channels`;
+const BFB_URL = `${API_BASE_URL}/channels?limit=8&mostDemanding=false`;
 
 const getSortedBeginnersFromCache = () => {
   const cached = apiCache.get(BFB_URL);
@@ -16,8 +16,7 @@ const getSortedBeginnersFromCache = () => {
       const pA = parseFloat((a.price || '0').replace(/[^0-9.-]+/g, ''));
       const pB = parseFloat((b.price || '0').replace(/[^0-9.-]+/g, ''));
       return pA - pB;
-    })
-    .slice(0, 8);
+    });
 };
 
 const BestForBeginners = () => {
@@ -28,10 +27,10 @@ const BestForBeginners = () => {
   useEffect(() => {
     const fetchChannels = async () => {
       try {
-        const response = await cachedGet(`${API_BASE_URL}/channels`);
+        const response = await cachedGet(BFB_URL);
         const payload = response?.data ?? {};
         
-        // Sort by price ascending and take top 8 for "Beginners"
+        // Sort by price ascending for "Beginners"
         const sortedList = (payload.channels || [])
           .filter(ch => ch.status === 'Available' && ch.price)
           .sort((a, b) => {
@@ -40,7 +39,7 @@ const BestForBeginners = () => {
             return priceA - priceB;
           });
 
-        setBeginnerChannels(sortedList.slice(0, 8));
+        setBeginnerChannels(sortedList);
         setLoading(false);
       } catch (err) {
         setError('Unable to load channels right now.');
@@ -87,15 +86,6 @@ const BestForBeginners = () => {
           >
             Best For Beginners
           </motion.h2>
-          <motion.p 
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
-            }}
-            className="text-text-secondary max-w-2xl mx-auto"
-          >
-            Kickstart your YouTube journey with these affordable, monetized channels. Perfect for those looking to start earning from day one without breaking the bank.
-          </motion.p>
         </motion.div>
 
         <AnimatePresence mode="wait">

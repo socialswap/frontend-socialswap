@@ -87,7 +87,7 @@ const ServicesSlider = () => {
   return (
     <section className="py-8 md:py-16 bg-transparent overflow-hidden">
       <div className="container mx-auto px-4 max-w-7xl">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 gap-6 md:gap-4 text-center md:text-left">
           <motion.div 
             initial="hidden"
             whileInView="visible"
@@ -96,6 +96,7 @@ const ServicesSlider = () => {
               hidden: { opacity: 0 },
               visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
             }}
+            className="flex flex-col items-center md:items-start"
           >
             <motion.span 
               variants={{
@@ -120,15 +121,6 @@ const ServicesSlider = () => {
             >
               Explore Our Services
             </motion.h2>
-            <motion.p 
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
-              }}
-              className="text-text-secondary max-w-xl"
-            >
-              Professional assistance to boost your growth, ensure secure transactions, and manage your channels effortlessly.
-            </motion.p>
           </motion.div>
           
           <motion.div

@@ -96,7 +96,7 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
       }}
     >
       {/* Banner Section with Interactive Overlay */}
-      <div className="relative h-32 overflow-hidden">
+      <div className="relative h-32 md:h-auto md:aspect-[5/4] overflow-hidden bg-black/5">
         <motion.img
           src={banner}
           alt={channel.name}
@@ -209,13 +209,13 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
         >
           <Tooltip title="Total Subscribers">
             <div className="text-center">
-              <UserOutlined className="text-[#6E4BFF] text-[10px] mb-0.5" />
-              <p className="text-[11px] font-bold text-[#312E4A] dark:text-white">
+              <UserOutlined className="text-[#6E4BFF] text-[12px] mb-0.5" />
+              <p className="text-sm font-extrabold text-[#312E4A] dark:text-white">
                 {(channel.subscriberCount || 0) >= 1000 
                   ? `${(channel.subscriberCount / 1000).toFixed(1)}K` 
                   : channel.subscriberCount || 0}
               </p>
-              <p className="text-[8px] text-[#6F6B8A] dark:text-[#C6B4FF] font-medium uppercase tracking-wider">Subscribers</p>
+              <p className="text-[9px] text-[#6F6B8A] dark:text-[#C6B4FF] font-bold uppercase tracking-wider">Subscribers</p>
             </div>
           </Tooltip>
           <Tooltip title="Total Views">
@@ -250,12 +250,6 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
               ₹{(channel.estimatedEarnings || 0).toLocaleString()}/mo
             </span>
           </div>
-          {channel.recentViews && (
-            <div className="flex items-center gap-1 text-[10px] text-gray-400">
-              <span>👁</span>
-              <span>{channel.recentViews > 100 ? `${channel.recentViews} views` : 'Recently viewed'}</span>
-            </div>
-          )}
         </div>
         </div>
 

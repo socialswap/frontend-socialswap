@@ -88,7 +88,7 @@ const HeroVideo = () => {
               className="text-2xl sm:text-4xl md:text-5xl font-extrabold mb-3 md:mb-6 leading-tight text-white drop-shadow-md tracking-tight"
             >
               Turn Your Channel <br />
-              Into <span className="bg-clip-text text-transparent" style={{ backgroundImage: 'var(--btn-gradient)', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.3))' }}>Real Value</span>
+              Into <span className="text-[#8A6CFF] font-black drop-shadow-sm">Real Value</span>
             </motion.h1>
             <motion.p 
               variants={itemVariants}
