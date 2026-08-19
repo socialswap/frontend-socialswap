@@ -119,12 +119,7 @@ const CategoryMarquee = () => {
     <section className="py-8 md:py-16 bg-transparent overflow-hidden">
       <div className="text-center mb-10 px-4">
         <span
-          className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase mb-4 border shadow-sm"
-          style={{
-            background: 'rgba(16, 185, 129, 0.1)',
-            color: '#10B981',
-            borderColor: 'rgba(16, 185, 129, 0.2)',
-          }}
+          className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase mb-4 bg-emerald-100/80 dark:bg-emerald-950/30 text-emerald-800 dark:text-[#10B981] border border-emerald-200/80 dark:border-emerald-900/30 shadow-sm"
         >
           Find Your Niche
         </span>

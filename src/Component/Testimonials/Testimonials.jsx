@@ -1,83 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import { Carousel } from 'antd';
+import { Carousel, Modal } from 'antd';
 import { StarFilled } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import axiosInstance, { api, cachedGet, apiCache } from '../../API/api';
 
 const TESTIMONIALS_URL = `${api}/testimonials?limit=10`;
 
-const TestimonialCard = ({ testimonial }) => {
+const TestimonialCard = ({ testimonial, onReadMore }) => {
+  const rating = testimonial.rating || 5;
+
+  // Option for read more based on content length
+  const isTextLong = testimonial.text && testimonial.text.length > 110;
+  const isHeadlineLong = testimonial.headline && testimonial.headline.length > 25;
+  const needsReadMore = isTextLong || isHeadlineLong;
+
   return (
     <div className="px-2 py-4">
       {/* Outer Card Wrapper with Brand Purple/Dark Theme Color */}
-      <div className="w-full max-w-[450px] h-[360px] rounded-[32px] p-1.5 bg-gradient-to-br from-[#3B1F8C] via-[#2A1568] to-[#1A0C48] dark:from-[#231252] dark:to-[#12082E] mx-auto relative shadow-2xl border border-white/10">
+      <div className="w-full max-w-[450px] h-[340px] rounded-[24px] p-1.5 bg-gradient-to-br from-[#3B1F8C] via-[#2A1568] to-[#1A0C48] dark:from-[#231252] dark:to-[#12082E] mx-auto relative shadow-2xl border border-white/10">
         
         {/* Inner White Glass Border Container */}
-        <div className="w-full h-full border-2 border-white/70 dark:border-white/20 rounded-[24px] p-5 flex relative overflow-hidden backdrop-blur-md">
+        <div className="w-full h-full border border-white/30 dark:border-white/10 rounded-[20px] p-6 flex relative overflow-hidden backdrop-blur-md">
           
-          {/* Left Avatar Section */}
-          <div className="w-[30%] flex items-center relative z-10">
-            {/* Brand Stylized Quotation Mark Art Pills */}
-            <div className="absolute -left-2 top-4 flex gap-1.5 pointer-events-none">
-              <div className="w-4 h-12 bg-gradient-to-b from-[#8A6CFF] to-[#F4B6D2] rounded-full shadow-sm"></div>
-              <div className="w-4 h-48 bg-gradient-to-b from-[#6E4BFF] via-[#8A6CFF] to-[#F4B6D2] rounded-full shadow-sm"></div>
-            </div>
-            
-            {/* Brand Circle Background */}
-            <div className="w-28 h-28 rounded-full bg-gradient-to-br from-[#6E4BFF] to-[#3B1F8C] absolute left-6 flex items-center justify-center shadow-lg border border-white/20">
-              {/* White-bordered circular avatar */}
-              <div className="w-24 h-24 rounded-full border-2 border-white overflow-hidden bg-[#6E4BFF] flex items-center justify-center shadow-inner">
+          <div className="flex gap-5 w-full items-start">
+            {/* Left Avatar Column */}
+            <div className="w-[72px] flex-shrink-0 flex justify-center">
+              <div className="w-16 h-16 rounded-full border-2 border-white/20 overflow-hidden bg-[#6E4BFF] flex items-center justify-center shadow-lg">
                 {testimonial.avatar ? (
                   <img src={testimonial.avatar} alt={testimonial.name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="text-3xl text-white font-bold">{testimonial.name?.charAt(0)}</div>
+                  <div className="text-2xl text-white font-bold">{testimonial.name?.charAt(0)}</div>
                 )}
               </div>
             </div>
-          </div>
 
-          {/* Right Content Section */}
-          <div className="w-[70%] pl-8 pr-2 flex flex-col justify-center relative z-10 text-white">
-            {/* Top Quotes */}
-            <div className="mb-2">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="#C6B4FF" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10 11H7V7h3v4zm5 0h-3V7h3v4zm-5 2H7v4c0 1.65 1.35 3 3 3v-2c-.55 0-1-.45-1-1v-4zm5 0h-3v4c0 1.65 1.35 3 3 3v-2c-.55 0-1-.45-1-1v-4z"/>
-              </svg>
-            </div>
-            
-            {/* Name and Stars */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full mb-1.5 gap-1">
-              <div className="text-sm sm:text-base">
-                <span className="font-bold text-white block sm:inline">{testimonial.name}</span>
+            {/* Right Content Column */}
+            <div className="flex-1 flex flex-col min-w-0 text-white">
+              {/* Name & Location (Same Line) */}
+              <div className="text-base font-bold leading-snug text-white flex flex-wrap items-baseline gap-x-2">
+                <span>{testimonial.name}</span>
                 {testimonial.title && (
-                  <span className="text-purple-200 text-xs sm:text-sm sm:ml-1 font-normal">- {testimonial.title}</span>
+                  <span className="text-purple-300 text-xs font-normal">
+                    - {testimonial.title}
+                  </span>
                 )}
               </div>
-              <div className="flex text-[#ffca28] text-sm gap-0.5">
+
+              {/* Stars placed below Name */}
+              <div className="flex text-[#ffca28] text-xs gap-0.5 mt-1.5 mb-3">
                 {[...Array(5)].map((_, i) => (
-                  <StarFilled key={i} className={i < (testimonial.rating || 5) ? 'text-[#ffca28]' : 'text-white/20'} />
+                  <StarFilled key={i} className={i < rating ? 'text-[#ffca28]' : 'text-white/20'} />
                 ))}
               </div>
+
+              {/* Headline */}
+              {testimonial.headline && (
+                <h3 className="text-base font-extrabold text-white uppercase tracking-wide mb-2 leading-tight line-clamp-1">
+                  {testimonial.headline}
+                </h3>
+              )}
+
+              {/* Review Text */}
+              <p className="text-purple-100 text-xs sm:text-sm leading-relaxed overflow-hidden font-normal text-justify line-clamp-4">
+                {testimonial.text}
+              </p>
+
+              {/* Read More button */}
+              {needsReadMore && (
+                <button
+                  onClick={() => onReadMore(testimonial)}
+                  className="text-xs text-[#C6B4FF] hover:text-white transition-colors underline mt-3 font-semibold text-left self-start cursor-pointer focus:outline-none"
+                >
+                  Read More
+                </button>
+              )}
             </div>
-
-            {/* Headline */}
-            {testimonial.headline && (
-              <h3 className="text-base sm:text-lg font-extrabold text-white uppercase tracking-wide mb-2 leading-tight line-clamp-1">
-                {testimonial.headline}
-              </h3>
-            )}
-
-            {/* Review Text */}
-            <p className="text-purple-100 text-xs sm:text-[14px] leading-relaxed overflow-hidden font-normal text-justify" style={{ display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical' }}>
-              {testimonial.text}
-            </p>
-          </div>
-
-          {/* Bottom Quotes */}
-          <div className="absolute bottom-5 right-5 pointer-events-none z-10">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="#C6B4FF" xmlns="http://www.w3.org/2000/svg">
-              <path d="M14 11h-3V7h3v4zm-5 0H6V7h3v4zm5 2h-3v4c0 1.65 1.35 3 3 3v-2c-.55 0-1-.45-1-1v-4zm-5 0H6v4c0 1.65 1.35 3 3 3v-2c-.55 0-1-.45-1-1v-4z"/>
-            </svg>
           </div>
 
         </div>
@@ -88,14 +85,15 @@ const TestimonialCard = ({ testimonial }) => {
 
 const TestimonialSkeleton = () => (
   <div className="px-2 py-4">
-    <div className="w-full max-w-[450px] h-[360px] rounded-[32px] p-1.5 bg-gray-200/20 dark:bg-[#231252]/50 mx-auto animate-pulse">
-      <div className="w-full h-full border-2 border-gray-300/20 rounded-[24px] p-5 flex relative overflow-hidden backdrop-blur-md">
-        <div className="w-[30%] flex items-center justify-center relative z-10">
-          <div className="w-24 h-24 rounded-full bg-gray-300/50 dark:bg-gray-700/50"></div>
+    <div className="w-full max-w-[450px] h-[340px] rounded-[24px] p-1.5 bg-gray-200/20 dark:bg-[#231252]/50 mx-auto animate-pulse">
+      <div className="w-full h-full border border-gray-300/20 rounded-[20px] p-6 flex relative overflow-hidden backdrop-blur-md">
+        <div className="w-[72px] flex-shrink-0 flex justify-center">
+          <div className="w-16 h-16 rounded-full bg-gray-300/50 dark:bg-gray-700/50"></div>
         </div>
-        <div className="w-[70%] pl-8 pr-2 flex flex-col justify-center relative z-10 space-y-4">
+        <div className="flex-1 pl-5 flex flex-col justify-start space-y-3">
           <div className="h-4 bg-gray-300/50 dark:bg-gray-700/50 rounded w-1/2"></div>
-          <div className="h-6 bg-gray-300/50 dark:bg-gray-700/50 rounded w-3/4"></div>
+          <div className="h-3 bg-gray-300/50 dark:bg-gray-700/50 rounded w-1/4"></div>
+          <div className="h-6 bg-gray-300/50 dark:bg-gray-700/50 rounded w-3/4 mt-2"></div>
           <div className="space-y-2 mt-4">
              <div className="h-3 bg-gray-300/50 dark:bg-gray-700/50 rounded"></div>
              <div className="h-3 bg-gray-300/50 dark:bg-gray-700/50 rounded"></div>
@@ -113,6 +111,7 @@ const Testimonials = () => {
     return cached?.data?.data || [];
   });
   const [loading, setLoading] = useState(() => !apiCache.has(TESTIMONIALS_URL));
+  const [activeTestimonial, setActiveTestimonial] = useState(null);
 
   useEffect(() => {
     const fetchTestimonials = async () => {
@@ -185,11 +184,80 @@ const Testimonials = () => {
         ) : testimonials.length > 0 ? (
           <Carousel {...carouselSettings}>
             {testimonials.map((testimonial) => (
-              <TestimonialCard key={testimonial._id} testimonial={testimonial} />
+              <TestimonialCard 
+                key={testimonial._id} 
+                testimonial={testimonial} 
+                onReadMore={setActiveTestimonial}
+              />
             ))}
           </Carousel>
         ) : null}
       </div>
+
+      {/* Read More Modal */}
+      <Modal
+        open={!!activeTestimonial}
+        onCancel={() => setActiveTestimonial(null)}
+        footer={null}
+        centered
+        width={500}
+        title={null}
+        bodyStyle={{
+          background: 'var(--bg-secondary)',
+          color: 'var(--text-primary)',
+          borderRadius: '16px',
+          padding: '24px'
+        }}
+        styles={{
+          content: {
+            background: 'var(--bg-secondary)',
+            color: 'var(--text-primary)',
+            borderRadius: '16px'
+          }
+        }}
+      >
+        {activeTestimonial && (
+          <div>
+            {/* Custom Header inside body */}
+            <div className="flex items-center gap-3 mb-5 pb-4 border-b border-white/10 dark:border-white/5">
+              <div className="w-12 h-12 rounded-full border border-white/20 overflow-hidden bg-purple-primary flex items-center justify-center shrink-0">
+                {activeTestimonial.avatar ? (
+                  <img src={activeTestimonial.avatar} alt={activeTestimonial.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="text-white font-bold text-lg">{activeTestimonial.name?.charAt(0)}</div>
+                )}
+              </div>
+              <div>
+                <h4 className="text-base font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
+                  {activeTestimonial.name}
+                  {activeTestimonial.title && (
+                    <span className="font-normal text-xs md:text-sm ml-1.5" style={{ color: 'var(--text-secondary)' }}>
+                      - {activeTestimonial.title}
+                    </span>
+                  )}
+                </h4>
+                <div className="flex text-[#ffca28] text-xs gap-0.5 mt-1">
+                  {[...Array(5)].map((_, i) => (
+                    <StarFilled key={i} className={i < (activeTestimonial.rating || 5) ? 'text-[#ffca28]' : 'text-white/20'} />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Custom Body */}
+            <div>
+              {activeTestimonial.headline && (
+                <h3 className="text-lg font-extrabold mb-3 leading-snug" style={{ color: 'var(--text-primary)' }}>
+                  {activeTestimonial.headline}
+                </h3>
+              )}
+              <p className="text-sm leading-relaxed text-justify whitespace-pre-line" style={{ color: 'var(--text-secondary)' }}>
+                {activeTestimonial.text}
+              </p>
+            </div>
+          </div>
+        )}
+      </Modal>
     </section>
   );
 };

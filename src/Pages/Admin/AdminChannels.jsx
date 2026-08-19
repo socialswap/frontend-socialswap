@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Input, Select, Modal, Spin, Tag, Checkbox, Button, Descriptions } from 'antd';
 import axiosInstance, { api } from '../../API/api';
 
@@ -6,6 +7,7 @@ const { Search } = Input;
 const { Option } = Select;
 
 const AdminChannels = () => {
+  const navigate = useNavigate();
   const [channels, setChannels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -157,19 +159,20 @@ const AdminChannels = () => {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
-        <>
-        <Button type="primary" onClick={() => handleApproveChannel(record._id)}         disabled={record.status === 'approved' || record.status === 'Sold' }
-        >
-        Approve
-      </Button>
-      <Button type="danger" onClick={() => handleDeleteChannel(record._id)}>
-        Delete
-      </Button>
-        <Button type="primary" onClick={() => handleViewChannel(record._id)}>
-          View
-        </Button>
-        </>
-    
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button type="primary" onClick={() => handleApproveChannel(record._id)} disabled={record.status === 'approved' || record.status === 'Sold' }>
+            Approve
+          </Button>
+          <Button type="default" onClick={() => navigate(`/edit-channel/${record._id}`)}>
+            Edit
+          </Button>
+          <Button type="primary" onClick={() => handleViewChannel(record._id)}>
+            View
+          </Button>
+          <Button danger type="primary" onClick={() => handleDeleteChannel(record._id)}>
+            Delete
+          </Button>
+        </div>
       ),
     },
   ];

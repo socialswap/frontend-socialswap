@@ -68,12 +68,7 @@ const BestForBeginners = () => {
               hidden: { opacity: 0, y: 20 },
               visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
             }}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase mb-4"
-            style={{
-              background: 'rgba(16, 185, 129, 0.1)', // Emerald green hint for beginners
-              color: '#10B981',
-              border: '1px solid rgba(16, 185, 129, 0.2)',
-            }}
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase mb-4 bg-emerald-100/80 dark:bg-emerald-950/30 text-emerald-800 dark:text-[#10B981] border border-emerald-200/80 dark:border-emerald-900/30 shadow-sm"
           >
             Start Your Journey
           </motion.span>
