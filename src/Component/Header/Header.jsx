@@ -371,7 +371,7 @@ const Header = () => {
             <button
               type="button"
               aria-label="Toggle theme"
-              className={`relative inline-flex items-center justify-between w-[68px] h-[34px] rounded-full p-1 cursor-pointer transition-all duration-300 border ${
+              className={`hidden lg:inline-flex relative items-center justify-between w-[68px] h-[34px] rounded-full p-1 cursor-pointer transition-all duration-300 border ${
                 isOverDarkHero 
                   ? 'bg-white/10 border-white/20' 
                   : 'bg-white/80 dark:bg-white/10 border-gray-200/80 dark:border-white/15'
@@ -595,7 +595,52 @@ const Header = () => {
             })}
           </nav>
 
-          <div className="p-4 border-t border-border mt-auto">
+          <div className="p-4 border-t border-border mt-auto flex flex-col gap-4">
+            
+            {/* Theme Toggle (Mobile Menu) */}
+            <div className="flex items-center justify-between px-2">
+              <span className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Theme Mode</span>
+              <button
+                type="button"
+                aria-label="Toggle theme"
+                className="relative inline-flex items-center justify-between w-[68px] h-[34px] rounded-full p-1 cursor-pointer transition-all duration-300 border bg-bg-secondary border-border"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              >
+                {/* Sliding background thumb */}
+                <motion.div
+                  className="absolute top-1 bottom-1 w-[26px] rounded-full shadow-md shadow-purple-500/30"
+                  style={{ 
+                    backgroundColor: '#6E4BFF',
+                  }}
+                  initial={false}
+                  animate={{ x: theme === 'light' ? 0 : 34 }}
+                  transition={{ type: "spring", stiffness: 600, damping: 30 }}
+                />
+                
+                {/* Sun Icon */}
+                <div className="relative z-10 w-[26px] h-full flex items-center justify-center pointer-events-none">
+                  <SunOutlined 
+                    style={{ 
+                      fontSize: '13px',
+                      color: theme === 'light' ? '#FFFFFF' : '#9CA3AF',
+                      transition: 'color 0.3s'
+                    }} 
+                  />
+                </div>
+                
+                {/* Moon Icon */}
+                <div className="relative z-10 w-[26px] h-full flex items-center justify-center pointer-events-none">
+                  <MoonOutlined 
+                    style={{ 
+                      fontSize: '13px',
+                      color: theme === 'dark' ? '#FFFFFF' : '#9CA3AF',
+                      transition: 'color 0.3s'
+                    }} 
+                  />
+                </div>
+              </button>
+            </div>
+
             {isLoggedIn ? (
               <button
                 onClick={handleLogout}
