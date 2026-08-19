@@ -11,6 +11,11 @@ const axiosInstance = axios.create({
 // Add a request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
+    // Invalidate cache on mutations
+    if (['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase())) {
+      apiCache.clear();
+    }
+
     // Get token from localStorage
     const token = localStorage.getItem('token');
 

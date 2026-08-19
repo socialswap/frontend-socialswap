@@ -28,6 +28,8 @@ const Header = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [cartPulse, setCartPulse] = useState(false);
+  const [monetizedOpen, setMonetizedOpen] = useState(false);
+  const [nonMonetizedOpen, setNonMonetizedOpen] = useState(false);
   
   // ── Global Toast Notifications ──────────────────────────────
   const [liveToasts, setLiveToasts] = useState([]);
@@ -414,7 +416,7 @@ const Header = () => {
             <button
               type="button"
               aria-label="Search channels"
-              className={`hidden md:inline-flex items-center justify-center h-10 w-10 rounded-full transition-all duration-300 hover:scale-110 border backdrop-blur-md shadow-sm ${
+              className={`inline-flex items-center justify-center h-10 w-10 rounded-full transition-all duration-300 hover:scale-110 border backdrop-blur-md shadow-sm ${
                 isOverDarkHero 
                   ? 'bg-white/10 border-white/20 text-white' 
                   : 'bg-white/80 dark:bg-white/10 border-gray-200/80 dark:border-white/15 text-text-primary'
@@ -426,7 +428,7 @@ const Header = () => {
 
             {isLoggedIn ? (
               <>
-                <Badge count={cartCount} size="small" className={`hidden md:block ${cartPulse ? 'animate-bounce' : ''}`}>
+                <Badge count={cartCount} size="small" className={`${cartPulse ? 'animate-bounce' : ''}`}>
                   <button
                     type="button"
                     aria-label="Open cart"
@@ -517,23 +519,63 @@ const Header = () => {
         <div className="flex flex-col h-full">
           <nav className="flex flex-col flex-1 p-4 overflow-y-auto">
             <div className="text-xs font-bold uppercase tracking-wider mb-2 ml-2" style={{ color: 'var(--text-muted)' }}>Main</div>
-            {menuItems.filter(item => item.type !== 'dropdown').map((item) => (
-              <button
-                key={item.path}
-                onClick={() => handleNavigation(item.path)}
-                className={`text-left py-3 px-4 rounded-xl w-full transition-all flex items-center justify-between mb-1 ${
-                  isActiveRoute(item.path) ? 'bg-bg-secondary font-bold shadow-sm' : 'hover:bg-bg-secondary/50 font-medium'
-                }`}
-                style={{ color: isActiveRoute(item.path) ? 'var(--text-primary)' : 'var(--text-secondary)' }}
-              >
-                {item.label}
-                {item.hot && (
-                  <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 text-white">
-                    HOT
-                  </span>
-                )}
-              </button>
-            ))}
+            {menuItems.map((item) => {
+              if (item.type === 'dropdown') {
+                const isOpen = item.monetized === 'monetized' ? monetizedOpen : nonMonetizedOpen;
+                const setIsOpen = item.monetized === 'monetized' ? setMonetizedOpen : setNonMonetizedOpen;
+                const options = [
+                  { label: 'Under ₹15,000', price: 15000 },
+                  { label: 'Under ₹20,000', price: 20000 },
+                  { label: 'Under ₹50,000', price: 50000 },
+                  { label: 'Under ₹100,000', price: 100000 },
+                ];
+
+                return (
+                  <div key={item.label} className="mb-1 w-full">
+                    <button
+                      onClick={() => setIsOpen(!isOpen)}
+                      className="text-left py-3 px-4 rounded-xl w-full transition-all flex items-center justify-between font-medium hover:bg-bg-secondary/50"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      <span>{item.label}</span>
+                      <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {isOpen && (
+                      <div className="pl-6 flex flex-col gap-1 mt-1 mb-2">
+                        {options.map((opt, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => handleNavigation(`/channels?monetization=${item.monetized}&maxPrice=${opt.price}`)}
+                            className="text-left py-2 px-3 rounded-lg text-xs font-semibold hover:bg-bg-secondary/30 w-full"
+                            style={{ color: 'var(--text-secondary)' }}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => handleNavigation(item.path)}
+                  className={`text-left py-3 px-4 rounded-xl w-full transition-all flex items-center justify-between mb-1 ${
+                    isActiveRoute(item.path) ? 'bg-bg-secondary font-bold shadow-sm' : 'hover:bg-bg-secondary/50 font-medium'
+                  }`}
+                  style={{ color: isActiveRoute(item.path) ? 'var(--text-primary)' : 'var(--text-secondary)' }}
+                >
+                  {item.label}
+                  {item.hot && (
+                    <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 text-white">
+                      HOT
+                    </span>
+                  )}
+                </button>
+              );
+            })}
 
             <div className="text-xs font-bold uppercase tracking-wider mt-6 mb-2 ml-2" style={{ color: 'var(--text-muted)' }}>More Options</div>
             {moreOptions.map((item) => {

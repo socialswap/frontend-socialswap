@@ -231,9 +231,9 @@ const NicheCarousel = () => {
       ref={containerRef}
       onMouseDown={(e)  => handleDragStart(e.clientX)}
       onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
-      onTouchMove={(e)  => { e.preventDefault(); handleDragMove(e.touches[0].clientX); }}
+      onTouchMove={(e)  => { handleDragMove(e.touches[0].clientX); }}
       onTouchEnd={handleDragEnd}
-      style={{ cursor: dragRef.current.isDragging ? 'grabbing' : 'grab' }}
+      style={{ cursor: dragRef.current.isDragging ? 'grabbing' : 'grab', touchAction: 'pan-y' }}
     >
       {/* Background image — full opacity in light, subtle in dark */}
       <div

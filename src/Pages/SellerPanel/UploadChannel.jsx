@@ -497,7 +497,7 @@ export default function UploadChannel() {
                     onChange={e => { setFetchInput(e.target.value); setFetchError(''); }}
                     onKeyDown={e => e.key === 'Enter' && fetchChannelInfo()}
                     placeholder="YouTube Link, ID, or @handle"
-                    className="flex-1 min-w-0 bg-white/60 dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 rounded-input px-3.5 py-2.5 text-sm text-text-primary placeholder-text-secondary outline-none focus:border-purple-500 transition-all"
+                    className="flex-1 min-w-0 bg-white/60 dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 rounded-input px-3.5 py-2.5 text-[16px] sm:text-sm text-text-primary placeholder-text-secondary outline-none focus:border-purple-500 transition-all"
                   />
                   <button
                     onClick={fetchChannelInfo}
@@ -926,7 +926,7 @@ function Field({ label, icon, error, children }) {
         [&_input]:rounded-input [&_select]:rounded-input [&_textarea]:rounded-input
         [&_input]:px-3.5 [&_select]:px-3.5 [&_textarea]:px-3.5
         [&_input]:py-2.5 [&_select]:py-2.5 [&_textarea]:py-2.5
-        [&_input]:text-sm [&_select]:text-sm [&_textarea]:text-sm
+        [&_input]:text-[16px] sm:[&_input]:text-sm [&_select]:text-[16px] sm:[&_select]:text-sm [&_textarea]:text-[16px] sm:[&_textarea]:text-sm
         [&_input]:text-text-primary [&_select]:text-text-primary [&_textarea]:text-text-primary
         [&_input]:outline-none [&_select]:outline-none [&_textarea]:outline-none
         [&_input]:transition-all [&_select]:transition-all [&_textarea]:transition-all

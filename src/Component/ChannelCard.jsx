@@ -96,7 +96,7 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
       }}
     >
       {/* Banner Section with Interactive Overlay */}
-      <div className="relative h-32 md:h-auto md:aspect-[5/4] overflow-hidden bg-black/5">
+      <div className="relative aspect-[5/4] overflow-hidden bg-black/5">
         <motion.img
           src={banner}
           alt={channel.name}
