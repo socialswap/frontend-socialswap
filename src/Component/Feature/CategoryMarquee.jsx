@@ -37,14 +37,24 @@ const MarqueeRow = ({ items, direction = 'left' }) => {
   const [contentWidth, setContentWidth] = useState(0);
   const x = useMotionValue(0);
 
-  // Measure single set width on mount
+  // Measure single set width robustly using ResizeObserver
+  const hasMeasured = useRef(false);
   useEffect(() => {
-    if (containerRef.current) {
-      // Divide by 4 because we render 4 copies for seamless drag
-      setContentWidth(containerRef.current.scrollWidth / 4);
-      // Start in the middle safe zone
-      x.set(-(containerRef.current.scrollWidth / 4));
-    }
+    if (!containerRef.current) return;
+    
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const width = entry.target.scrollWidth / 4;
+        setContentWidth(width);
+        if (!hasMeasured.current && width > 0) {
+          x.set(-width);
+          hasMeasured.current = true;
+        }
+      }
+    });
+
+    resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
   }, [x]);
 
   // Framer motion animation loop for marquee
