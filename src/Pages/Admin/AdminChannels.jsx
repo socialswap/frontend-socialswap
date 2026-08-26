@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Input, Select, Modal, Spin, Tag, Checkbox, Button, Descriptions } from 'antd';
+import { Table, Input, Select, Modal, Spin, Tag, Checkbox, Button, Descriptions, Tooltip, Space } from 'antd';
+import { Check, X, Eye, EyeOff, Edit, Trash2, Maximize2 } from 'lucide-react';
 import axiosInstance, { api } from '../../API/api';
 
 const { Search } = Input;
@@ -194,42 +195,65 @@ const AdminChannels = () => {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <Button
-            type="primary"
-            style={{ background: '#52c41a', borderColor: '#52c41a' }}
-            onClick={() => handleApproveChannel(record._id)}
-            disabled={record.status === 'approved' || record.status === 'sold'}
-          >
-            Approve
-          </Button>
-          <Button
-            danger
-            onClick={() => handleRejectChannel(record._id)}
-            disabled={record.status === 'rejected' || record.status === 'sold'}
-          >
-            Reject
-          </Button>
-          <Button
-            type="default"
-            style={record.isHidden
-              ? { background: '#52c41a', borderColor: '#52c41a', color: '#fff' }
-              : { background: '#fa8c16', borderColor: '#fa8c16', color: '#fff' }
-            }
-            onClick={() => handleToggleVisibility(record._id, record.isHidden)}
-          >
-            {record.isHidden ? '👁 Show' : '🚫 Hide'}
-          </Button>
-          <Button type="default" onClick={() => navigate(`/edit-channel/${record._id}`)}>
-            Edit
-          </Button>
-          <Button type="default" onClick={() => handleViewChannel(record._id)}>
-            View
-          </Button>
-          <Button danger type="primary" onClick={() => handleDeleteChannel(record._id)}>
-            Delete
-          </Button>
-        </div>
+        <Space size="small" wrap>
+          <Tooltip title="Approve">
+            <Button
+              type="primary"
+              shape="circle"
+              style={{ background: '#52c41a', borderColor: '#52c41a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              onClick={() => handleApproveChannel(record._id)}
+              disabled={record.status === 'approved' || record.status === 'sold'}
+              icon={<Check size={16} />}
+            />
+          </Tooltip>
+          <Tooltip title="Reject">
+            <Button
+              danger
+              shape="circle"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              onClick={() => handleRejectChannel(record._id)}
+              disabled={record.status === 'rejected' || record.status === 'sold'}
+              icon={<X size={16} />}
+            />
+          </Tooltip>
+          <Tooltip title={record.isHidden ? 'Show' : 'Hide'}>
+            <Button
+              shape="circle"
+              style={record.isHidden
+                ? { background: '#52c41a', borderColor: '#52c41a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }
+                : { background: '#fa8c16', borderColor: '#fa8c16', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }
+              }
+              onClick={() => handleToggleVisibility(record._id, record.isHidden)}
+              icon={record.isHidden ? <Eye size={16} /> : <EyeOff size={16} />}
+            />
+          </Tooltip>
+          <Tooltip title="Edit">
+            <Button 
+              shape="circle" 
+              onClick={() => navigate(`/edit-channel/${record._id}`)}
+              icon={<Edit size={16} />}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            />
+          </Tooltip>
+          <Tooltip title="View Details">
+            <Button 
+              shape="circle" 
+              onClick={() => handleViewChannel(record._id)}
+              icon={<Maximize2 size={16} />}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            />
+          </Tooltip>
+          <Tooltip title="Delete">
+            <Button 
+              danger 
+              type="primary" 
+              shape="circle" 
+              onClick={() => handleDeleteChannel(record._id)}
+              icon={<Trash2 size={16} />}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            />
+          </Tooltip>
+        </Space>
       ),
     },
   ];
