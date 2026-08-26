@@ -345,6 +345,10 @@ export default function UploadChannel() {
     }
     if (isEditMode) {
       formData.append('existingImages', JSON.stringify(existingImages));
+      // If no new dashboard image was selected, tell backend to keep the existing one
+      if (!dashboardFile && dashboardPreview) {
+        formData.append('keepExistingDashboard', 'true');
+      }
     }
 
     try {

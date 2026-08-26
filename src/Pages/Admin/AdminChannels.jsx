@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Input, Select, Modal, Spin, Tag, Checkbox, Button, Descriptions } from 'antd';
+import { Table, Input, Select, Modal, Spin, Tag, Checkbox, Button, Descriptions, Tooltip, Space } from 'antd';
+import { Check, X, Eye, EyeOff, Edit, Trash2, Maximize2 } from 'lucide-react';
 import axiosInstance, { api } from '../../API/api';
 
 const { Search } = Input;
@@ -94,7 +95,20 @@ const AdminChannels = () => {
       console.error('Error approving channel:', error);
     }
   };
-  
+
+  const handleRejectChannel = async (channelId) => {
+    try {
+      await axiosInstance.patch(`${api}/admin/channels/${channelId}/reject`, { reason: 'Rejected by admin' });
+      setChannels((prevChannels) =>
+        prevChannels.map((channel) =>
+          channel._id === channelId ? { ...channel, status: 'rejected' } : channel
+        )
+      );
+    } catch (error) {
+      console.error('Error rejecting channel:', error);
+    }
+  };
+
   const handleDeleteChannel = async (channelId) => {
     try {
       await axiosInstance.delete(`${api}/admin/channels/${channelId}`);
@@ -105,7 +119,19 @@ const AdminChannels = () => {
       console.error('Error deleting channel:', error);
     }
   };
-  
+
+  const handleToggleVisibility = async (channelId, currentHidden) => {
+    try {
+      const res = await axiosInstance.patch(`${api}/admin/channels/${channelId}/toggle-visibility`);
+      setChannels((prevChannels) =>
+        prevChannels.map((channel) =>
+          channel._id === channelId ? { ...channel, isHidden: res.data.isHidden } : channel
+        )
+      );
+    } catch (error) {
+      console.error('Error toggling channel visibility:', error);
+    }
+  };
 
   const columns = [
     {
@@ -156,23 +182,78 @@ const AdminChannels = () => {
       ),
     },
     {
+      title: 'Hidden',
+      dataIndex: 'isHidden',
+      key: 'isHidden',
+      render: (isHidden) => (
+        <Tag color={isHidden ? 'orange' : 'default'}>
+          {isHidden ? 'Hidden' : 'Visible'}
+        </Tag>
+      ),
+    },
+    {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <Button type="primary" onClick={() => handleApproveChannel(record._id)} disabled={record.status === 'approved' || record.status === 'Sold' }>
-            Approve
-          </Button>
-          <Button type="default" onClick={() => navigate(`/edit-channel/${record._id}`)}>
-            Edit
-          </Button>
-          <Button type="primary" onClick={() => handleViewChannel(record._id)}>
-            View
-          </Button>
-          <Button danger type="primary" onClick={() => handleDeleteChannel(record._id)}>
-            Delete
-          </Button>
-        </div>
+        <Space size="small" wrap>
+          <Tooltip title="Approve">
+            <Button
+              type="primary"
+              shape="circle"
+              style={{ background: '#52c41a', borderColor: '#52c41a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              onClick={() => handleApproveChannel(record._id)}
+              disabled={record.status === 'approved' || record.status === 'sold'}
+              icon={<Check size={16} />}
+            />
+          </Tooltip>
+          <Tooltip title="Reject">
+            <Button
+              danger
+              shape="circle"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              onClick={() => handleRejectChannel(record._id)}
+              disabled={record.status === 'rejected' || record.status === 'sold'}
+              icon={<X size={16} />}
+            />
+          </Tooltip>
+          <Tooltip title={record.isHidden ? 'Show' : 'Hide'}>
+            <Button
+              shape="circle"
+              style={record.isHidden
+                ? { background: '#52c41a', borderColor: '#52c41a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }
+                : { background: '#fa8c16', borderColor: '#fa8c16', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }
+              }
+              onClick={() => handleToggleVisibility(record._id, record.isHidden)}
+              icon={record.isHidden ? <Eye size={16} /> : <EyeOff size={16} />}
+            />
+          </Tooltip>
+          <Tooltip title="Edit">
+            <Button 
+              shape="circle" 
+              onClick={() => navigate(`/edit-channel/${record._id}`)}
+              icon={<Edit size={16} />}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            />
+          </Tooltip>
+          <Tooltip title="View Details">
+            <Button 
+              shape="circle" 
+              onClick={() => handleViewChannel(record._id)}
+              icon={<Maximize2 size={16} />}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            />
+          </Tooltip>
+          <Tooltip title="Delete">
+            <Button 
+              danger 
+              type="primary" 
+              shape="circle" 
+              onClick={() => handleDeleteChannel(record._id)}
+              icon={<Trash2 size={16} />}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            />
+          </Tooltip>
+        </Space>
       ),
     },
   ];
@@ -260,6 +341,13 @@ const AdminChannels = () => {
     <Descriptions bordered column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }}>
       <Descriptions.Item label="Channel Name">{selectedChannel.name}</Descriptions.Item>
       <Descriptions.Item label="Subscribers">{selectedChannel.subscriberCount?.toLocaleString()}</Descriptions.Item>
+      <Descriptions.Item label="Channel Link" span={2}>
+        {selectedChannel.channelLink ? (
+          <a href={selectedChannel.channelLink} target="_blank" rel="noopener noreferrer" style={{ color: '#6366f1', wordBreak: 'break-all' }}>
+            {selectedChannel.channelLink}
+          </a>
+        ) : '—'}
+      </Descriptions.Item>
       <Descriptions.Item label="Category">{selectedChannel.category}</Descriptions.Item>
       <Descriptions.Item label="Status">
         <Tag color={selectedChannel.status === 'sold' ? 'red' : 'green'}>
@@ -292,21 +380,29 @@ const AdminChannels = () => {
       <Descriptions.Item label="Phone">{selectedChannel.contactInfo?.phone}</Descriptions.Item>
       {selectedChannel.description && (
         <Descriptions.Item label="Description" span={2}>
-          <a href={selectedChannel.description} target="_blank" rel="noopener noreferrer">
-            {selectedChannel.description}
-          </a>
+          {selectedChannel.description}
+        </Descriptions.Item>
+      )}
+      {selectedChannel.dashboardImage && (
+        <Descriptions.Item label="YouTube Studio Dashboard" span={2}>
+          <img
+            src={selectedChannel.dashboardImage}
+            alt="YouTube Studio Dashboard"
+            style={{ width: '100%', height: 'auto', borderRadius: '8px', border: '1px solid #e5e7eb' }}
+          />
         </Descriptions.Item>
       )}
       {selectedChannel.imageUrls && selectedChannel.imageUrls.length > 0 && (
-        <Descriptions.Item label="Image Gallery" span={2}>
-          <div className="image-gallery">
+        <Descriptions.Item label="Channel Screenshots" span={2}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {selectedChannel.imageUrls.map((url, index) => (
-              <img
-                key={index}
-                src={url}
-                alt={`Screenshot ${index + 1}`}
-                style={{ width: '100px', marginRight: '10px' }}
-              />
+              <a key={index} href={url} target="_blank" rel="noopener noreferrer">
+                <img
+                  src={url}
+                  alt={`Screenshot ${index + 1}`}
+                  style={{ width: '140px', height: 'auto', borderRadius: '6px', border: '1px solid #e5e7eb' }}
+                />
+              </a>
             ))}
           </div>
         </Descriptions.Item>
@@ -316,7 +412,7 @@ const AdminChannels = () => {
           <img
             src={selectedChannel.bannerUrl}
             alt="Channel Banner"
-            style={{ width: '100%', height: 'auto' }}
+            style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
           />
         </Descriptions.Item>
       )}
