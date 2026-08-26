@@ -317,6 +317,13 @@ const AdminChannels = () => {
     <Descriptions bordered column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }}>
       <Descriptions.Item label="Channel Name">{selectedChannel.name}</Descriptions.Item>
       <Descriptions.Item label="Subscribers">{selectedChannel.subscriberCount?.toLocaleString()}</Descriptions.Item>
+      <Descriptions.Item label="Channel Link" span={2}>
+        {selectedChannel.channelLink ? (
+          <a href={selectedChannel.channelLink} target="_blank" rel="noopener noreferrer" style={{ color: '#6366f1', wordBreak: 'break-all' }}>
+            {selectedChannel.channelLink}
+          </a>
+        ) : '—'}
+      </Descriptions.Item>
       <Descriptions.Item label="Category">{selectedChannel.category}</Descriptions.Item>
       <Descriptions.Item label="Status">
         <Tag color={selectedChannel.status === 'sold' ? 'red' : 'green'}>
@@ -349,21 +356,29 @@ const AdminChannels = () => {
       <Descriptions.Item label="Phone">{selectedChannel.contactInfo?.phone}</Descriptions.Item>
       {selectedChannel.description && (
         <Descriptions.Item label="Description" span={2}>
-          <a href={selectedChannel.description} target="_blank" rel="noopener noreferrer">
-            {selectedChannel.description}
-          </a>
+          {selectedChannel.description}
+        </Descriptions.Item>
+      )}
+      {selectedChannel.dashboardImage && (
+        <Descriptions.Item label="YouTube Studio Dashboard" span={2}>
+          <img
+            src={selectedChannel.dashboardImage}
+            alt="YouTube Studio Dashboard"
+            style={{ width: '100%', height: 'auto', borderRadius: '8px', border: '1px solid #e5e7eb' }}
+          />
         </Descriptions.Item>
       )}
       {selectedChannel.imageUrls && selectedChannel.imageUrls.length > 0 && (
-        <Descriptions.Item label="Image Gallery" span={2}>
-          <div className="image-gallery">
+        <Descriptions.Item label="Channel Screenshots" span={2}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {selectedChannel.imageUrls.map((url, index) => (
-              <img
-                key={index}
-                src={url}
-                alt={`Screenshot ${index + 1}`}
-                style={{ width: '100px', marginRight: '10px' }}
-              />
+              <a key={index} href={url} target="_blank" rel="noopener noreferrer">
+                <img
+                  src={url}
+                  alt={`Screenshot ${index + 1}`}
+                  style={{ width: '140px', height: 'auto', borderRadius: '6px', border: '1px solid #e5e7eb' }}
+                />
+              </a>
             ))}
           </div>
         </Descriptions.Item>
@@ -373,7 +388,7 @@ const AdminChannels = () => {
           <img
             src={selectedChannel.bannerUrl}
             alt="Channel Banner"
-            style={{ width: '100%', height: 'auto' }}
+            style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
           />
         </Descriptions.Item>
       )}
