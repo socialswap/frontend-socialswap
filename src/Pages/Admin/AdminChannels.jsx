@@ -94,7 +94,20 @@ const AdminChannels = () => {
       console.error('Error approving channel:', error);
     }
   };
-  
+
+  const handleRejectChannel = async (channelId) => {
+    try {
+      await axiosInstance.patch(`${api}/admin/channels/${channelId}/reject`, { reason: 'Rejected by admin' });
+      setChannels((prevChannels) =>
+        prevChannels.map((channel) =>
+          channel._id === channelId ? { ...channel, status: 'rejected' } : channel
+        )
+      );
+    } catch (error) {
+      console.error('Error rejecting channel:', error);
+    }
+  };
+
   const handleDeleteChannel = async (channelId) => {
     try {
       await axiosInstance.delete(`${api}/admin/channels/${channelId}`);
@@ -159,14 +172,26 @@ const AdminChannels = () => {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <Button type="primary" onClick={() => handleApproveChannel(record._id)} disabled={record.status === 'approved' || record.status === 'Sold' }>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <Button
+            type="primary"
+            style={{ background: '#52c41a', borderColor: '#52c41a' }}
+            onClick={() => handleApproveChannel(record._id)}
+            disabled={record.status === 'approved' || record.status === 'sold'}
+          >
             Approve
+          </Button>
+          <Button
+            danger
+            onClick={() => handleRejectChannel(record._id)}
+            disabled={record.status === 'rejected' || record.status === 'sold'}
+          >
+            Reject
           </Button>
           <Button type="default" onClick={() => navigate(`/edit-channel/${record._id}`)}>
             Edit
           </Button>
-          <Button type="primary" onClick={() => handleViewChannel(record._id)}>
+          <Button type="default" onClick={() => handleViewChannel(record._id)}>
             View
           </Button>
           <Button danger type="primary" onClick={() => handleDeleteChannel(record._id)}>
