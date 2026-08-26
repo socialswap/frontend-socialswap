@@ -583,6 +583,15 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                     <span className="font-bold text-text-primary">{channel.organicGrowth ? 'Yes' : 'No'}</span>
                   </div>
                 </div>
+
+                {channel.description && (
+                  <div className="mt-6 pt-4 border-t border-white/20 dark:border-white/10">
+                    <h4 className="text-sm font-semibold text-text-primary mb-2">Description</h4>
+                    <p className="text-sm text-text-secondary whitespace-pre-wrap leading-relaxed">
+                      {channel.description}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Metrics */}

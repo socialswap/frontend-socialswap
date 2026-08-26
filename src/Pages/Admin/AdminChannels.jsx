@@ -118,7 +118,19 @@ const AdminChannels = () => {
       console.error('Error deleting channel:', error);
     }
   };
-  
+
+  const handleToggleVisibility = async (channelId, currentHidden) => {
+    try {
+      const res = await axiosInstance.patch(`${api}/admin/channels/${channelId}/toggle-visibility`);
+      setChannels((prevChannels) =>
+        prevChannels.map((channel) =>
+          channel._id === channelId ? { ...channel, isHidden: res.data.isHidden } : channel
+        )
+      );
+    } catch (error) {
+      console.error('Error toggling channel visibility:', error);
+    }
+  };
 
   const columns = [
     {
@@ -169,6 +181,16 @@ const AdminChannels = () => {
       ),
     },
     {
+      title: 'Hidden',
+      dataIndex: 'isHidden',
+      key: 'isHidden',
+      render: (isHidden) => (
+        <Tag color={isHidden ? 'orange' : 'default'}>
+          {isHidden ? 'Hidden' : 'Visible'}
+        </Tag>
+      ),
+    },
+    {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
@@ -187,6 +209,16 @@ const AdminChannels = () => {
             disabled={record.status === 'rejected' || record.status === 'sold'}
           >
             Reject
+          </Button>
+          <Button
+            type="default"
+            style={record.isHidden
+              ? { background: '#52c41a', borderColor: '#52c41a', color: '#fff' }
+              : { background: '#fa8c16', borderColor: '#fa8c16', color: '#fff' }
+            }
+            onClick={() => handleToggleVisibility(record._id, record.isHidden)}
+          >
+            {record.isHidden ? '👁 Show' : '🚫 Hide'}
           </Button>
           <Button type="default" onClick={() => navigate(`/edit-channel/${record._id}`)}>
             Edit
