@@ -22,7 +22,7 @@ const Footer = () => {
 
   const socialLinks = [
     { href: 'https://youtube.com/@shubhzlord?si=BiP10uT0YN3Zm0nq', Icon: FaYoutube, label: 'YouTube' },
-    { href: 'https://www.instagram.com/socialswapofficial?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==', Icon: FaInstagram, label: 'Instagram' },
+    { href: 'https://www.instagram.com/socialswap.official/', Icon: FaInstagram, label: 'Instagram' },
     { href: 'https://wa.me/919423523291', Icon: FaWhatsapp, label: 'WhatsApp' },
     { href: 'https://x.com/Socialswaphq', Icon: FaXTwitter, label: 'X (Twitter)' },
   ];

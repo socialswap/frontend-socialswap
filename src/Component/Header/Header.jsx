@@ -263,6 +263,8 @@ const Header = () => {
                   { label: 'Under ₹20,000', price: 20000 },
                   { label: 'Under ₹50,000', price: 50000 },
                   { label: 'Under ₹100,000', price: 100000 },
+                  { label: 'Under ₹500,000', price: 500000 },
+                  { label: 'Under ₹1,000,000', price: 1000000 },
                 ];
                 
                 return (
@@ -528,6 +530,8 @@ const Header = () => {
                   { label: 'Under ₹20,000', price: 20000 },
                   { label: 'Under ₹50,000', price: 50000 },
                   { label: 'Under ₹100,000', price: 100000 },
+                  { label: 'Under ₹500,000', price: 500000 },
+                  { label: 'Under ₹1,000,000', price: 1000000 },
                 ];
 
                 return (
