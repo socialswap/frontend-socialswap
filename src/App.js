@@ -122,6 +122,8 @@ const AppContent = () => {
 
   const lastRouteChange = React.useRef(0);
   const isRestoring = React.useRef(false);
+  const currentLocationKey = React.useRef(location.key);
+  currentLocationKey.current = location.key;
 
   // Update lastRouteChange when route changes
   React.useEffect(() => {
@@ -131,6 +133,9 @@ const AppContent = () => {
   // Save scroll position of current page on scroll (with transition guard)
   React.useEffect(() => {
     const handleScroll = () => {
+      if (currentLocationKey.current !== location.key) {
+        return;
+      }
       if (isRestoring.current) {
         return;
       }
