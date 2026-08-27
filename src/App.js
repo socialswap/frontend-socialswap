@@ -120,19 +120,17 @@ const AppContent = () => {
     }
   }, []);
 
-  // Save scroll position of current page
-  React.useEffect(() => {
-    const handleScroll = () => {
-      try {
-        sessionStorage.setItem(`scroll_${location.key}`, window.scrollY.toString());
-      } catch (e) {}
-    };
+  const prevLocation = React.useRef(location);
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [location.key]);
+  // Save scroll position of the previous page on transition
+  React.useEffect(() => {
+    if (prevLocation.current && prevLocation.current.key !== location.key) {
+      try {
+        sessionStorage.setItem(`scroll_${prevLocation.current.key}`, window.scrollY.toString());
+      } catch (e) {}
+    }
+    prevLocation.current = location;
+  }, [location.key, location.pathname]);
 
   // Restore scroll position or scroll to top instantly without smooth-scroll glitching
   React.useEffect(() => {
