@@ -136,37 +136,66 @@ const AppContent = () => {
 
   // Restore scroll position or scroll to top instantly without smooth-scroll glitching
   React.useEffect(() => {
+    if (navigationType !== 'POP') {
+      const origScrollBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = 'auto';
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.style.scrollBehavior = origScrollBehavior;
+      return;
+    }
+
+    const saved = sessionStorage.getItem(`scroll_${location.key}`);
+    if (saved === null) return;
+    const savedPosition = parseInt(saved, 10);
+    if (isNaN(savedPosition) || savedPosition <= 0) return;
+
     const origScrollBehavior = document.documentElement.style.scrollBehavior;
     document.documentElement.style.scrollBehavior = 'auto';
 
-    if (navigationType === 'POP') {
-      const saved = sessionStorage.getItem(`scroll_${location.key}`);
-      if (saved !== null) {
-        const savedPosition = parseInt(saved, 10);
+    let restored = false;
 
-        const doInstantScroll = () => {
-          window.scrollTo({ top: savedPosition, left: 0, behavior: 'instant' });
-        };
+    const attemptRestore = () => {
+      const maxScrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const target = Math.min(savedPosition, maxScrollable);
+      window.scrollTo({ top: target, left: 0, behavior: 'instant' });
 
-        doInstantScroll();
-
-        const frame = requestAnimationFrame(doInstantScroll);
-        const timer = setTimeout(() => {
-          doInstantScroll();
-          document.documentElement.style.scrollBehavior = origScrollBehavior;
-        }, 100);
-
-        return () => {
-          cancelAnimationFrame(frame);
-          clearTimeout(timer);
-          document.documentElement.style.scrollBehavior = origScrollBehavior;
-        };
+      if (window.scrollY >= savedPosition || maxScrollable >= savedPosition) {
+        restored = true;
       }
-    } else {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    };
+
+    attemptRestore();
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (restored) return;
+      attemptRestore();
+    });
+
+    if (document.body) {
+      resizeObserver.observe(document.body);
     }
 
-    document.documentElement.style.scrollBehavior = origScrollBehavior;
+    const interval = setInterval(() => {
+      if (restored) {
+        clearInterval(interval);
+        return;
+      }
+      attemptRestore();
+    }, 100);
+
+    const timeout = setTimeout(() => {
+      restored = true;
+      clearInterval(interval);
+      resizeObserver.disconnect();
+      document.documentElement.style.scrollBehavior = origScrollBehavior;
+    }, 2500);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+      resizeObserver.disconnect();
+      document.documentElement.style.scrollBehavior = origScrollBehavior;
+    };
   }, [location.pathname, location.key, navigationType]);
 
   React.useEffect(() => {
