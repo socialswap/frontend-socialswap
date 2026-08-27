@@ -85,14 +85,14 @@ const HeroVideo = () => {
             </motion.span>
             <motion.h1 
               variants={itemVariants}
-              className="text-2xl sm:text-4xl md:text-5xl font-extrabold mb-3 md:mb-6 leading-tight text-text-primary dark:text-white drop-shadow-md tracking-tight"
+              className="text-2xl sm:text-4xl md:text-5xl font-extrabold mb-3 md:mb-6 leading-tight text-text-primary dark:text-white tracking-tight"
             >
               Turn Your Channel <br />
-              Into <span className="text-[#8A6CFF] font-black drop-shadow-sm">Real Value</span>
+              Into <span className="text-[#6E4BFF] dark:text-[#8A6CFF] font-black">Real Value</span>
             </motion.h1>
             <motion.p 
               variants={itemVariants}
-              className="text-sm md:text-lg text-text-secondary dark:text-white/90 drop-shadow-sm mb-6 md:mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed font-normal"
+              className="text-sm md:text-lg text-text-secondary dark:text-white/90 mb-6 md:mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed font-normal"
             >
               SocialSwap offers the safest, fastest, and most reliable way to buy and sell monetized YouTube channels with 100% Escrow Protection.
             </motion.p>

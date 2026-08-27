@@ -138,18 +138,6 @@ const PurchaseSteps = () => {
       <Paragraph style={{ marginTop: 6, textAlign: 'center', color: 'inherit' }}>
         Thank you for choosing our platform. If you have any questions or need further assistance, feel free to contact us!
       </Paragraph>
-      <div className="w-full flex items-center justify-center mt-4">
-        <a
-          href="https://wa.me/919423523291"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-white font-semibold bg-gradient-to-r from-emerald-500 to-green-500 shadow-lg hover:shadow-xl transition-transform hover:scale-[1.02]"
-          aria-label="Open WhatsApp to continue transfer"
-        >
-          <span className="inline-block h-2 w-2 rounded-full bg-white animate-pulse" />
-          Go to WhatsApp for Transfer
-        </a>
-      </div>
     </Card>
   );
 };
