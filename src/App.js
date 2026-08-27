@@ -120,21 +120,38 @@ const AppContent = () => {
     }
   }, []);
 
-  const prevLocation = React.useRef(location);
+  const lastRouteChange = React.useRef(0);
+  const isRestoring = React.useRef(false);
 
-  // Save scroll position of the previous page on transition
+  // Update lastRouteChange when route changes
   React.useEffect(() => {
-    if (prevLocation.current && prevLocation.current.key !== location.key) {
-      try {
-        sessionStorage.setItem(`scroll_${prevLocation.current.key}`, window.scrollY.toString());
-      } catch (e) {}
-    }
-    prevLocation.current = location;
+    lastRouteChange.current = Date.now();
   }, [location.key, location.pathname]);
+
+  // Save scroll position of current page on scroll (with transition guard)
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (isRestoring.current) {
+        return;
+      }
+      if (Date.now() - lastRouteChange.current < 200) {
+        return;
+      }
+      try {
+        sessionStorage.setItem(`scroll_${location.key}`, window.scrollY.toString());
+      } catch (e) {}
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [location.key]);
 
   // Restore scroll position or scroll to top instantly without smooth-scroll glitching
   React.useEffect(() => {
     if (navigationType !== 'POP') {
+      isRestoring.current = false;
       const origScrollBehavior = document.documentElement.style.scrollBehavior;
       document.documentElement.style.scrollBehavior = 'auto';
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -146,6 +163,8 @@ const AppContent = () => {
     if (saved === null) return;
     const savedPosition = parseInt(saved, 10);
     if (isNaN(savedPosition) || savedPosition <= 0) return;
+
+    isRestoring.current = true;
 
     const origScrollBehavior = document.documentElement.style.scrollBehavior;
     document.documentElement.style.scrollBehavior = 'auto';
@@ -159,6 +178,7 @@ const AppContent = () => {
 
       if (window.scrollY >= savedPosition || maxScrollable >= savedPosition) {
         restored = true;
+        isRestoring.current = false;
       }
     };
 
@@ -183,12 +203,14 @@ const AppContent = () => {
 
     const timeout = setTimeout(() => {
       restored = true;
+      isRestoring.current = false;
       clearInterval(interval);
       resizeObserver.disconnect();
       document.documentElement.style.scrollBehavior = origScrollBehavior;
     }, 2500);
 
     return () => {
+      isRestoring.current = false;
       clearInterval(interval);
       clearTimeout(timeout);
       resizeObserver.disconnect();
