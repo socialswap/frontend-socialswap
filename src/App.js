@@ -1,6 +1,6 @@
 import React from 'react';
 import Routes  from './Routing/Routes';
-import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, useLocation, useNavigate, useNavigationType } from 'react-router-dom';
 import { MessageOutlined } from '@ant-design/icons';
 import Header from './Component/Header/Header';
 import MobileFooter from './Component/Header/MobileFooter';
@@ -110,9 +110,46 @@ export async function unsubscribeFromPush() {
 const AppContent = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const navigationType = useNavigationType();
   const isBlogPage = location.pathname.startsWith('/blogs');
 
-  React.useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
+  // Save scroll position of current page
+  React.useEffect(() => {
+    const handleScroll = () => {
+      try {
+        sessionStorage.setItem(`scroll_${location.key}`, window.scrollY.toString());
+      } catch (e) {}
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [location.key]);
+
+  // Restore scroll position or scroll to top
+  React.useEffect(() => {
+    if (navigationType === 'POP') {
+      const saved = sessionStorage.getItem(`scroll_${location.key}`);
+      if (saved !== null) {
+        const savedPosition = parseInt(saved, 10);
+        const restore = () => {
+          window.scrollTo(0, savedPosition);
+        };
+        restore();
+        const t1 = setTimeout(restore, 50);
+        const t2 = setTimeout(restore, 150);
+        const t3 = setTimeout(restore, 350);
+        return () => {
+          clearTimeout(t1);
+          clearTimeout(t2);
+          clearTimeout(t3);
+        };
+      }
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname, location.key, navigationType]);
 
   React.useEffect(() => {
     if ('serviceWorker' in navigator) {
