@@ -113,6 +113,13 @@ const AppContent = () => {
   const navigationType = useNavigationType();
   const isBlogPage = location.pathname.startsWith('/blogs');
 
+  // Set history scroll restoration to manual so browser doesn't conflict
+  React.useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+
   // Save scroll position of current page
   React.useEffect(() => {
     const handleScroll = () => {
@@ -127,28 +134,39 @@ const AppContent = () => {
     };
   }, [location.key]);
 
-  // Restore scroll position or scroll to top
+  // Restore scroll position or scroll to top instantly without smooth-scroll glitching
   React.useEffect(() => {
+    const origScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+
     if (navigationType === 'POP') {
       const saved = sessionStorage.getItem(`scroll_${location.key}`);
       if (saved !== null) {
         const savedPosition = parseInt(saved, 10);
-        const restore = () => {
-          window.scrollTo(0, savedPosition);
+
+        const doInstantScroll = () => {
+          window.scrollTo({ top: savedPosition, left: 0, behavior: 'instant' });
         };
-        restore();
-        const t1 = setTimeout(restore, 50);
-        const t2 = setTimeout(restore, 150);
-        const t3 = setTimeout(restore, 350);
+
+        doInstantScroll();
+
+        const frame = requestAnimationFrame(doInstantScroll);
+        const timer = setTimeout(() => {
+          doInstantScroll();
+          document.documentElement.style.scrollBehavior = origScrollBehavior;
+        }, 100);
+
         return () => {
-          clearTimeout(t1);
-          clearTimeout(t2);
-          clearTimeout(t3);
+          cancelAnimationFrame(frame);
+          clearTimeout(timer);
+          document.documentElement.style.scrollBehavior = origScrollBehavior;
         };
       }
     } else {
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }
+
+    document.documentElement.style.scrollBehavior = origScrollBehavior;
   }, [location.pathname, location.key, navigationType]);
 
   React.useEffect(() => {
