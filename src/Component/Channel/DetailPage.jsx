@@ -648,9 +648,17 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                 <span className="ml-1 text-text-secondary">6 min ago</span>
               </p>
 
-              <div className="bg-[#6E4BFF]/10 text-[#6E4BFF] dark:text-[#C6B4FF] text-xs font-semibold px-4 py-1.5 rounded-full mb-6 inline-block border border-[#6E4BFF]/20">
+              <div className="bg-[#6E4BFF]/10 text-[#6E4BFF] dark:text-[#C6B4FF] text-xs font-semibold px-4 py-1.5 rounded-full mb-4 inline-block border border-[#6E4BFF]/20">
                 Since {channel.joinedDate ? new Date(channel.joinedDate).getFullYear() : '2026'}
               </div>
+
+              {channel.createdBy?.username && (
+                <Link to={`/userprofile/@${channel.createdBy.username}`} className="w-full">
+                  <button className="w-full bg-gradient-to-r from-[#6E4BFF] to-[#8A6CFF] hover:from-[#5a3acb] hover:to-[#6E4BFF] text-white text-sm font-bold py-2.5 px-4 rounded-button transition-all shadow-[0_4px_15px_rgba(110,75,255,0.25)] hover:shadow-[0_4px_20px_rgba(110,75,255,0.4)] active:scale-95">
+                    View Profile
+                  </button>
+                </Link>
+              )}
 
             </div>
 
