@@ -78,7 +78,7 @@ const ServicesSlider = () => {
       {
         breakpoint: 640,
         settings: {
-          slidesToShow: 1,
+          slidesToShow: 1.15,
         }
       }
     ]
