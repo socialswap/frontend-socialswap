@@ -1,6 +1,6 @@
 import React from 'react';
 import Routes  from './Routing/Routes';
-import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, useLocation, useNavigate, useNavigationType } from 'react-router-dom';
 import { MessageOutlined } from '@ant-design/icons';
 import Header from './Component/Header/Header';
 import MobileFooter from './Component/Header/MobileFooter';
@@ -110,9 +110,118 @@ export async function unsubscribeFromPush() {
 const AppContent = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const navigationType = useNavigationType();
   const isBlogPage = location.pathname.startsWith('/blogs');
 
-  React.useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
+  // Set history scroll restoration to manual so browser doesn't conflict
+  React.useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+
+  const lastRouteChange = React.useRef(0);
+  const isRestoring = React.useRef(false);
+  const currentLocationKey = React.useRef(location.key);
+  currentLocationKey.current = location.key;
+
+  // Update lastRouteChange when route changes
+  React.useEffect(() => {
+    lastRouteChange.current = Date.now();
+  }, [location.key, location.pathname]);
+
+  // Save scroll position of current page on scroll (with transition guard)
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (currentLocationKey.current !== location.key) {
+        return;
+      }
+      if (isRestoring.current) {
+        return;
+      }
+      if (Date.now() - lastRouteChange.current < 200) {
+        return;
+      }
+      try {
+        sessionStorage.setItem(`scroll_${location.key}`, window.scrollY.toString());
+      } catch (e) {}
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [location.key]);
+
+  // Restore scroll position or scroll to top instantly without smooth-scroll glitching
+  React.useEffect(() => {
+    if (navigationType !== 'POP') {
+      isRestoring.current = false;
+      const origScrollBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = 'auto';
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.style.scrollBehavior = origScrollBehavior;
+      return;
+    }
+
+    const saved = sessionStorage.getItem(`scroll_${location.key}`);
+    if (saved === null) return;
+    const savedPosition = parseInt(saved, 10);
+    if (isNaN(savedPosition) || savedPosition <= 0) return;
+
+    isRestoring.current = true;
+
+    const origScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+
+    let restored = false;
+
+    const attemptRestore = () => {
+      const maxScrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const target = Math.min(savedPosition, maxScrollable);
+      window.scrollTo({ top: target, left: 0, behavior: 'instant' });
+
+      if (window.scrollY >= savedPosition || maxScrollable >= savedPosition) {
+        restored = true;
+        isRestoring.current = false;
+      }
+    };
+
+    attemptRestore();
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (restored) return;
+      attemptRestore();
+    });
+
+    if (document.body) {
+      resizeObserver.observe(document.body);
+    }
+
+    const interval = setInterval(() => {
+      if (restored) {
+        clearInterval(interval);
+        return;
+      }
+      attemptRestore();
+    }, 100);
+
+    const timeout = setTimeout(() => {
+      restored = true;
+      isRestoring.current = false;
+      clearInterval(interval);
+      resizeObserver.disconnect();
+      document.documentElement.style.scrollBehavior = origScrollBehavior;
+    }, 2500);
+
+    return () => {
+      isRestoring.current = false;
+      clearInterval(interval);
+      clearTimeout(timeout);
+      resizeObserver.disconnect();
+      document.documentElement.style.scrollBehavior = origScrollBehavior;
+    };
+  }, [location.pathname, location.key, navigationType]);
 
   React.useEffect(() => {
     if ('serviceWorker' in navigator) {
