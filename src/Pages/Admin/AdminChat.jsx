@@ -274,11 +274,13 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
     }
   }, [fetchThreads]);
 
+  const targetUserId = prefillUserId || location.state?.prefillUserId;
+
   useEffect(() => {
-    if (prefillUserId) {
-      loadThreadByUserId(prefillUserId);
+    if (targetUserId) {
+      loadThreadByUserId(targetUserId);
     }
-  }, [prefillUserId, loadThreadByUserId]);
+  }, [targetUserId, loadThreadByUserId]);
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !activeThread) return;
@@ -466,12 +468,41 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </button>
               )}
-              <svg className="w-5 h-5 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-              </svg>
-              <span className="font-semibold text-white">
-                {activeThread ? `Chat with ${activeThread.participants?.find(p => p._id !== currentUserId && p !== currentUserId)?.name || 'User'}` : 'Chats'}
-              </span>
+              {activeThread ? (
+                (() => {
+                  const activeParticipant = activeThread.participants?.find(p => p._id !== currentUserId && p !== currentUserId);
+                  return (
+                    <div 
+                      onClick={() => activeParticipant?._id && navigate(`/admin/user-profile/${activeParticipant._id}`)}
+                      className="flex items-center cursor-pointer hover:opacity-90 transition-opacity"
+                      title="Click to view user profile, contact number & seller channels"
+                    >
+                      <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm mr-3 overflow-hidden shrink-0 border border-white/30 shadow-sm">
+                        {activeParticipant?.avatar ? (
+                          <img src={activeParticipant.avatar} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          activeParticipant?.name?.charAt(0) || 'U'
+                        )}
+                      </div>
+                      <div>
+                        <span className="font-semibold text-white text-sm block leading-tight hover:underline">
+                          {activeParticipant?.name || 'User'}
+                        </span>
+                        <span className="text-[10px] text-purple-200 block">
+                          View profile & channels →
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()
+              ) : (
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                  </svg>
+                  <span className="font-semibold text-white">Chats</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -506,8 +537,21 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                     }}
                     className="flex items-center p-3 mb-1 cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-colors border-b border-gray-50 dark:border-purple-900/10 last:border-0 group relative"
                   >
-                    <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/40 rounded-full flex items-center justify-center text-[#7C3AED] dark:text-[#A855F7] font-bold text-lg mr-4 uppercase shrink-0 group-hover:bg-purple-200 dark:group-hover:bg-purple-900/60 transition-colors">
-                      {participant?.name?.charAt(0) || 'U'}
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (participant?._id) {
+                          navigate(`/admin/user-profile/${participant._id}`);
+                        }
+                      }}
+                      title="Click DP to view user profile, contact info & seller channels"
+                      className="w-12 h-12 bg-purple-100 dark:bg-purple-900/40 rounded-full flex items-center justify-center text-[#7C3AED] dark:text-[#A855F7] font-bold text-lg mr-4 uppercase shrink-0 hover:ring-2 hover:ring-[#7C3AED] hover:scale-105 transition-all shadow-sm z-10 cursor-pointer overflow-hidden"
+                    >
+                      {participant?.avatar ? (
+                        <img src={participant.avatar} alt="" className="w-full h-full object-cover rounded-full" />
+                      ) : (
+                        participant?.name?.charAt(0) || 'U'
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-baseline mb-1">

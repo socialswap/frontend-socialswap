@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../API/api';
 import {
   Table,
@@ -40,6 +41,7 @@ const { Option } = Select;
 const { Title, Text } = Typography;
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -145,7 +147,11 @@ const AdminDashboard = () => {
       render: (_, record) => {
         const initials = (record?.name || record?.email || 'U').charAt(0).toUpperCase();
         return (
-          <Space>
+          <Space 
+            className="cursor-pointer hover:opacity-80 transition-opacity" 
+            onClick={() => navigate(`/admin/user-profile/${record._id}`)}
+            title="Click to view full user profile & seller channels"
+          >
             <Avatar 
               src={record?.avatar} 
               style={{ backgroundColor: '#1890ff' }} 
@@ -154,7 +160,7 @@ const AdminDashboard = () => {
               {!record?.avatar && (record?.name || record?.email) ? initials : null}
             </Avatar>
             <div>
-              <div className="font-medium">{record?.name || '-'}</div>
+              <div className="font-medium hover:text-[#7C3AED] transition-colors">{record?.name || '-'}</div>
               <Text type="secondary" style={{ fontSize: 12 }}>{record?.email || '-'}</Text>
             </div>
           </Space>
@@ -211,7 +217,10 @@ const AdminDashboard = () => {
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Tooltip title="View details">
+          <Tooltip title="View full profile & seller channels">
+            <Button icon={<UserOutlined />} style={{ color: '#7C3AED', borderColor: '#7C3AED' }} onClick={() => navigate(`/admin/user-profile/${record._id}`)} />
+          </Tooltip>
+          <Tooltip title="Edit role & status">
             <Button icon={<EyeOutlined />} onClick={() => handleViewDetails(record)} />
           </Tooltip>
           <Tooltip title="Chat with user">
