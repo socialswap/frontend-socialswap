@@ -182,35 +182,39 @@ const AdminDeals = () => {
   const filteredChannels = channels;
 
   return (
-    <div className="p-4">
-      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="p-2 sm:p-4">
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold">Escrow Deals Management</h2>
-          <p className="text-gray-500 text-sm">View and manage all escrow transactions across the platform.</p>
+          <h2 className="text-lg sm:text-xl font-bold">Escrow Deals Management</h2>
+          <p className="text-gray-500 text-xs sm:text-sm">View and manage all escrow transactions across the platform.</p>
         </div>
         <Button 
           type="primary" 
           icon={<PlusOutlined />} 
           onClick={openCreateModal}
           size="large"
+          className="w-full sm:w-auto"
           style={{ background: 'linear-gradient(135deg, #7C3AED, #A855F7)', border: 'none' }}
         >
           Create New Deal
         </Button>
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={deals}
-        rowKey="_id"
-        loading={loading}
-        pagination={{
-          pageSize: 10,
-          showSizeChanger: true,
-          showTotal: (total) => `Total ${total} deals`,
-        }}
-        bordered
-      />
+      <div className="overflow-x-auto w-full">
+        <Table
+          columns={columns}
+          dataSource={deals}
+          rowKey="_id"
+          loading={loading}
+          scroll={{ x: 'max-content' }}
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showTotal: (total) => `Total ${total} deals`,
+          }}
+          bordered
+        />
+      </div>
 
       {/* View Deal Modal */}
       <Modal

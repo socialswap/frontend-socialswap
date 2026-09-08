@@ -299,13 +299,13 @@ const AdminChannels = () => {
   ];
 
   return (
-    <div className="p-4">
+    <div className="p-2 sm:p-4">
        
         <hr />
         <br />
-      <h1 className="text-2xl font-bold mb-6">YouTube Channels Admin Dashboard</h1>
+      <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">YouTube Channels Admin Dashboard</h1>
 
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <Search
           placeholder="Search channels..."
           value={filters.search}
@@ -344,30 +344,33 @@ const AdminChannels = () => {
         </Select>
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={channels.filter(channel => {
-          const isSold = channel.sold === true || channel.status === 'sold' || channel.status === 'Sold';
-          const matchesStatus = filters.status === ''
-            ? true
-            : filters.status === 'sold'
-              ? isSold
-              : !isSold;
+      <div className="overflow-x-auto w-full">
+        <Table
+          columns={columns}
+          dataSource={channels.filter(channel => {
+            const isSold = channel.sold === true || channel.status === 'sold' || channel.status === 'Sold';
+            const matchesStatus = filters.status === ''
+              ? true
+              : filters.status === 'sold'
+                ? isSold
+                : !isSold;
 
-          return (
-            channel.name.toLowerCase().includes(filters.search.toLowerCase()) &&
-            (filters.category === '' || channel.category === filters.category) &&
-            matchesStatus &&
-            (filters.monetized === '' || channel.monetized?.toString() === filters.monetized)
-          );
-        })}
-        rowKey="_id"
-        loading={loading}
-        pagination={{
-          showSizeChanger: true,
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-        }}
-      />
+            return (
+              channel.name.toLowerCase().includes(filters.search.toLowerCase()) &&
+              (filters.category === '' || channel.category === filters.category) &&
+              matchesStatus &&
+              (filters.monetized === '' || channel.monetized?.toString() === filters.monetized)
+            );
+          })}
+          rowKey="_id"
+          loading={loading}
+          scroll={{ x: 'max-content' }}
+          pagination={{
+            showSizeChanger: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+          }}
+        />
+      </div>
 
 <Modal
   title="Channel Details"
