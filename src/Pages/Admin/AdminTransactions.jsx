@@ -50,10 +50,32 @@ const AdminTransactions = () => {
       ellipsis: true,
     },
     {
+      title: 'User',
+      key: 'user',
+      render: (_, record) => (
+        <div>
+          <div className="font-bold text-xs">{record.user?.name || 'Unknown User'}</div>
+          <div className="text-[11px] text-gray-500">{record.user?.email || 'N/A'}</div>
+        </div>
+      ),
+    },
+    {
+      title: 'Order Type',
+      key: 'itemType',
+      render: (_, record) => {
+        const items = record.metadata?.cartItems || [];
+        const isService = items.some(i => i.itemType === 'service');
+        const isDeal = record.metadata?.dealId;
+        if (isService) return <Tag color="purple">SERVICE</Tag>;
+        if (isDeal) return <Tag color="cyan">ESCROW DEAL</Tag>;
+        return <Tag color="blue">CHANNEL</Tag>;
+      },
+    },
+    {
       title: 'Amount',
       dataIndex: 'amount',
       key: 'amount',
-      render: (amount, record) => `${amount} ${record.currency || 'INR'}`,
+      render: (amount, record) => `₹${amount?.toLocaleString()}`,
     },
     {
       title: 'Status',
@@ -89,7 +111,7 @@ const AdminTransactions = () => {
   });
 
   const totalAmount = filteredTransactions.reduce((sum, t) => {
-    if (t.status !== 'SUCCESS') return sum; // Optionally only sum successful transactions? Let's just sum all that match the filter, or maybe only SUCCESS. Let's sum only SUCCESS to be accurate for revenue.
+    if (t.status !== 'SUCCESS') return sum;
     return sum + (parseFloat(t.amount) || 0);
   }, 0);
 
@@ -109,42 +131,60 @@ const AdminTransactions = () => {
           <Descriptions.Item label="Status">
             <Tag color={getStatusColor(transaction.status)}>{transaction.status}</Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Amount">{transaction.amount} {transaction.currency || 'INR'}</Descriptions.Item>
+          <Descriptions.Item label="Amount">₹{transaction.amount?.toLocaleString()} {transaction.currency || 'INR'}</Descriptions.Item>
           <Descriptions.Item label="Payment Method">{transaction.paymentMethod || 'N/A'}</Descriptions.Item>
           <Descriptions.Item label="Created At">{formatDate(transaction.createdAt)}</Descriptions.Item>
           <Descriptions.Item label="Updated At">{formatDate(transaction.updatedAt)}</Descriptions.Item>
         </Descriptions>
       </Card>
 
-      <Card title="User Details" className="w-full mt-4">
+      <Card title="User Details (Purchaser)" className="w-full mt-4">
         <Descriptions bordered column={{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }}>
           <Descriptions.Item label="Name">{transaction.user?.name || 'N/A'}</Descriptions.Item>
           <Descriptions.Item label="Email">{transaction.user?.email || 'N/A'}</Descriptions.Item>
           <Descriptions.Item label="Mobile">{transaction.user?.mobile || 'N/A'}</Descriptions.Item>
+          <Descriptions.Item label="Role">{transaction.user?.role || 'user'}</Descriptions.Item>
         </Descriptions>
       </Card>
 
-      <Card title="Cart Items" className="w-full mt-4">
+      <Card title="Purchased Items / Services" className="w-full mt-4">
         <Table 
           dataSource={transaction.metadata?.cartItems || []}
-          rowKey="id"
+          rowKey={(item, idx) => item.id || idx}
           pagination={false}
           columns={[
             {
-              title: 'Item Name',
+              title: 'Item / Service Name',
               dataIndex: 'name',
               key: 'name',
+              render: (name, item) => (
+                <div>
+                  <span className="font-bold text-sm">{name}</span>
+                  {item.category && <span className="ml-2 text-xs text-purple-600 font-semibold">({item.category})</span>}
+                </div>
+              ),
+            },
+            {
+              title: 'Type',
+              dataIndex: 'itemType',
+              key: 'itemType',
+              render: (type) => (
+                <Tag color={type === 'service' ? 'purple' : 'blue'}>
+                  {type ? type.toUpperCase() : 'CHANNEL'}
+                </Tag>
+              ),
             },
             {
               title: 'Price',
               dataIndex: 'price',
               key: 'price',
-              render: (price) => `${price} ${transaction.currency || 'INR'}`,
+              render: (price) => `₹${price?.toLocaleString()} ${transaction.currency || 'INR'}`,
             },
             {
               title: 'Quantity',
               dataIndex: 'quantity',
               key: 'quantity',
+              render: (qty) => qty || 1,
             },
           ]}
         />

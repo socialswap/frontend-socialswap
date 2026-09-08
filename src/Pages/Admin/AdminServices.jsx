@@ -8,6 +8,7 @@ const initialForm = {
   category: '',
   price: '',
   description: '',
+  pdfTitle: '',
   faq: [],
   sortOrder: 0,
   isActive: true,
@@ -23,6 +24,10 @@ const AdminServices = () => {
   const [newPreviews, setNewPreviews] = useState([]);   // string[] — object URLs for preview
   const [existingImages, setExistingImages] = useState([]); // string[] — already saved URLs
   const [removedImages, setRemovedImages] = useState([]); // string[] — URLs to delete from R2
+  const [pdfFile, setPdfFile] = useState(null);          // File | null — picked pdf file
+  const [pdfFileName, setPdfFileName] = useState('');    // string — pdf name
+  const [existingPdfUrl, setExistingPdfUrl] = useState(''); // string — saved pdf URL
+  const [deletePdf, setDeletePdf] = useState(false);     // boolean — delete existing pdf
   const [submitting, setSubmitting] = useState(false);
   const [slugPreview, setSlugPreview] = useState('');
 
@@ -52,6 +57,8 @@ const AdminServices = () => {
     setForm(initialForm);
     setNewImages([]); setNewPreviews([]);
     setExistingImages([]); setRemovedImages([]);
+    setPdfFile(null); setPdfFileName('');
+    setExistingPdfUrl(''); setDeletePdf(false);
     setModalOpen(true);
   };
 
@@ -62,6 +69,7 @@ const AdminServices = () => {
       category: svc.category,
       price: svc.price,
       description: svc.description,
+      pdfTitle: svc.pdfTitle || '',
       faq: svc.faq || [],
       sortOrder: svc.sortOrder || 0,
       isActive: svc.isActive !== undefined ? svc.isActive : true,
@@ -69,6 +77,9 @@ const AdminServices = () => {
     setExistingImages(svc.images || []);
     setNewImages([]); setNewPreviews([]);
     setRemovedImages([]);
+    setExistingPdfUrl(svc.pdfUrl || '');
+    setPdfFile(null); setPdfFileName('');
+    setDeletePdf(false);
     setModalOpen(true);
   };
 
@@ -78,6 +89,18 @@ const AdminServices = () => {
     const converted = await Promise.all(files.map(f => compressAndConvertToWebP(f, 0.82)));
     setNewImages(prev => [...prev, ...converted]);
     setNewPreviews(prev => [...prev, ...converted.map(f => URL.createObjectURL(f))]);
+    e.target.value = '';
+  };
+
+  const handlePdfPick = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+      return message.error('Please select a valid PDF file (.pdf)');
+    }
+    setPdfFile(file);
+    setPdfFileName(file.name);
+    setDeletePdf(false);
     e.target.value = '';
   };
 
@@ -111,13 +134,22 @@ const AdminServices = () => {
       fd.append('category', form.category.trim());
       fd.append('price', form.price);
       fd.append('description', form.description.trim());
+      fd.append('pdfTitle', form.pdfTitle.trim());
       fd.append('faq', JSON.stringify(form.faq.filter(f => f.question && f.answer)));
       fd.append('sortOrder', form.sortOrder);
       fd.append('isActive', form.isActive);
 
       if (editService) {
         fd.append('removedImages', JSON.stringify(removedImages));
+        if (deletePdf) {
+          fd.append('deletePdf', 'true');
+        }
       }
+
+      if (pdfFile) {
+        fd.append('pdfFile', pdfFile);
+      }
+
       newImages.forEach(file => fd.append('images', file));
 
       if (editService) {
@@ -170,7 +202,7 @@ const AdminServices = () => {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 dark:bg-[#18112e]">
               <tr>
-                {['Image', 'Name', 'Category', 'Price', 'Status', 'FAQs', 'Actions'].map(h => (
+                {['Image', 'Name', 'Category', 'Price', 'PDF Portfolio', 'Status', 'FAQs', 'Actions'].map(h => (
                   <th key={h} className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-300">{h}</th>
                 ))}
               </tr>
@@ -190,6 +222,15 @@ const AdminServices = () => {
                   </td>
                   <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{svc.category}</td>
                   <td className="px-4 py-3 font-bold text-purple-600 dark:text-purple-400">₹{svc.price.toLocaleString()}</td>
+                  <td className="px-4 py-3">
+                    {svc.pdfUrl ? (
+                      <a href={svc.pdfUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 hover:underline">
+                        📄 View PDF
+                      </a>
+                    ) : (
+                      <span className="text-xs text-gray-400">None</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${svc.isActive ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'}`}>
                       {svc.isActive ? 'Active' : 'Inactive'}
@@ -303,6 +344,64 @@ const AdminServices = () => {
                 Add
                 <input type="file" multiple accept="image/*" className="hidden" onChange={handleImagePick} />
               </label>
+            </div>
+          </div>
+
+          {/* Portfolio PDF Attachment */}
+          <div className="p-4 bg-purple-50/50 dark:bg-purple-900/10 rounded-2xl border border-purple-200 dark:border-purple-800/30 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Portfolio & Showcase PDF (Clickable Links)
+              </label>
+              <span className="text-xs text-purple-600 dark:text-purple-400 font-semibold">Optional</span>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">PDF Title / Headline</label>
+              <input
+                className="w-full border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-1.5 text-sm outline-none focus:border-purple-500 bg-white dark:bg-[#231542] text-gray-900 dark:text-white"
+                value={form.pdfTitle}
+                onChange={e => setForm(f => ({ ...f, pdfTitle: e.target.value }))}
+                placeholder="e.g. Website Portfolio, Case Studies & Samples PDF"
+              />
+            </div>
+
+            {/* Current PDF or Upload New */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">PDF File Attachment (.pdf)</label>
+              
+              {pdfFileName ? (
+                <div className="flex items-center justify-between bg-white dark:bg-[#231542] p-2.5 rounded-xl border border-purple-300 dark:border-purple-700">
+                  <div className="flex items-center gap-2 overflow-hidden pr-2">
+                    <span className="text-xs px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 font-bold uppercase">New PDF</span>
+                    <span className="text-xs text-gray-800 dark:text-gray-200 font-medium truncate">{pdfFileName}</span>
+                  </div>
+                  <button type="button" onClick={() => { setPdfFile(null); setPdfFileName(''); }} className="text-xs text-red-500 hover:underline font-semibold shrink-0">
+                    Remove
+                  </button>
+                </div>
+              ) : existingPdfUrl && !deletePdf ? (
+                <div className="flex items-center justify-between bg-white dark:bg-[#231542] p-2.5 rounded-xl border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-2 overflow-hidden pr-2">
+                    <span className="text-xs px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 font-bold uppercase">Attached</span>
+                    <a href={existingPdfUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-purple-600 dark:text-purple-400 hover:underline font-medium truncate">
+                      View Attached PDF
+                    </a>
+                  </div>
+                  <button type="button" onClick={() => setDeletePdf(true)} className="text-xs text-red-500 hover:underline font-semibold shrink-0">
+                    Delete PDF
+                  </button>
+                </div>
+              ) : (
+                <label className="flex items-center justify-center gap-2 py-2.5 px-4 bg-white dark:bg-[#231542] border border-dashed border-purple-300 dark:border-purple-700 rounded-xl cursor-pointer hover:border-purple-500 transition text-purple-600 dark:text-purple-400 font-semibold text-xs">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                  Select PDF File
+                  <input type="file" accept=".pdf,application/pdf" className="hidden" onChange={handlePdfPick} />
+                </label>
+              )}
             </div>
           </div>
 
