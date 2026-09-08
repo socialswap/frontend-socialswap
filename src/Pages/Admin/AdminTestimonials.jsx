@@ -223,25 +223,29 @@ const AdminTestimonials = ({ isEmbedded = false }) => {
   ];
 
   return (
-    <div className={!isEmbedded ? "p-6" : ""}>
-      <div className="flex justify-between items-center mb-6">
-        {!isEmbedded && <h2 className="text-2xl font-bold">Manage Testimonials</h2>}
+    <div className={!isEmbedded ? "p-3 sm:p-6" : ""}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+        {!isEmbedded && <h2 className="text-xl sm:text-2xl font-bold">Manage Testimonials</h2>}
         <Button 
           type="primary" 
           icon={<PlusOutlined />} 
           onClick={handleAdd}
+          className="w-full sm:w-auto"
         >
           Add Testimonial
         </Button>
       </div>
 
-      <Table 
-        columns={columns} 
-        dataSource={testimonials} 
-        rowKey="_id"
-        loading={loading}
-        pagination={{ pageSize: 10 }}
-      />
+      <div className="overflow-x-auto w-full">
+        <Table 
+          columns={columns} 
+          dataSource={testimonials} 
+          rowKey="_id"
+          loading={loading}
+          scroll={{ x: 'max-content' }}
+          pagination={{ pageSize: 10 }}
+        />
+      </div>
 
       <Modal
         title={editingTestimonial ? "Edit Testimonial" : "Add Testimonial"}
