@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { message } from 'antd';
+import { jwtDecode } from 'jwt-decode';
 import axiosInstance, { api } from '../../API/api';
 import SEOHead from '../../Component/SEO/SEOHead';
 
@@ -34,11 +36,79 @@ const FAQItem = ({ question, answer }) => {
 
 const ServiceDetail = () => {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [ordering, setOrdering] = useState(false);
+  const [showPdfViewer, setShowPdfViewer] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [notFound, setNotFound] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+
+  const handleOrderNow = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.info('Please log in to purchase this service.');
+      navigate('/login');
+      return;
+    }
+
+    if (!service || !service.price) {
+      message.error('Service details unavailable');
+      return;
+    }
+
+    setOrdering(true);
+    try {
+      let decodedUser = null;
+      try {
+        decodedUser = jwtDecode(token);
+      } catch (e) {}
+
+      const res = await axiosInstance.post(`${api}/create-order`, {
+        amount: service.price,
+        cartItems: [{
+          id: service._id,
+          name: service.serviceName,
+          price: service.price,
+          quantity: 1,
+          itemType: 'service',
+          category: service.category || 'Service',
+          image: service.images?.[0] || null
+        }],
+        user: decodedUser
+      });
+
+      if (res.data.success) {
+        const { data } = res.data;
+        localStorage.setItem('currentTransaction', JSON.stringify({
+          transactionId: data.transactionId,
+          amount: service.price,
+          cartItems: [{
+            id: service._id,
+            name: service.serviceName,
+            price: service.price,
+            quantity: 1,
+            itemType: 'service',
+            category: service.category || 'Service'
+          }]
+        }));
+
+        if (data.data?.instrumentResponse?.redirectInfo?.url) {
+          window.location.href = data.data.instrumentResponse.redirectInfo.url;
+        } else {
+          message.error('Payment redirect URL not found');
+        }
+      } else {
+        message.error(res.data.message || 'Failed to initiate payment');
+      }
+    } catch (err) {
+      console.error('Service order error:', err);
+      message.error(err.response?.data?.message || 'Payment initiation failed');
+    } finally {
+      setOrdering(false);
+    }
+  };
 
   useEffect(() => {
     const fetchService = async () => {
@@ -179,29 +249,42 @@ const ServiceDetail = () => {
                 </span>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-3 relative z-10">
-                <Link
-                  to="/user/chat"
-                  state={{ requestDeal: service }}
-                  className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#EC4899] text-white font-bold text-sm shadow-[0_10px_20px_rgba(124,58,237,0.3)] hover:-translate-y-1 transition-transform"
+              <div className="flex flex-col gap-3 relative z-10">
+                <button
+                  onClick={handleOrderNow}
+                  disabled={ordering}
+                  className="w-full flex items-center justify-center gap-2 px-5 py-4 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#EC4899] hover:from-[#6D28D9] hover:to-[#DB2777] text-white font-black text-base shadow-[0_10px_25px_rgba(124,58,237,0.4)] hover:-translate-y-0.5 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 11h14l1 12H4L5 11z" />
                   </svg>
-                  Chat with Us
-                </Link>
-                <button
-                  onClick={() => {
-                    const msg = encodeURIComponent(`Hello, I'm interested in the "${service.serviceName}" service on SocialSwap. Let's discuss details.`);
-                    window.open(`https://wa.me/+919423523291?text=${msg}`, '_blank');
-                  }}
-                  className="flex-1 flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white border border-[#25D366]/30 hover:border-[#25D366] font-bold text-sm transition-all"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.717-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.863-9.864.001-2.637-1.03-5.112-2.905-6.986-1.875-1.875-4.37-2.907-7.011-2.908-5.438 0-9.863 4.421-9.866 9.865-.001 1.77.461 3.5 1.336 5.025l-.972 3.551 3.638-.954zm10.902-5.433c-.299-.149-1.77-.875-2.044-.975-.275-.1-.475-.149-.675.15-.2.299-.774.975-.949 1.174-.175.199-.349.224-.648.075-.3-.15-1.266-.467-2.41-1.485-.89-.793-1.49-1.773-1.665-2.072-.175-.3-.019-.462.13-.611.134-.133.3-.349.449-.523.15-.174.2-.299.3-.499.1-.2.05-.375-.025-.524-.075-.15-.675-1.625-.925-2.224-.244-.589-.493-.51-.675-.519-.174-.009-.374-.01-.574-.01-.2 0-.524.075-.798.374-.275.299-1.048 1.024-1.048 2.5 0 1.475 1.073 2.899 1.223 3.099.15.2 2.11 3.224 5.116 4.519.715.309 1.273.493 1.707.63.718.228 1.37.196 1.885.12.573-.086 1.77-.724 2.02-1.424.25-.699.25-1.299.175-1.424-.075-.125-.275-.199-.574-.349z"/>
-                  </svg>
-                  WhatsApp Chat
+                  {ordering ? 'Processing Order...' : `Order Now • ₹${service.price.toLocaleString()}`}
                 </button>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link
+                    to="/user/chat"
+                    state={{ requestDeal: service }}
+                    className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white/40 dark:bg-white/10 text-gray-900 dark:text-white border border-white/60 dark:border-white/10 hover:border-purple-500 font-bold text-sm transition-all"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    Chat with Us
+                  </Link>
+                  <button
+                    onClick={() => {
+                      const msg = encodeURIComponent(`Hello, I'm interested in the "${service.serviceName}" service on SocialSwap. Let's discuss details.`);
+                      window.open(`https://wa.me/+919423523291?text=${msg}`, '_blank');
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white border border-[#25D366]/30 hover:border-[#25D366] font-bold text-sm transition-all"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.717-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.863-9.864.001-2.637-1.03-5.112-2.905-6.986-1.875-1.875-4.37-2.907-7.011-2.908-5.438 0-9.863 4.421-9.866 9.865-.001 1.77.461 3.5 1.336 5.025l-.972 3.551 3.638-.954zm10.902-5.433c-.299-.149-1.77-.875-2.044-.975-.275-.1-.475-.149-.675.15-.2.299-.774.975-.949 1.174-.175.199-.349.224-.648.075-.3-.15-1.266-.467-2.41-1.485-.89-.793-1.49-1.773-1.665-2.072-.175-.3-.019-.462.13-.611.134-.133.3-.349.449-.523.15-.174.2-.299.3-.499.1-.2.05-.375-.025-.524-.075-.15-.675-1.625-.925-2.224-.244-.589-.493-.51-.675-.519-.174-.009-.374-.01-.574-.01-.2 0-.524.075-.798.374-.275.299-1.048 1.024-1.048 2.5 0 1.475 1.073 2.899 1.223 3.099.15.2 2.11 3.224 5.116 4.519.715.309 1.273.493 1.707.63.718.228 1.37.196 1.885.12.573-.086 1.77-.724 2.02-1.424.25-.699.25-1.299.175-1.424-.075-.125-.275-.199-.574-.349z"/>
+                    </svg>
+                    WhatsApp Chat
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -212,6 +295,70 @@ const ServiceDetail = () => {
                 <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
                   {service.description}
                 </p>
+              </div>
+            )}
+
+            {/* PDF Portfolio / Showcase Section */}
+            {service.pdfUrl && (
+              <div className="mt-8 p-6 rounded-[28px] bg-gradient-to-br from-purple-900/20 via-purple-900/10 to-indigo-900/20 dark:from-[#1A142E]/80 dark:to-[#110C1F]/80 border border-purple-500/30 backdrop-blur-[16px] shadow-[0_15px_40px_rgba(124,58,237,0.15)] relative overflow-hidden">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+                  <div className="flex items-start gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#7C3AED] to-[#EC4899] flex items-center justify-center text-white shrink-0 shadow-lg">
+                      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                          Work Showcase & Portfolio
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-black text-gray-900 dark:text-white leading-snug">
+                        {service.pdfTitle || `${service.serviceName} - Work Portfolio PDF`}
+                      </h3>
+                      <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
+                        Includes past projects, live work samples, client case studies, and clickable links.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto shrink-0">
+                    <a
+                      href={service.pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#A855F7] text-white font-bold text-xs shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                      Open PDF (Clickable Links)
+                    </a>
+
+                    <button
+                      onClick={() => setShowPdfViewer(!showPdfViewer)}
+                      className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-2xl bg-white/40 dark:bg-white/10 text-gray-900 dark:text-white border border-white/60 dark:border-white/10 hover:border-purple-500 font-bold text-xs transition-all"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      {showPdfViewer ? 'Hide Inline Reader' : 'Preview Document'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Embedded PDF Reader */}
+                {showPdfViewer && (
+                  <div className="mt-4 rounded-2xl overflow-hidden border border-purple-500/30 bg-black/40 shadow-inner">
+                    <iframe
+                      src={service.pdfUrl}
+                      title="Portfolio PDF"
+                      className="w-full h-[550px] border-0"
+                    />
+                  </div>
+                )}
               </div>
             )}
 
@@ -254,10 +401,21 @@ const ServiceDetail = () => {
               <hr className="border-gray-200/60 dark:border-white/5 my-6" />
 
               <div className="space-y-3 relative z-10">
+                <button
+                  onClick={handleOrderNow}
+                  disabled={ordering}
+                  className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#EC4899] hover:from-[#6D28D9] hover:to-[#DB2777] text-white font-black text-base shadow-[0_10px_25px_rgba(124,58,237,0.4)] hover:shadow-[0_15px_30px_rgba(124,58,237,0.5)] hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 11h14l1 12H4L5 11z" />
+                  </svg>
+                  {ordering ? 'Processing Order...' : `Order Now • ₹${service.price.toLocaleString()}`}
+                </button>
+
                 <Link
                   to="/user/chat"
                   state={{ requestDeal: service }}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#EC4899] text-white font-bold text-sm shadow-[0_10px_20px_rgba(124,58,237,0.3)] hover:shadow-[0_15px_30px_rgba(124,58,237,0.4)] hover:-translate-y-1 transition-all duration-300"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-white/40 dark:bg-white/10 text-gray-900 dark:text-white border border-white/60 dark:border-white/10 hover:border-purple-500 font-bold text-sm transition-all duration-300"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />

@@ -37,6 +37,7 @@ const ShippingAndCancellationPolicy = lazy(() => import('../ExternalPages/Cancel
 
 const UserChat = lazy(() => import('../Pages/Chat/UserChat'));
 const AdminChat = lazy(() => import('../Pages/Admin/AdminChat'));
+const AdminUserProfile = lazy(() => import('../Pages/Admin/AdminUserProfile'));
 const ProfileLayout = lazy(() => import('../Component/Profile/ProfileLayout'));
 const ServicesPage = lazy(() => import('../Pages/Services/ServicesPage'));
 const ServiceDetail = lazy(() => import('../Pages/Services/ServiceDetail'));
@@ -122,6 +123,10 @@ const Routes = () => {
     { 
       path: '/admin/chats', 
       element: <ProtectedRoute element={<AdminChat />} isAuthRequired={true} />
+    },
+    { 
+      path: '/admin/user-profile/:userId', 
+      element: <ProtectedRoute element={<AdminUserProfile />} isAuthRequired={true} />
     },
     { path: '/services', element: <ServicesPage /> },
     { path: '/services/:slug', element: <ServiceDetail /> },

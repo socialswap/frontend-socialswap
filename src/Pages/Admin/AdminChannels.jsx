@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Input, Select, Modal, Spin, Tag, Checkbox, Button, Descriptions, Tooltip, Space } from 'antd';
-import { Check, X, Eye, EyeOff, Edit, Trash2, Maximize2 } from 'lucide-react';
+import { Check, X, Eye, EyeOff, Edit, Trash2, Maximize2, ShoppingBag } from 'lucide-react';
 import axiosInstance, { api } from '../../API/api';
 
 const { Search } = Input;
@@ -133,6 +133,21 @@ const AdminChannels = () => {
     }
   };
 
+  const handleToggleSold = async (channelId) => {
+    try {
+      const res = await axiosInstance.patch(`${api}/admin/channels/${channelId}/toggle-sold`);
+      setChannels((prevChannels) =>
+        prevChannels.map((channel) =>
+          channel._id === channelId
+            ? { ...channel, sold: res.data.sold, status: res.data.status }
+            : channel
+        )
+      );
+    } catch (error) {
+      console.error('Error toggling channel sold status:', error);
+    }
+  };
+
   const columns = [
     {
       title: 'Channel Name',
@@ -154,11 +169,21 @@ const AdminChannels = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => (
-        <Tag color={status === 'sold' ? 'red' : 'green'}>
-          {status}
-        </Tag>
-      ),
+      render: (status, record) => {
+        const isSold = record.sold === true || status === 'sold' || status === 'Sold';
+        if (isSold) {
+          return (
+            <Tag color="red" style={{ fontWeight: 600 }}>
+              SOLD OUT
+            </Tag>
+          );
+        }
+        return (
+          <Tag color={status === 'approved' ? 'green' : status === 'rejected' ? 'red' : 'gold'}>
+            {status ? status.toUpperCase() : 'PENDING'}
+          </Tag>
+        );
+      },
     },
     {
       title: 'Monetized',
@@ -194,67 +219,82 @@ const AdminChannels = () => {
     {
       title: 'Actions',
       key: 'actions',
-      render: (_, record) => (
-        <Space size="small" wrap>
-          <Tooltip title="Approve">
-            <Button
-              type="primary"
-              shape="circle"
-              style={{ background: '#52c41a', borderColor: '#52c41a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              onClick={() => handleApproveChannel(record._id)}
-              disabled={record.status === 'approved' || record.status === 'sold'}
-              icon={<Check size={16} />}
-            />
-          </Tooltip>
-          <Tooltip title="Reject">
-            <Button
-              danger
-              shape="circle"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              onClick={() => handleRejectChannel(record._id)}
-              disabled={record.status === 'rejected' || record.status === 'sold'}
-              icon={<X size={16} />}
-            />
-          </Tooltip>
-          <Tooltip title={record.isHidden ? 'Show' : 'Hide'}>
-            <Button
-              shape="circle"
-              style={record.isHidden
-                ? { background: '#52c41a', borderColor: '#52c41a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }
-                : { background: '#fa8c16', borderColor: '#fa8c16', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }
-              }
-              onClick={() => handleToggleVisibility(record._id, record.isHidden)}
-              icon={record.isHidden ? <Eye size={16} /> : <EyeOff size={16} />}
-            />
-          </Tooltip>
-          <Tooltip title="Edit">
-            <Button 
-              shape="circle" 
-              onClick={() => navigate(`/edit-channel/${record._id}`)}
-              icon={<Edit size={16} />}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            />
-          </Tooltip>
-          <Tooltip title="View Details">
-            <Button 
-              shape="circle" 
-              onClick={() => handleViewChannel(record._id)}
-              icon={<Maximize2 size={16} />}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button 
-              danger 
-              type="primary" 
-              shape="circle" 
-              onClick={() => handleDeleteChannel(record._id)}
-              icon={<Trash2 size={16} />}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            />
-          </Tooltip>
-        </Space>
-      ),
+      render: (_, record) => {
+        const isSold = record.sold === true || record.status === 'sold' || record.status === 'Sold';
+        return (
+          <Space size="small" wrap>
+            <Tooltip title="Approve">
+              <Button
+                type="primary"
+                shape="circle"
+                style={{ background: '#52c41a', borderColor: '#52c41a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={() => handleApproveChannel(record._id)}
+                disabled={record.status === 'approved' || isSold}
+                icon={<Check size={16} />}
+              />
+            </Tooltip>
+            <Tooltip title="Reject">
+              <Button
+                danger
+                shape="circle"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={() => handleRejectChannel(record._id)}
+                disabled={record.status === 'rejected' || isSold}
+                icon={<X size={16} />}
+              />
+            </Tooltip>
+            <Tooltip title={record.isHidden ? 'Show' : 'Hide'}>
+              <Button
+                shape="circle"
+                style={record.isHidden
+                  ? { background: '#52c41a', borderColor: '#52c41a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }
+                  : { background: '#fa8c16', borderColor: '#fa8c16', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }
+                }
+                onClick={() => handleToggleVisibility(record._id, record.isHidden)}
+                icon={record.isHidden ? <Eye size={16} /> : <EyeOff size={16} />}
+              />
+            </Tooltip>
+            <Tooltip title={isSold ? "Mark as Available / Unsold" : "Mark as Sold Out"}>
+              <Button
+                shape="circle"
+                style={
+                  isSold
+                    ? { background: '#ef4444', borderColor: '#ef4444', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }
+                    : { background: '#fff', borderColor: '#ef4444', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }
+                }
+                onClick={() => handleToggleSold(record._id)}
+                icon={<ShoppingBag size={16} />}
+              />
+            </Tooltip>
+            <Tooltip title="Edit">
+              <Button 
+                shape="circle" 
+                onClick={() => navigate(`/edit-channel/${record._id}`)}
+                icon={<Edit size={16} />}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              />
+            </Tooltip>
+            <Tooltip title="View Details">
+              <Button 
+                shape="circle" 
+                onClick={() => handleViewChannel(record._id)}
+                icon={<Maximize2 size={16} />}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              />
+            </Tooltip>
+            <Tooltip title="Delete">
+              <Button 
+                danger 
+                type="primary" 
+                shape="circle" 
+                onClick={() => handleDeleteChannel(record._id)}
+                icon={<Trash2 size={16} />}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              />
+            </Tooltip>
+          </Space>
+        );
+      },
     },
   ];
 
@@ -306,12 +346,21 @@ const AdminChannels = () => {
 
       <Table
         columns={columns}
-        dataSource={channels.filter(channel => (
-          channel.name.toLowerCase().includes(filters.search.toLowerCase()) &&
-          (filters.category === '' || channel.category === filters.category) &&
-          (filters.status === '' || channel.status === filters.status) &&
-          (filters.monetized === '' || channel.monetized.toString() === filters.monetized)
-        ))}
+        dataSource={channels.filter(channel => {
+          const isSold = channel.sold === true || channel.status === 'sold' || channel.status === 'Sold';
+          const matchesStatus = filters.status === ''
+            ? true
+            : filters.status === 'sold'
+              ? isSold
+              : !isSold;
+
+          return (
+            channel.name.toLowerCase().includes(filters.search.toLowerCase()) &&
+            (filters.category === '' || channel.category === filters.category) &&
+            matchesStatus &&
+            (filters.monetized === '' || channel.monetized?.toString() === filters.monetized)
+          );
+        })}
         rowKey="_id"
         loading={loading}
         pagination={{
@@ -350,8 +399,8 @@ const AdminChannels = () => {
       </Descriptions.Item>
       <Descriptions.Item label="Category">{selectedChannel.category}</Descriptions.Item>
       <Descriptions.Item label="Status">
-        <Tag color={selectedChannel.status === 'sold' ? 'red' : 'green'}>
-          {selectedChannel.status}
+        <Tag color={(selectedChannel.status === 'sold' || selectedChannel.sold) ? 'red' : 'green'}>
+          {(selectedChannel.status === 'sold' || selectedChannel.sold) ? 'SOLD OUT' : selectedChannel.status}
         </Tag>
       </Descriptions.Item>
       <Descriptions.Item label="Monetized">

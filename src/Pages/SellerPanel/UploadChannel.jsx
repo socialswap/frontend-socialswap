@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import ReactCrop from 'react-image-crop';
+import ReactCrop, { makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import {
   Youtube, Link, Tag, FileText, IndianRupee,
@@ -21,6 +21,9 @@ const CATEGORY_OPTIONS = [
   'Food', 'Infotainment', 'Vlogging', 'Sports', 'Commentary',
   'Entertainment', 'Music', 'Motivation & Self-Improvement', 'Other'
 ];
+
+// Rigid ratio (5:4 = 1.25) matching ChannelCard sticker front image
+const DASHBOARD_ASPECT_RATIO = 5 / 4;
 
 const formatCompact = (num) => {
   if (!num) return '0';
@@ -750,9 +753,9 @@ export default function UploadChannel() {
                   <span className="font-normal text-gray-400 dark:text-white/30">(showing front page of yt studio dashboard)</span>
                 </p>
                 
-                <div className="max-w-md">
+                <div className="max-w-sm">
                   {dashboardPreview ? (
-                    <div className="relative rounded-2xl overflow-hidden aspect-video bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 group shadow-md">
+                    <div className="relative rounded-2xl overflow-hidden aspect-[5/4] bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 group shadow-md">
                       <img src={dashboardPreview} alt="Dashboard Preview" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                         <label className="px-4 py-2 bg-white text-black font-semibold text-xs rounded-xl cursor-pointer hover:bg-gray-100 transition-colors shadow-lg">
@@ -768,7 +771,7 @@ export default function UploadChannel() {
                       </div>
                     </div>
                   ) : (
-                    <label className={`flex flex-col items-center justify-center gap-3 aspect-video border-2 border-dashed rounded-2xl cursor-pointer transition-all text-xs font-medium py-8 bg-gray-50/50 dark:bg-white/[0.02]
+                    <label className={`flex flex-col items-center justify-center gap-3 aspect-[5/4] border-2 border-dashed rounded-2xl cursor-pointer transition-all text-xs font-medium py-8 bg-gray-50/50 dark:bg-white/[0.02]
                       ${fieldErrors.dashboardImage ? 'border-red-500/40 text-red-400 bg-red-500/[0.02]' : 'border-gray-300 dark:border-white/[0.12] hover:border-purple-500 hover:bg-purple-500/[0.04] text-gray-500 dark:text-white/30 hover:text-purple-400'}`}>
                       <div className="w-10 h-10 rounded-full bg-purple-500/10 text-purple-400 flex items-center justify-center">
                         <Upload size={20} />
@@ -817,9 +820,14 @@ export default function UploadChannel() {
                   <div className="bg-[#150f24] border border-white/10 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
                     {/* Header */}
                     <div className="p-5 border-b border-white/5 flex justify-between items-center bg-[#1c152e]">
-                      <h4 className="font-bold text-white flex items-center gap-2">
-                        <Sparkles size={16} className="text-purple-400" /> Crop Dashboard Image
-                      </h4>
+                      <div>
+                        <h4 className="font-bold text-white flex items-center gap-2">
+                          <Sparkles size={16} className="text-purple-400" /> Crop Dashboard Image
+                        </h4>
+                        <p className="text-xs text-purple-300/80 mt-1">
+                          Locked to Channel Sticker ratio (5:4). Position over the top area showing subscribers & revenue.
+                        </p>
+                      </div>
                       <button
                         onClick={() => { setIsCropModalOpen(false); setRawDashboardImageSrc(null); }}
                         className="text-white/70 hover:text-white text-lg transition-colors p-1"
@@ -834,14 +842,28 @@ export default function UploadChannel() {
                         crop={crop}
                         onChange={(c) => setCrop(c)}
                         onComplete={(c) => setCompletedCrop(c)}
+                        aspect={DASHBOARD_ASPECT_RATIO}
+                        ruleOfThirds
                       >
                         <img 
                           ref={imageRef} 
                           src={rawDashboardImageSrc} 
                           alt="Crop me" 
                           style={{ maxHeight: '60vh', objectFit: 'contain' }}
-                          onLoad={() => {
-                            setCrop({ unit: '%', width: 90, height: 90, x: 5, y: 5 });
+                          onLoad={(e) => {
+                            const { width, height } = e.currentTarget;
+                            const initialCrop = makeAspectCrop(
+                              {
+                                unit: '%',
+                                width: 95,
+                              },
+                              DASHBOARD_ASPECT_RATIO,
+                              width,
+                              height
+                            );
+                            initialCrop.x = (100 - initialCrop.width) / 2;
+                            initialCrop.y = 2;
+                            setCrop(initialCrop);
                           }}
                         />
                       </ReactCrop>

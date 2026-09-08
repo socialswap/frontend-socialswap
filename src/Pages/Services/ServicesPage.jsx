@@ -49,10 +49,10 @@ const ServicesPage = () => {
   const renderCard = (svc) => (
     <Link
       to={`/services/${svc.slug}`}
-      className="relative group flex items-center min-h-[175px] overflow-hidden rounded-[24px] bg-gradient-to-r from-white/60 to-white/30 dark:from-[#1A142E]/70 dark:to-[#0D081F]/70 backdrop-blur-[20px] border border-white/60 dark:border-white/10 hover:border-purple-500/40 dark:hover:border-purple-500/30 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(124,58,237,0.12)] dark:hover:shadow-[0_20px_50px_rgba(124,58,237,0.22)] hover:-translate-y-1.5 p-4 gap-4 sm:gap-6 w-full h-full text-left"
+      className="relative group flex items-center min-h-[160px] sm:min-h-[175px] overflow-hidden rounded-[24px] bg-gradient-to-r from-white/60 to-white/30 dark:from-[#1A142E]/70 dark:to-[#0D081F]/70 backdrop-blur-[20px] border border-white/60 dark:border-white/10 hover:border-purple-500/40 dark:hover:border-purple-500/30 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(124,58,237,0.12)] dark:hover:shadow-[0_20px_50px_rgba(124,58,237,0.22)] hover:-translate-y-1.5 p-3.5 sm:p-4 gap-3 sm:gap-6 w-full h-full text-left"
     >
       {/* Minimalistic square image wrapper with subtle outline, drop shadow, and round corners */}
-      <div className="relative w-28 h-28 sm:w-32 sm:h-32 shrink-0 z-10 flex-shrink-0 rounded-[20px] overflow-hidden border border-black/10 dark:border-white/10 shadow-md bg-white/5 dark:bg-white/[0.03]">
+      <div className="relative w-24 h-24 sm:w-32 sm:h-32 shrink-0 z-10 flex-shrink-0 rounded-[20px] overflow-hidden border border-black/10 dark:border-white/10 shadow-md bg-white/5 dark:bg-white/[0.03]">
         {svc.images?.[0] ? (
           <img
             src={svc.images[0]}
@@ -69,31 +69,31 @@ const ServicesPage = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-between py-1 min-w-0 h-full">
+      <div className="flex-1 flex flex-col justify-between py-0.5 sm:py-1 min-w-0 h-full">
         <div>
           <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#7C3AED] dark:text-[#C6B4FF]">
             {svc.category}
           </span>
-          <h2 className="font-extrabold text-gray-900 dark:text-white text-base sm:text-lg group-hover:text-[#7C3AED] dark:group-hover:text-[#A855F7] transition-colors leading-snug line-clamp-1 mt-1">
+          <h2 className="font-extrabold text-gray-900 dark:text-white text-sm sm:text-lg group-hover:text-[#7C3AED] dark:group-hover:text-[#A855F7] transition-colors leading-snug line-clamp-1 mt-0.5 sm:mt-1">
             {svc.serviceName}
           </h2>
           {svc.description && (
-            <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed line-clamp-2 mt-2">
+            <p className="text-gray-500 dark:text-gray-400 text-[11px] sm:text-xs leading-relaxed line-clamp-2 mt-1 sm:mt-2">
               {svc.description}
             </p>
           )}
         </div>
 
-        <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100 dark:border-white/5">
+        <div className="flex items-center justify-between mt-2 sm:mt-3 pt-1.5 sm:pt-2 border-t border-gray-100 dark:border-white/5">
           <div className="flex flex-col">
-            <span className="text-[9px] text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold">Price</span>
-            <span className="text-base sm:text-lg font-black text-[#7C3AED] dark:text-[#C6B4FF]">
-              ₹{svc.price.toLocaleString()}
+            <span className="text-[8px] sm:text-[9px] text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold">Price</span>
+            <span className="text-sm sm:text-lg font-black text-[#7C3AED] dark:text-[#C6B4FF]">
+              ₹{svc.price?.toLocaleString()}
             </span>
           </div>
 
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-500/10 dark:bg-purple-500/20 text-[#7C3AED] dark:text-[#C6B4FF] group-hover:bg-[#7C3AED] group-hover:text-white transition-all duration-300 shadow-purple-glow-soft">
-            <svg className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-purple-500/10 dark:bg-purple-500/20 text-[#7C3AED] dark:text-[#C6B4FF] group-hover:bg-[#7C3AED] group-hover:text-white transition-all duration-300 shadow-purple-glow-soft">
+            <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 transform group-hover:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
             </svg>
           </div>
@@ -191,9 +191,9 @@ const ServicesPage = () => {
               </div>
 
               {/* Horizontal Scroll list */}
-              <div className="flex overflow-x-auto gap-6 pb-6 pt-2 px-2 no-scrollbar scroll-smooth snap-x snap-mandatory">
+              <div className="flex overflow-x-auto gap-3 sm:gap-6 pb-6 pt-2 px-2 no-scrollbar scroll-smooth snap-x snap-mandatory">
                 {groupedServices[catName].map(svc => (
-                  <div key={svc._id} className="w-[360px] sm:w-[440px] shrink-0 snap-start">
+                  <div key={svc._id} className="w-[73vw] max-w-[300px] sm:w-[440px] shrink-0 snap-start">
                     {renderCard(svc)}
                   </div>
                 ))}

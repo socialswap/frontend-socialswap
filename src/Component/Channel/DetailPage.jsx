@@ -351,7 +351,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                         </button>
                       )}
                       <button onClick={handleBuyNow} className="flex-1 md:flex-1 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 hover:shadow-[0_0_20px_rgba(169,85,247,0.4)] shadow-[0_4px_15px_rgba(169,85,247,0.15)] hover:translate-y-[-3px] hover:scale-[1.03] text-white text-xs md:text-sm font-bold py-2.5 px-3 md:py-3 md:px-5 rounded-button transition-all flex items-center justify-center whitespace-nowrap">
-                        Buy ${channel.price || 0}
+                        Buy ₹{channel.price ? Number(channel.price).toLocaleString('en-IN') : 0}
                       </button>
                     </div>
                     {/* Row 2: Cart + WhatsApp + Share */}
@@ -583,15 +583,6 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                     <span className="font-bold text-text-primary">{channel.organicGrowth ? 'Yes' : 'No'}</span>
                   </div>
                 </div>
-
-                {channel.description && (
-                  <div className="mt-6 pt-4 border-t border-white/20 dark:border-white/10">
-                    <h4 className="text-sm font-semibold text-text-primary mb-2">Description</h4>
-                    <p className="text-sm text-text-secondary whitespace-pre-wrap leading-relaxed">
-                      {channel.description}
-                    </p>
-                  </div>
-                )}
               </div>
 
               {/* Metrics */}
@@ -616,6 +607,16 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
                   </div>
                 </div>
               </div>
+
+              {/* Description */}
+              {channel.description && (
+                <div className="lg:col-span-3 pt-4 border-t border-white/20 dark:border-white/10">
+                  <h3 className="text-lg font-bold text-text-primary mb-3">Description</h3>
+                  <p className="text-sm text-text-secondary whitespace-pre-wrap leading-relaxed">
+                    {channel.description}
+                  </p>
+                </div>
+              )}
             </div>
 
 
