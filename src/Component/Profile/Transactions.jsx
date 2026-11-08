@@ -166,7 +166,7 @@ const TransactionsList = () => {
         setTransactions(prevTransactions => 
           prevTransactions.map(transaction => 
             transaction.transactionId === transactionId 
-              ? { ...transaction, status: response.data.data.status }
+              ? { ...transaction, status: response.data.status }
               : transaction
           )
         );

@@ -190,6 +190,24 @@ const AdminTransactions = () => {
         />
       </Card>
 
+      {transaction.gatewayDetails && (
+        <Card title="Razorpay Payment" className="w-full mt-4">
+          <Descriptions bordered column={{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }}>
+            <Descriptions.Item label="Payment ID">{transaction.gatewayDetails.paymentId || 'N/A'}</Descriptions.Item>
+            <Descriptions.Item label="Order ID">{transaction.gatewayDetails.orderId || transaction.razorpayOrderId || 'N/A'}</Descriptions.Item>
+            <Descriptions.Item label="State">{transaction.gatewayDetails.status || 'N/A'}</Descriptions.Item>
+            <Descriptions.Item label="Method">{transaction.gatewayDetails.method || 'N/A'}</Descriptions.Item>
+            <Descriptions.Item label="UPI ID">{transaction.gatewayDetails.vpa || 'N/A'}</Descriptions.Item>
+            <Descriptions.Item label="Bank / Wallet">{transaction.gatewayDetails.bank || transaction.gatewayDetails.wallet || 'N/A'}</Descriptions.Item>
+            <Descriptions.Item label="RRN">{transaction.gatewayDetails.rrn || 'N/A'}</Descriptions.Item>
+            <Descriptions.Item label="UPI Transaction ID">{transaction.gatewayDetails.upiTransactionId || 'N/A'}</Descriptions.Item>
+            {transaction.gatewayDetails.errorDescription && (
+              <Descriptions.Item label="Error">{transaction.gatewayDetails.errorDescription}</Descriptions.Item>
+            )}
+          </Descriptions>
+        </Card>
+      )}
+
       {transaction.phonepeResponse && (
         <Card title="PhonePe Response" className="w-full mt-4">
           <Descriptions bordered column={{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }}>

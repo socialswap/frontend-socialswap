@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { message } from 'antd';
 import { jwtDecode } from 'jwt-decode';
 import axiosInstance, { api } from '../../API/api';
+import { openRazorpayCheckout } from '../../Utils/razorpay';
 import SEOHead from '../../Component/SEO/SEOHead';
 
 const FAQItem = ({ question, answer }) => {
@@ -94,11 +95,7 @@ const ServiceDetail = () => {
           }]
         }));
 
-        if (data.data?.instrumentResponse?.redirectInfo?.url) {
-          window.location.href = data.data.instrumentResponse.redirectInfo.url;
-        } else {
-          message.error('Payment redirect URL not found');
-        }
+        await openRazorpayCheckout(data, { description: service.serviceName });
       } else {
         message.error(res.data.message || 'Failed to initiate payment');
       }

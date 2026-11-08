@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef } from 'react';
 
 /**
  * useChatSounds — Plays high-quality professional MP3 notification sounds.
@@ -10,24 +10,22 @@ const useChatSounds = () => {
   const incomingAudioRef = useRef(null);
   const notificationAudioRef = useRef(null);
 
-  // Preload the audio files on mount
-  useEffect(() => {
-    incomingAudioRef.current = new Audio('/sounds/incoming.mp3');
-    notificationAudioRef.current = new Audio('/sounds/notification.mp3');
-    
-    // Lowered volume drastically to make them extremely soft and comfortable
-    incomingAudioRef.current.volume = 0.15;
-    notificationAudioRef.current.volume = 0.30;
-  }, []);
+  // Created on first use so visitors who never get a message don't download them
+  const getAudio = (ref, src, volume) => {
+    if (!ref.current) {
+      ref.current = new Audio(src);
+      ref.current.volume = volume;
+    }
+    return ref.current;
+  };
 
   const playIncomingSound = useCallback(() => {
     try {
-      if (incomingAudioRef.current) {
-        incomingAudioRef.current.currentTime = 0; // Reset in case it's already playing
-        const playPromise = incomingAudioRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(err => console.log('Audio play prevented by browser:', err));
-        }
+      const audio = getAudio(incomingAudioRef, '/sounds/incoming.mp3', 0.15);
+      audio.currentTime = 0; // Reset in case it's already playing
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => console.log('Audio play prevented by browser:', err));
       }
     } catch (e) {
       console.error('Failed to play incoming sound', e);
@@ -36,12 +34,11 @@ const useChatSounds = () => {
 
   const playNotificationSound = useCallback(() => {
     try {
-      if (notificationAudioRef.current) {
-        notificationAudioRef.current.currentTime = 0;
-        const playPromise = notificationAudioRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(err => console.log('Audio play prevented by browser:', err));
-        }
+      const audio = getAudio(notificationAudioRef, '/sounds/notification.mp3', 0.30);
+      audio.currentTime = 0;
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => console.log('Audio play prevented by browser:', err));
       }
     } catch (e) {
       console.error('Failed to play notification sound', e);

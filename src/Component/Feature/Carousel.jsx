@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, useMotionValue, useAnimationFrame } from 'framer-motion';
+import React, { useRef, useState } from 'react';
+import { motion, useInView, useMotionValue, useAnimationFrame } from 'framer-motion';
 
 const Carousel = ({ children, direction = 'left', speed = 1.0 }) => {
   const childCount = React.Children.count(children);
@@ -20,8 +20,11 @@ const Carousel = ({ children, direction = 'left', speed = 1.0 }) => {
   // Start precisely in the middle safe zone (Set 2)
   const x = useMotionValue(-singleSetWidth);
 
+  const containerRef = useRef(null);
+  const isInView = useInView(containerRef);
+
   useAnimationFrame((t, delta) => {
-    if (singleSetWidth === 0) return;
+    if (singleSetWidth === 0 || !isInView) return;
     
     // Cap delta to prevent massive jumps when tab resumes or scroll unpauses
     const safeDelta = Math.min(delta, 50);
@@ -51,7 +54,8 @@ const Carousel = ({ children, direction = 'left', speed = 1.0 }) => {
   if (childCount === 0) return null;
 
   return (
-    <div 
+    <div
+      ref={containerRef}
       className="overflow-hidden relative w-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

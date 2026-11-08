@@ -11,7 +11,7 @@ const getSortedBeginnersFromCache = () => {
   if (!cached) return [];
   const payload = cached?.data ?? {};
   return (payload.channels || [])
-    .filter(ch => ch.status === 'Available' && ch.price)
+    .filter(ch => ch.price)
     .sort((a, b) => {
       const pA = parseFloat((a.price || '0').replace(/[^0-9.-]+/g, ''));
       const pB = parseFloat((b.price || '0').replace(/[^0-9.-]+/g, ''));
@@ -32,7 +32,7 @@ const BestForBeginners = () => {
         
         // Sort by price ascending for "Beginners"
         const sortedList = (payload.channels || [])
-          .filter(ch => ch.status === 'Available' && ch.price)
+          .filter(ch => ch.price)
           .sort((a, b) => {
             const priceA = parseFloat((a.price || '0').replace(/[^0-9.-]+/g, ''));
             const priceB = parseFloat((b.price || '0').replace(/[^0-9.-]+/g, ''));

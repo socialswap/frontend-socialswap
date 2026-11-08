@@ -1,5 +1,6 @@
 import React, { Suspense, useEffect } from 'react';
-import Lenis from 'lenis';
+import { useInView } from 'react-intersection-observer';
+import { useLocation, useNavigationType } from 'react-router-dom';
 import SEOHead from '../../Component/SEO/SEOHead';
 import NicheCarousel from '../../Component/Feature/NicheCarousel';
 
@@ -61,31 +62,25 @@ const SectionShell = ({ height = '60vh' }) => (
   </div>
 );
 
+// Renders a section, and fetches its data, only as it nears the screen. Once shown
+// it stays mounted. Returning with the back button shows everything straight away
+// so the saved scroll position lands in the right place.
+const LazySection = ({ height, children }) => {
+  const location = useLocation();
+  const navigationType = useNavigationType();
+  const { ref, inView } = useInView({ triggerOnce: true, rootMargin: '500px 0px' });
+
+  const isRestoringScroll =
+    navigationType === 'POP' && Number(sessionStorage.getItem(`scroll_${location.key}`)) > 0;
+
+  if (!inView && !isRestoringScroll) {
+    return <div ref={ref}><SectionShell height={height} /></div>;
+  }
+
+  return <Suspense fallback={<SectionShell height={height} />}>{children}</Suspense>;
+};
+
 const HomePage = () => {
-  useEffect(() => {
-    // Lenis smooth scroll — disabled on mobile (native scroll is faster)
-    if (window.innerWidth < 768) return;
-
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smooth: true,
-      smoothTouch: false,
-    });
-
-    let rafId;
-    function raf(time) {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    }
-    rafId = requestAnimationFrame(raf);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      lenis.destroy();
-    };
-  }, []);
-
   // Pre-fetch all JS chunks in background shortly after first render
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -97,7 +92,7 @@ const HomePage = () => {
       Testimonials.preload();
       ContactForm.preload();
       FAQSection.preload();
-    }, 800);
+    }, 3000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -112,8 +107,6 @@ const HomePage = () => {
         structuredData={[websiteSchema, orgSchema]}
         preloadImages={[
           '/homelogos/DiamandPlayButton.webp',
-          '/homelogos/mobileBG (1).webp',
-          '/homelogos/backgroundLogo (1).webp',
           '/homelogos/gaming (1).webp',
           '/homelogos/education (1).webp'
         ]}
@@ -128,37 +121,14 @@ const HomePage = () => {
             Suspense fallback only shows during initial JS chunk download.
             Components self-manage loading states via apiCache. */}
 
-        <Suspense fallback={<SectionShell height="70vh" />}>
-          <HeroVideo />
-        </Suspense>
-
-        <Suspense fallback={<SectionShell height="60vh" />}>
-          <TopChannelsCarousel />
-        </Suspense>
-
-        <Suspense fallback={<SectionShell height="60vh" />}>
-          <BestForBeginners />
-        </Suspense>
-
-        <Suspense fallback={<SectionShell height="40vh" />}>
-          <CategoryMarquee />
-        </Suspense>
-
-        <Suspense fallback={<SectionShell height="60vh" />}>
-          <ServicesSlider />
-        </Suspense>
-
-        <Suspense fallback={<SectionShell height="50vh" />}>
-          <Testimonials />
-        </Suspense>
-
-        <Suspense fallback={<SectionShell height="80vh" />}>
-          <ContactForm />
-        </Suspense>
-
-        <Suspense fallback={<SectionShell height="60vh" />}>
-          <FAQSection />
-        </Suspense>
+        <LazySection height="70vh"><HeroVideo /></LazySection>
+        <LazySection height="60vh"><TopChannelsCarousel /></LazySection>
+        <LazySection height="60vh"><BestForBeginners /></LazySection>
+        <LazySection height="40vh"><CategoryMarquee /></LazySection>
+        <LazySection height="60vh"><ServicesSlider /></LazySection>
+        <LazySection height="50vh"><Testimonials /></LazySection>
+        <LazySection height="80vh"><ContactForm /></LazySection>
+        <LazySection height="60vh"><FAQSection /></LazySection>
         
         {/* 10. Footer is already rendered in App.js at the bottom of routes */}
       </div>

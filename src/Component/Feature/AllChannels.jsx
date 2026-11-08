@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ExternalLink, IndianRupee, TrendingUp } from "lucide-react";
 import { message } from "antd";
-import axiosInstance from "../../API/api";
+import axiosInstance, { getCart } from "../../API/api";
 
 const ChannelCard = ({ channel }) => {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ const ChannelCard = ({ channel }) => {
   useEffect(() => {
     const fetchCartStatus = async () => {
       try {
-        const response = await axiosInstance.get('/cart');
+        const response = await getCart();
         const items = response?.data?.channels || [];
         setIsInCart(items.some(item => item?._id === channelId));
       } catch (error) {

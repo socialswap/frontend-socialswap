@@ -1,15 +1,41 @@
 {
   "rewrites": [
-    { "source": "/channel/:username", "destination": "/api/og" },
-    { "source": "/userprofile/:username", "destination": "/api/og" },
-    { "source": "/blogs/:slug", "destination": "/api/og" },
+    {
+      "source": "/channel/:username",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(Googlebot|bingbot|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|WhatsApp|TelegramBot|Slackbot|Discordbot|Applebot|DuckDuckBot).*" }],
+      "destination": "/api/og"
+    },
+    {
+      "source": "/userprofile/:username",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(Googlebot|bingbot|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|WhatsApp|TelegramBot|Slackbot|Discordbot|Applebot|DuckDuckBot).*" }],
+      "destination": "/api/og"
+    },
+    {
+      "source": "/blogs/:slug",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(Googlebot|bingbot|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|WhatsApp|TelegramBot|Slackbot|Discordbot|Applebot|DuckDuckBot).*" }],
+      "destination": "/api/og"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "redirects": [
     {
       "source": "/sitemap.xml",
-      "destination": "https://backend-socialswap.onrender.com/api/sitemap.xml",
+      "destination": "https://backend-socialswap-1.onrender.com/api/sitemap.xml",
       "permanent": false
+    }
+  ],
+  "headers": [
+    {
+      "source": "/static/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/(homelogos|images|sounds)/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
     }
   ]
 }

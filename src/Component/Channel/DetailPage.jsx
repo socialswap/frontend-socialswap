@@ -9,6 +9,7 @@ import {
   ShareAltOutlined, CopyOutlined, CheckOutlined
 } from '@ant-design/icons';
 import axiosInstance, { api } from '../../API/api';
+import { openRazorpayCheckout } from '../../Utils/razorpay';
 import { motion, AnimatePresence } from 'framer-motion';
 import { jwtDecode } from 'jwt-decode';
 import ChannelCard from '../ChannelCard';
@@ -225,9 +226,7 @@ const DetailPage = ({ channel: initialChannel, refreshData }) => {
             localStorage.setItem('currentTransaction', JSON.stringify({
                 transactionId: data.transactionId, amount: channel.price, cartItems: [channel]
             }));
-            if (data.data.instrumentResponse?.redirectInfo?.url) {
-                window.location.href = data.data.instrumentResponse.redirectInfo.url;
-            } else message.error('No redirect URL found');
+            await openRazorpayCheckout(data, { description: channel.name });
         } else message.error('Failed to create payment order');
     } catch (error) { message.error('Payment processing failed'); }
   };
