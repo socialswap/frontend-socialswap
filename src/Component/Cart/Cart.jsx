@@ -3,6 +3,7 @@ import { Typography, Empty, message, Skeleton, Button, ConfigProvider, theme } f
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import axiosInstance, { api } from '../../API/api';
+import { openRazorpayCheckout } from '../../Utils/razorpay';
 import {jwtDecode} from 'jwt-decode';
 import ChannelCard from '../ChannelCard';
 import SEOHead from '../SEO/SEOHead';
@@ -176,12 +177,7 @@ const CartPage = () => {
           cartItems: cartItems
         }));
   
-        // Redirect to PhonePe payment page
-        if (data.data.instrumentResponse?.redirectInfo?.url) {
-          window.location.href = data.data.instrumentResponse.redirectInfo.url;
-        } else {
-          message.error('No redirect URL found. Payment initialization failed.');
-        }
+        await openRazorpayCheckout(data, { description: 'Channel purchase' });
       } else {
         message.error('Failed to create payment order.');
       }
@@ -279,7 +275,7 @@ const CartPage = () => {
                       Total cart value
                     </Text>
                     <div className="text-4xl font-bold text-gray-900 dark:text-white">{formatCurrency(getTotalValue())}</div>
-                    <Text type="secondary">Secure checkout powered by PhonePe</Text>
+                    <Text type="secondary">Secure checkout powered by Razorpay</Text>
                   </div>
                   <Button
                     type="primary"

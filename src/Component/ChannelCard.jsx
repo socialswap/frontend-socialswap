@@ -3,7 +3,7 @@ import { Tag, Tooltip, message } from "antd";
 import { EyeOutlined, UserOutlined, YoutubeOutlined, CheckCircleFilled, FireOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import axiosInstance from "../API/api";
+import axiosInstance, { getCart } from "../API/api";
 
 const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
   useEffect(() => {
     const fetchCartStatus = async () => {
       try {
-        const response = await axiosInstance.get('/cart');
+        const response = await getCart();
         const items = response?.data?.channels || [];
         setIsInCart(items.some(item => item?._id === channelId));
       } catch (error) {
@@ -87,22 +87,22 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
       onHoverEnd={() => setIsHovered(false)}
       whileHover={{ y: -6, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="relative h-full flex flex-col rounded-card overflow-hidden bg-white/45 dark:bg-[#110C1F]/45 backdrop-blur-[18px] cursor-pointer group border border-white/40 dark:border-white/10"
+      className="relative h-full flex flex-col rounded-card overflow-hidden bg-white/75 dark:bg-[#110C1F]/80 cursor-pointer group border border-white/40 dark:border-white/10"
       style={{
         boxShadow: isHovered 
           ? '0 30px 70px rgba(120, 90, 255, 0.25)' 
           : '0 15px 40px rgba(120, 90, 255, 0.15)',
-        transition: 'all 0.3s ease',
+        transition: 'box-shadow 0.3s ease',
       }}
     >
       {/* Banner Section with Interactive Overlay */}
       <div className="relative aspect-[5/4] overflow-hidden bg-black/5">
-        <motion.img
+        <img
           src={banner}
           alt={channel.name}
-          className="h-full w-full object-cover"
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.4 }}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
         
         {/* Gradient Overlay */}
@@ -162,6 +162,8 @@ const ChannelCard = ({ channel, isCartView = false, onRemove }) => {
               <img
                 src={avatar}
                 alt="avatar"
+                loading="lazy"
+                decoding="async"
                 className="w-8 h-8 rounded-full border-2 border-white/40 dark:border-white/10 object-cover"
               />
             </div>

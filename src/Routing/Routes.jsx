@@ -1,17 +1,17 @@
 import React, { Suspense, lazy } from 'react';
 import { useRoutes, Navigate } from 'react-router-dom';
 
-import HomePage from '../Pages/LandingPage/HomePage';
-import BlogSection from '../Pages/Blogs/Blogs';
-import BlogDetail from '../Pages/Blogs/BlogDetail';
-
-import DetailPageWrapper from '../Component/Channel/DetailPageWrapper';
+const HomePage = lazy(() => import('../Pages/LandingPage/HomePage'));
+const BlogSection = lazy(() => import('../Pages/Blogs/Blogs'));
+const BlogDetail = lazy(() => import('../Pages/Blogs/BlogDetail'));
+const DetailPageWrapper = lazy(() => import('../Component/Channel/DetailPageWrapper'));
 const Stats = lazy(() => import('../Component/Stats/Stats'));
 const FeaturedListings = lazy(() => import('../Component/Feature/Feature'));
 
 const CartPage = lazy(() => import('../Component/Cart/Cart'));
 const NotFoundPage = lazy(() => import('../Component/PageNotFound/PageNotFound'));
 const Login = lazy(() => import('../Pages/Seller/Login'));
+const GoogleOAuthWrapper = lazy(() => import('../Components/GoogleOAuthWrapper'));
 const Signup = lazy(() => import('../Pages/Seller/SignUp'));
 const ChannelList = lazy(() => import('../Pages/Channels/Channels'));
 const AdminDashboard = lazy(() => import('../Pages/Admin/AdminDashboard'));
@@ -97,7 +97,7 @@ const Routes = () => {
     },
     {
       path: '/login',
-      element: <ProtectedRoute element={<Login />} isGuestRequired={true} />
+      element: <ProtectedRoute element={<GoogleOAuthWrapper><Login /></GoogleOAuthWrapper>} isGuestRequired={true} />
     },
     { path: '/user/orders', element: <ProtectedRoute element={<ProfileLayout><Orders /></ProfileLayout>} isAuthRequired={true} /> },
     {

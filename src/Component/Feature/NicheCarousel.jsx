@@ -53,6 +53,7 @@ const NicheCarousel = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isLightMode, setIsLightMode] = useState(() => !document.documentElement.classList.contains('dark'));
+  const [isInView, setIsInView] = useState(true);
 
   const containerRef = useRef(null);
   const cardsRef = useRef([]);
@@ -61,6 +62,8 @@ const NicheCarousel = () => {
   const labelRef = useRef(null);
   const sublabelRef = useRef(null);
   const activeIdxRef = useRef(0);
+  const hiddenCardsRef = useRef({});
+  const layoutRef = useRef({ width: window.innerWidth, isMobile: window.innerWidth < 768 });
   const dragRef = useRef({
     isDragging: false,
     startX: 0,
@@ -82,11 +85,39 @@ const NicheCarousel = () => {
     return () => observer.disconnect();
   }, []);
 
+  // Measuring on resize avoids forcing a browser layout on every animation frame.
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return undefined;
+
+    const measure = () => {
+      layoutRef.current = {
+        width: container.offsetWidth || 1200,
+        isMobile: window.innerWidth < 768,
+      };
+    };
+    measure();
+
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(container);
+
+    const visibilityObserver = new IntersectionObserver(([entry]) => setIsInView(entry.isIntersecting));
+    visibilityObserver.observe(container);
+
+    return () => {
+      resizeObserver.disconnect();
+      visibilityObserver.disconnect();
+    };
+  }, []);
+
   // activeNiche no longer needed — label updated via DOM ref
 
   // ─── GSAP horizontal ticker ─────────────────────────────────────────────────
   useGSAP(() => {
     const cards = cardsRef.current;
+
+    // This slow ticker still looks smooth at 30fps and saves a lot of phone CPU
+    if (layoutRef.current.isMobile) gsap.ticker.fps(30);
 
     const tween = gsap.to(progressObj.current, {
       value: 1,
@@ -95,8 +126,7 @@ const NicheCarousel = () => {
       ease: 'none',
       onUpdate: () => {
         const pGlobal = progressObj.current.value;
-        const isMob = window.innerWidth < 768;
-        const contW   = containerRef.current?.offsetWidth || 1200;
+        const { width: contW, isMobile: isMob } = layoutRef.current;
         const cardW   = isMob ? 96  : 176;  // w-24 / w-44
         const step    = isMob ? (contW / 3.2) : (contW / 6); // exactly 6 on desktop
         const totalW  = N * step;
@@ -138,6 +168,16 @@ const NicheCarousel = () => {
             closestIdx  = i;
           }
 
+          // Off-screen cards only need hiding once
+          if (opacity === 0) {
+            if (!hiddenCardsRef.current[i]) {
+              gsap.set(cards[i], { opacity: 0 });
+              hiddenCardsRef.current[i] = true;
+            }
+            return;
+          }
+          hiddenCardsRef.current[i] = false;
+
           // Arch curve: center stays, edges curve DOWN
           const normalizedX = x / halfC;
           const curveDepth  = isMob ? 40 : 90;
@@ -171,12 +211,12 @@ const NicheCarousel = () => {
     return () => tween.kill();
   }, { dependencies: [], scope: containerRef });
 
-  // Pause on hover
+  // Pause on hover and while scrolled out of view
   useEffect(() => {
     if (!tweenRef.current) return;
-    if (isHovered) tweenRef.current.pause();
+    if (isHovered || !isInView) tweenRef.current.pause();
     else tweenRef.current.play();
-  }, [isHovered]);
+  }, [isHovered, isInView]);
 
   // ─── Drag handlers ────────────────────────────────────────────────────────
   const handleDragStart = (clientX) => {

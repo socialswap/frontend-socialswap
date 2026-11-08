@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance, { api, cachedGet, apiCache } from '../../API/api';
+import axiosInstance, { api, cachedGet, apiCache, getCart } from '../../API/api';
 import { message } from 'antd';
 import { FaCheckCircle, FaUsers, FaEye, FaChartLine, FaClock } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,7 +19,7 @@ export const ChannelCard = ({ channel }) => {
   useEffect(() => {
     const fetchCartStatus = async () => {
       try {
-        const response = await axiosInstance.get('/cart');
+        const response = await getCart();
         const cartChannels = response?.data?.channels || [];
         setIsInCart(cartChannels.some(item => item?._id === channelId));
       } catch (error) {

@@ -1,12 +1,3 @@
-// ── Keep the service worker alive (prevents browser from killing it) ────────
-// Without a fetch handler browsers aggressively terminate the SW,
-// which means push events never fire.
-self.addEventListener('fetch', function(event) {
-  // Pass every fetch through — we just need this handler to exist
-  // so the browser marks the SW as "used" and keeps it running.
-  event.respondWith(fetch(event.request));
-});
-
 // ── Push notification handler ─────────────────────────────────────────────
 self.addEventListener('push', function(event) {
   let data = { title: 'SocialSwap', body: 'You have a new message.', url: '/' };

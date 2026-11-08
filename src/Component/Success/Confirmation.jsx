@@ -6,6 +6,7 @@ import SEOHead from '../SEO/SEOHead';
 
 const POLLING_INTERVAL = 3000;
 const MAX_RETRIES = 10;
+const MAX_PENDING_POLLS = 60; // Three minutes at the polling interval above
 
 const PaymentStatus = {
   LOADING: 'loading',
@@ -115,6 +116,7 @@ const PaymentConfirmation = () => {
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [error, setError] = useState('');
   const retryCountRef = useRef(0);
+  const pendingPollsRef = useRef(0);
 
   useEffect(() => {
     let pollingInterval;
@@ -141,7 +143,20 @@ const PaymentConfirmation = () => {
         
         if (data.success) {
           setPaymentDetails(data.data);
-          const paymentStatus = data.data.details?.code === 'PAYMENT_SUCCESS' ? 'success' : 'failed';
+          const paymentCode = data.data.details?.code;
+
+          // Keep waiting: a pending payment has not failed
+          if (paymentCode === 'PAYMENT_PENDING') {
+            pendingPollsRef.current += 1;
+            if (pendingPollsRef.current >= MAX_PENDING_POLLS) {
+              clearInterval(pollingInterval);
+              setStatus(PaymentStatus.ERROR);
+              setError('Your payment is still being processed. Check Transactions in your profile for the latest status.');
+            }
+            return;
+          }
+
+          const paymentStatus = paymentCode === 'PAYMENT_SUCCESS' ? 'success' : 'failed';
           setStatus(paymentStatus);
           
           if (paymentStatus === 'success') {
@@ -222,7 +237,7 @@ const PaymentConfirmation = () => {
           </button>
           {status === PaymentStatus.FAILED && (
             <button
-              onClick={() => window.location.href = '/checkout'}
+              onClick={() => window.location.href = '/user/cart'}
               className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
             >
               Try Again

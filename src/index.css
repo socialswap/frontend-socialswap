@@ -1159,3 +1159,18 @@ a:hover {
   background: linear-gradient(90deg, #8B5CF6, #C084FC);
 }
 
+/* Soft page glows. Gradients look like a large blur but cost far less to paint. */
+.ambient-blob-1 { background: radial-gradient(circle, rgba(182, 155, 255, 0.35) 0%, transparent 65%); }
+.ambient-blob-2 { background: radial-gradient(circle, rgba(255, 215, 181, 0.35) 0%, transparent 65%); }
+.ambient-blob-3 { background: radial-gradient(circle, rgba(244, 182, 210, 0.25) 0%, transparent 65%); }
+.dark .ambient-blob-1 { background: radial-gradient(circle, rgba(123, 97, 255, 0.2) 0%, transparent 65%); }
+.dark .ambient-blob-2 { background: radial-gradient(circle, rgba(244, 182, 210, 0.15) 0%, transparent 65%); }
+.dark .ambient-blob-3 { background: radial-gradient(circle, rgba(198, 180, 255, 0.15) 0%, transparent 65%); }
+
+/* Background blur is slow on phones. Fixed bars keep it so text stays readable over content. */
+@media (max-width: 767px), (hover: none) {
+  [class*="backdrop-blur"]:not(.fixed):not(.sticky):not(header):not(nav) {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { motion } from 'framer-motion';
 import { PlayCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +14,9 @@ const HeroVideo = () => {
     return cached?.data?.url || "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&loop=1&playlist=dQw4w9WgXcQ";
   });
   const [loading, setLoading] = useState(() => !apiCache.has(HOME_VIDEO_URL));
+
+  // The YouTube player is about 750 KB, so load it only once the video is on screen
+  const { ref: videoRef, inView: isVideoVisible } = useInView({ triggerOnce: true, threshold: 0.3 });
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -123,8 +127,8 @@ const HeroVideo = () => {
             className="flex-1 relative w-full max-w-lg aspect-video rounded-card overflow-hidden shadow-card border border-white/50 dark:border-white/10 bg-white/60 dark:bg-[#110C1F]/60 backdrop-blur-[20px] p-2 hover:shadow-purple-glow-soft transition-all"
           >
             {/* Main Info Video Focus */}
-            <div className="w-full h-full rounded-2xl overflow-hidden shadow-inner">
-              {loading ? (
+            <div ref={videoRef} className="w-full h-full rounded-2xl overflow-hidden shadow-inner">
+              {loading || !isVideoVisible ? (
                 <div className="w-full h-full bg-gray-200/50 dark:bg-gray-800/50 animate-pulse flex items-center justify-center">
                   <PlayCircleOutlined className="text-4xl text-gray-400 dark:text-gray-600" />
                 </div>
@@ -133,6 +137,7 @@ const HeroVideo = () => {
                   className="w-full h-full"
                   src={videoUrl}
                   title="SocialSwap Info Video"
+                  loading="lazy"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
+import { api, cachedGet } from "../../API/api";
 import ChannelCard from "../../Component/ChannelCard.jsx";
 import { useLocation } from "react-router-dom";
 import SEOHead from "../../Component/SEO/SEOHead";
@@ -73,6 +73,8 @@ const FilterSection = ({ title, icon, children }) => (
   </div>
 );
 
+const channelsPageUrl = (page) => `${api}/channels?limit=100&page=${page}`;
+
 const Channels = () => {
   const location = useLocation();
   const [channels, setChannels] = useState([]);
@@ -126,23 +128,25 @@ const Channels = () => {
   useEffect(() => {
     const fetchAllChannels = async () => {
       try {
-        const firstPage = await axios.post(
-          `${process.env.REACT_APP_API_BASE_URL}/channels/filter?limit=100&page=1`, {}
-        );
+        const firstPage = await cachedGet(channelsPageUrl(1));
         const data = firstPage.data;
         let allChannels = [...(data.channels || [])];
+
+        // Show the first page now; later pages arrive in the background
+        setChannels(allChannels);
+        setFilteredChannels(allChannels);
+        setLoading(false);
+
         const totalPages = data.totalPages || 1;
         if (totalPages > 1) {
           const promises = [];
           for (let i = 2; i <= totalPages; i++) {
-            promises.push(axios.post(`${process.env.REACT_APP_API_BASE_URL}/channels/filter?limit=100&page=${i}`, {}));
+            promises.push(cachedGet(channelsPageUrl(i)));
           }
           const results = await Promise.all(promises);
           results.forEach(res => { allChannels = [...allChannels, ...(res.data.channels || [])]; });
+          setChannels(allChannels);
         }
-        setChannels(allChannels);
-        setFilteredChannels(allChannels);
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching channels:", error);
         setLoading(false);

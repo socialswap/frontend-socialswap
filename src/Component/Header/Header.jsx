@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Drawer, Badge } from 'antd';
-import io from 'socket.io-client';
 import { jwtDecode } from 'jwt-decode';
 import { 
   MenuOutlined, 
@@ -12,9 +10,11 @@ import {
   MoonOutlined
 } from '@ant-design/icons';
 import { ChevronDown } from 'lucide-react';
-import { motion } from 'framer-motion';
-import axiosInstance from '../../API/api';
+import { cachedGet, clearApiCache, getCart } from '../../API/api';
 import useChatSounds from '../../Utils/useChatSounds';
+
+// Opened rarely, and antd is large, so it isn't part of every page load
+const Drawer = lazy(() => import('antd/es/drawer'));
 
 const SOCKET_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND || 'http://localhost:8090';
 
@@ -22,6 +22,7 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [visible, setVisible] = useState(false);
+  const [hasOpenedDrawer, setHasOpenedDrawer] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -64,36 +65,49 @@ const Header = () => {
       if (decoded) {
         const currentUserId = decoded.userId || decoded._id || decoded.id;
         const role = decoded.role;
-        const socket = io(SOCKET_URL);
-        
-        socket.emit('global_connect', { userId: currentUserId, role });
-        
-        socket.on('global_notification', (data) => {
-          const isChatActive = window.location.pathname.includes('/chat');
-          if (!isChatActive) {
-            playNotificationSound();
-            
-            const msg = data.message || {};
-            const senderName = msg.sender?.name || (role === 'admin' ? 'User' : 'Escrow Agent');
-            const preview = msg.text
-              ? msg.text.slice(0, 60) + (msg.text.length > 60 ? '…' : '')
-              : msg.mediaUrl ? '📷 Image'
-              : '📋 Update';
-              
-            const toastId = Date.now();
-            setLiveToasts(prev => [
-              ...prev,
-              { id: toastId, senderName, preview, role }
-            ]);
-            
-            // Auto-dismiss after 6 seconds
-            setTimeout(() => {
-              setLiveToasts(prev => prev.filter(t => t.id !== toastId));
-            }, 6000);
-          }
+        let socket = null;
+        let isCancelled = false;
+
+        // Loaded here so visitors who aren't logged in never download it
+        import('socket.io-client').then(({ io }) => {
+          if (isCancelled) return;
+
+          socket = io(SOCKET_URL);
+
+          socket.emit('global_connect', { userId: currentUserId, role });
+
+          socket.on('global_notification', (data) => {
+            window.dispatchEvent(new Event('chat:new-message'));
+
+            const isChatActive = window.location.pathname.includes('/chat');
+            if (!isChatActive) {
+              playNotificationSound();
+
+              const msg = data.message || {};
+              const senderName = msg.sender?.name || (role === 'admin' ? 'User' : 'Escrow Agent');
+              const preview = msg.text
+                ? msg.text.slice(0, 60) + (msg.text.length > 60 ? '…' : '')
+                : msg.mediaUrl ? '📷 Image'
+                : '📋 Update';
+
+              const toastId = Date.now();
+              setLiveToasts(prev => [
+                ...prev,
+                { id: toastId, senderName, preview, role }
+              ]);
+
+              // Auto-dismiss after 6 seconds
+              setTimeout(() => {
+                setLiveToasts(prev => prev.filter(t => t.id !== toastId));
+              }, 6000);
+            }
+          });
         });
-        
-        return () => socket.close();
+
+        return () => {
+          isCancelled = true;
+          if (socket) socket.close();
+        };
       }
     }
   }, [isLoggedIn, navigate, playNotificationSound]);
@@ -105,10 +119,9 @@ const Header = () => {
     const fetchCartAndProfile = async () => {
       if (isLoggedIn && localStorage.getItem('token')) {
         try {
-          const cartRes = await axiosInstance.get('/cart');
+          const [cartRes, profileRes] = await Promise.all([getCart(), cachedGet('/profile')]);
           setCartCount(cartRes.data.channelCount);
-          
-          const profileRes = await axiosInstance.get('/profile');
+
           if (profileRes.data && profileRes.data.avatar) {
             setUserAvatar(profileRes.data.avatar);
           }
@@ -158,6 +171,7 @@ const Header = () => {
   }, [cartCount]);
 
   const showDrawer = () => {
+    setHasOpenedDrawer(true);
     setVisible(true);
   };
 
@@ -200,6 +214,7 @@ const Header = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
+    clearApiCache();
     setIsLoggedIn(false);
     setIsAdmin(false);
     setCartCount(0);
@@ -311,12 +326,7 @@ const Header = () => {
                   }}
                 >
                   {active && (
-                    <motion.div
-                      layoutId="activeTabBackground"
-                      className="absolute inset-0 bg-btn-gradient rounded-full shadow-md shadow-purple-500/20"
-                      initial={false}
-                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    />
+                    <div className="absolute inset-0 bg-btn-gradient rounded-full shadow-md shadow-purple-500/20" />
                   )}
                   <span className="relative z-10 flex items-center gap-1.5">
                     {item.label}
@@ -381,14 +391,12 @@ const Header = () => {
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             >
               {/* Sliding background thumb */}
-              <motion.div
-                className="absolute top-1 bottom-1 w-[26px] rounded-full shadow-md shadow-purple-500/30"
-                style={{ 
+              <div
+                className="absolute top-1 bottom-1 w-[26px] rounded-full shadow-md shadow-purple-500/30 transition-transform duration-200"
+                style={{
                   backgroundColor: '#6E4BFF',
+                  transform: `translateX(${theme === 'light' ? 0 : 34}px)`,
                 }}
-                initial={false}
-                animate={{ x: theme === 'light' ? 0 : 34 }}
-                transition={{ type: "spring", stiffness: 600, damping: 30 }}
               />
               
               {/* Sun Icon */}
@@ -430,7 +438,7 @@ const Header = () => {
 
             {isLoggedIn ? (
               <>
-                <Badge count={cartCount} size="small" className={`${cartPulse ? 'animate-bounce' : ''}`}>
+                <span className={`relative inline-flex ${cartPulse ? 'animate-bounce' : ''}`}>
                   <button
                     type="button"
                     aria-label="Open cart"
@@ -443,7 +451,12 @@ const Header = () => {
                   >
                     <ShoppingCartOutlined className="w-4 h-4" />
                   </button>
-                </Badge>
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#ff4d4f] text-white text-[10px] font-medium leading-4 text-center pointer-events-none">
+                      {cartCount}
+                    </span>
+                  )}
+                </span>
                 
                 <button
                   type="button"
@@ -490,6 +503,8 @@ const Header = () => {
         </div>
       </div>
 
+      {hasOpenedDrawer && (
+      <Suspense fallback={null}>
       <Drawer
         title={
           <div className="flex items-center gap-2">
@@ -611,14 +626,12 @@ const Header = () => {
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               >
                 {/* Sliding background thumb */}
-                <motion.div
-                  className="absolute top-1 bottom-1 w-[26px] rounded-full shadow-md shadow-purple-500/30"
-                  style={{ 
+                <div
+                  className="absolute top-1 bottom-1 w-[26px] rounded-full shadow-md shadow-purple-500/30 transition-transform duration-200"
+                  style={{
                     backgroundColor: '#6E4BFF',
+                    transform: `translateX(${theme === 'light' ? 0 : 34}px)`,
                   }}
-                  initial={false}
-                  animate={{ x: theme === 'light' ? 0 : 34 }}
-                  transition={{ type: "spring", stiffness: 600, damping: 30 }}
                 />
                 
                 {/* Sun Icon */}
@@ -679,6 +692,8 @@ const Header = () => {
           </div>
         </div>
       </Drawer>
+      </Suspense>
+      )}
 
       {/* ── Global Live in-app notification toasts ──────────────────────────
           Fires on all pages EXCEPT the chat pages, so admin/users get alerts

@@ -44,9 +44,22 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>SocialSwap</title>
+    <script>
+      // The homepage hero background is the largest thing on first load, so fetch it before the app starts
+      if (location.pathname === '/') {
+        var heroBackground = document.createElement('link');
+        heroBackground.rel = 'preload';
+        heroBackground.as = 'image';
+        heroBackground.href = innerWidth < 768 ? '/homelogos/mobileBG%20(1).webp' : '/homelogos/backgroundLogo%20(1).webp';
+        heroBackground.fetchPriority = 'high';
+        document.head.appendChild(heroBackground);
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="%REACT_APP_BACKEND%">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

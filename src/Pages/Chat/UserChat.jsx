@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Modal, message } from 'antd';
 import io from 'socket.io-client';
 import axiosInstance, { api } from '../../API/api';
+import { openRazorpayCheckout } from '../../Utils/razorpay';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import EmojiPicker from 'emoji-picker-react';
@@ -211,11 +212,7 @@ const UserChat = () => {
       
       if (paymentResponse.data.success) {
         const { data } = paymentResponse.data;
-        if (data.data.instrumentResponse?.redirectInfo?.url) {
-          window.location.href = data.data.instrumentResponse.redirectInfo.url;
-        } else {
-          message.error('No redirect URL found from gateway.');
-        }
+        await openRazorpayCheckout(data, { description: deal.channel?.name || 'Escrow deal' });
       } else {
         message.error('Failed to create payment order.');
       }
