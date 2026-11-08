@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { Modal, message, Form, Select, InputNumber } from 'antd';
 import io from 'socket.io-client';
 import axiosInstance, { api } from '../../API/api';
@@ -98,6 +98,32 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
     }
   }, []);
 
+  // Several messages in a burst cause one list reload, not one each
+  const threadsRefreshTimerRef = useRef(null);
+  const scheduleThreadsRefresh = useCallback(() => {
+    clearTimeout(threadsRefreshTimerRef.current);
+    threadsRefreshTimerRef.current = setTimeout(fetchThreads, 2000);
+  }, [fetchThreads]);
+
+  useEffect(() => () => clearTimeout(threadsRefreshTimerRef.current), []);
+
+  // Moves the thread to the top with its new last message straight away
+  const applyMessageToThreads = useCallback((msg) => {
+    const threadId = msg?.conversationId?._id || msg?.conversationId;
+    if (!threadId) return;
+    setThreads((prev) => {
+      const index = prev.findIndex((t) => t._id === threadId);
+      if (index === -1) return prev;
+      const isViewing = activeThreadRef.current?._id === threadId;
+      const updated = {
+        ...prev[index],
+        lastMessage: { ...msg, read: isViewing || msg.read },
+        updatedAt: msg.createdAt || new Date().toISOString(),
+      };
+      return [updated, ...prev.filter((_, i) => i !== index)];
+    });
+  }, []);
+
   const fetchDeals = async () => {
     try {
       const res = await axiosInstance.get(`${api}/admin/deals`);
@@ -152,8 +178,14 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
     }
 
     newSocket.on('receive_message', (msg) => {
-      setMessages((prev) => [...prev, msg]);
-      fetchThreads();
+      // The socket stays in every thread opened before, so only show messages for the open one
+      const openThreadId = activeThreadRef.current?._id;
+      const incomingThreadId = msg.conversationId?._id || msg.conversationId;
+      if (openThreadId && incomingThreadId === openThreadId) {
+        setMessages((prev) => (prev.some((m) => m._id === msg._id) ? prev : [...prev, msg]));
+      }
+      applyMessageToThreads(msg);
+      scheduleThreadsRefresh();
 
       // Play correct sound based on whether admin is viewing the thread that got the message
       const msgThreadId = msg.conversationId || msg.threadId;
@@ -182,8 +214,9 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
     // even when the admin has not opened that thread yet.
     // This is the primary real-time alert path.
     newSocket.on('global_notification', ({ threadId, message: msg }) => {
-      // 1. Always refresh thread list so unread badge updates
-      fetchThreads();
+      // 1. Update the thread list now, and confirm with the server shortly after
+      applyMessageToThreads(msg);
+      scheduleThreadsRefresh();
 
       const senderId = msg.sender?._id || msg.sender;
       const isFromOther = senderId && senderId !== currentUserId;
@@ -227,7 +260,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
       newSocket.off('message_updated');
       newSocket.close();
     };
-  }, [currentUserId, playIncomingSound, playNotificationSound, fetchThreads]);
+  }, [currentUserId, playIncomingSound, playNotificationSound, fetchThreads, applyMessageToThreads, scheduleThreadsRefresh]);
 
   // Keep activeThreadRef in sync so the socket closure can read the latest value
   useEffect(() => {
@@ -241,11 +274,51 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
     }
   }, [activeThread, socket, currentUserId]);
 
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+
+  const [hasMoreMessages, setHasMoreMessages] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const lastMessageIdRef = useRef(null);
+  const prependAnchorRef = useRef(null);
+
+  // Keeps the view on the newest message, and holds position when older ones are added on top
+  useLayoutEffect(() => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+
+    if (prependAnchorRef.current) {
+      const { height, top } = prependAnchorRef.current;
+      container.scrollTop = container.scrollHeight - height + top;
+      prependAnchorRef.current = null;
+      return;
+    }
+
+    const lastId = messages[messages.length - 1]?._id || null;
+    if (lastId !== lastMessageIdRef.current) {
+      const isFirstLoad = lastMessageIdRef.current === null;
+      lastMessageIdRef.current = lastId;
+      container.scrollTo({ top: container.scrollHeight, behavior: isFirstLoad ? 'auto' : 'smooth' });
     }
   }, [messages]);
+
+  const loadOlderMessages = useCallback(async () => {
+    if (!activeThread || !hasMoreMessages || loadingOlder || !messages.length) return;
+    const container = chatContainerRef.current;
+    const threadId = activeThread._id;
+    setLoadingOlder(true);
+    try {
+      const res = await axiosInstance.get(`${api}/admin/chats/${threadId}?before=${messages[0]._id}`);
+      // Ignore the result if the admin has switched chats meanwhile
+      if (res.data.success && activeThreadRef.current?._id === threadId) {
+        if (container) prependAnchorRef.current = { height: container.scrollHeight, top: container.scrollTop };
+        setMessages((prev) => [...res.data.messages, ...prev]);
+        setHasMoreMessages(Boolean(res.data.hasMore));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingOlder(false);
+    }
+  }, [activeThread, hasMoreMessages, loadingOlder, messages]);
 
 
 
@@ -253,8 +326,10 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
     try {
       const res = await axiosInstance.get(`${api}/admin/chats/${thread._id}`);
       if (res.data.success) {
+        lastMessageIdRef.current = null;
         setActiveThread(res.data.thread);
         setMessages(res.data.messages);
+        setHasMoreMessages(Boolean(res.data.hasMore));
       }
     } catch (err) {
       console.error(err);
@@ -265,8 +340,10 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
     try {
       const res = await axiosInstance.get(`${api}/admin/chats/user/${userId}`);
       if (res.data.success) {
+        lastMessageIdRef.current = null;
         setActiveThread(res.data.thread);
         setMessages(res.data.messages);
+        setHasMoreMessages(Boolean(res.data.hasMore));
         fetchThreads();
       }
     } catch (err) {
@@ -575,12 +652,19 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
             // Active Chat View
             <div className="flex flex-col h-full overflow-hidden bg-gray-50/50 dark:bg-transparent">
 
-              <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-5 pt-16 pb-32 space-y-5 bg-gray-50/50 dark:bg-transparent relative">
+              <div
+                ref={chatContainerRef}
+                onScroll={(e) => { if (e.currentTarget.scrollTop < 150) loadOlderMessages(); }}
+                className="flex-1 overflow-y-auto p-5 pt-16 pb-32 space-y-5 bg-gray-50/50 dark:bg-transparent relative"
+              >
+                {loadingOlder && (
+                  <div className="text-center text-xs text-gray-500 dark:text-gray-400">Loading older messages…</div>
+                )}
                 {messages.map((msg, idx) => {
                   const isAdmin = msg.sender?.role === 'admin' || msg.sender === currentUserId;
                   
                   return (
-                    <div key={idx} id={`msg-${msg._id}`} className={`flex ${isAdmin ? 'justify-end' : 'justify-start'} group/msg relative mb-5`}>
+                    <div key={msg._id || idx} id={`msg-${msg._id}`} className={`flex ${isAdmin ? 'justify-end' : 'justify-start'} group/msg relative mb-5`}>
                       <div className={`max-w-[85%] rounded-2xl px-4 py-3 pb-2 shadow-sm relative ${
                         isAdmin 
                         ? 'bg-gradient-to-r from-[#7C3AED] to-[#9333EA] text-white rounded-br-sm' 
@@ -603,13 +687,13 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                           </div>
                         )}
                         {msg.mediaUrl && (
-                          <img src={msg.mediaUrl} alt="Attachment" className="rounded-lg mb-2 w-full object-cover max-h-64 cursor-pointer" onClick={() => window.open(msg.mediaUrl, '_blank')} />
+                          <img src={msg.mediaUrl} alt="Attachment" loading="lazy" decoding="async" className="rounded-lg mb-2 w-full object-cover max-h-64 cursor-pointer" onClick={() => window.open(msg.mediaUrl, '_blank')} />
                         )}
                         {msg.text && <p className={`text-[13.5px] md:text-[14.5px] leading-relaxed pr-6 break-words whitespace-pre-wrap ${isAdmin ? 'text-white' : 'text-gray-800 dark:text-gray-200'}`}>{msg.text}</p>}
                         
                         {(msg.isChannelCard || msg.type === 'channel') && msg.channelId && (
                           <div className="mt-3 p-3 bg-white dark:bg-[#18112e] rounded-xl border border-purple-200 dark:border-purple-800/40 shadow-sm flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/channel/${msg.channelId._id || msg.channelId}`)}>
-                            <img src={msg.channelId.imageUrls?.[0] || 'https://via.placeholder.com/80'} className="w-16 h-16 rounded-lg object-cover" alt="channel" />
+                            <img src={msg.channelId.imageUrls?.[0] || 'https://via.placeholder.com/80'} loading="lazy" decoding="async" className="w-16 h-16 rounded-lg object-cover" alt="channel" />
                             <div className="flex-1 overflow-hidden">
                               <h4 className="font-bold text-xs md:text-sm text-gray-900 dark:text-white truncate">{msg.channelId.name || 'Unknown Channel'}</h4>
                               <p className="text-[10px] md:text-[11px] text-gray-600 dark:text-gray-300 mt-1">{msg.channelId.category} • {msg.channelId.subscriberCount?.toLocaleString()} subs</p>

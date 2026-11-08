@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { Modal, message } from 'antd';
 import io from 'socket.io-client';
 import axiosInstance, { api } from '../../API/api';
@@ -23,6 +23,7 @@ const UserChat = () => {
   const [isDealModalVisible, setIsDealModalVisible] = useState(false);
   const [socket, setSocket] = useState(null);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const fileInputRef = useRef(null);
   const token = localStorage.getItem('token');
   let currentUserId = null;
@@ -59,8 +60,10 @@ const UserChat = () => {
     try {
       const res = await axiosInstance.get(`${api}/chat`);
       if (res.data.success) {
+        lastMessageIdRef.current = null;
         setThread(res.data.thread);
         setMessages(res.data.messages);
+        setHasMoreMessages(Boolean(res.data.hasMore));
       }
     } catch (err) {
       console.error(err);
@@ -121,9 +124,49 @@ const UserChat = () => {
     }
   }, [socket, thread, currentUserId, playIncomingSound]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+
+  const [hasMoreMessages, setHasMoreMessages] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const lastMessageIdRef = useRef(null);
+  const prependAnchorRef = useRef(null);
+
+  // Keeps the view on the newest message, and holds position when older ones are added on top
+  useLayoutEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    if (prependAnchorRef.current) {
+      const { height, top } = prependAnchorRef.current;
+      container.scrollTop = container.scrollHeight - height + top;
+      prependAnchorRef.current = null;
+      return;
+    }
+
+    const lastId = messages[messages.length - 1]?._id || null;
+    if (lastId !== lastMessageIdRef.current) {
+      const isFirstLoad = lastMessageIdRef.current === null;
+      lastMessageIdRef.current = lastId;
+      container.scrollTo({ top: container.scrollHeight, behavior: isFirstLoad ? 'auto' : 'smooth' });
+    }
   }, [messages]);
+
+  const loadOlderMessages = useCallback(async () => {
+    if (!hasMoreMessages || loadingOlder || !messages.length) return;
+    const container = messagesContainerRef.current;
+    setLoadingOlder(true);
+    try {
+      const res = await axiosInstance.get(`${api}/chat?before=${messages[0]._id}`);
+      if (res.data.success) {
+        if (container) prependAnchorRef.current = { height: container.scrollHeight, top: container.scrollTop };
+        setMessages((prev) => [...res.data.messages, ...prev]);
+        setHasMoreMessages(Boolean(res.data.hasMore));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingOlder(false);
+    }
+  }, [hasMoreMessages, loadingOlder, messages]);
 
   useEffect(() => {
     if (socket && thread && location.state?.requestDeal && !requestProcessed) {
@@ -269,7 +312,14 @@ const UserChat = () => {
           </div>
 
           {/* Chat Interface */}
-          <div className="flex-1 overflow-y-auto p-5 pt-16 pb-32 space-y-5 bg-gray-50/50 dark:bg-transparent relative">
+          <div
+            ref={messagesContainerRef}
+            onScroll={(e) => { if (e.currentTarget.scrollTop < 150) loadOlderMessages(); }}
+            className="flex-1 overflow-y-auto p-5 pt-16 pb-32 space-y-5 bg-gray-50/50 dark:bg-transparent relative"
+          >
+            {loadingOlder && (
+              <div className="text-center text-xs text-gray-500 dark:text-gray-400">Loading older messages…</div>
+            )}
             {!messages.length && (
               <div className="h-full flex flex-col items-center justify-center text-center px-4">
                 <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mb-3">
@@ -283,7 +333,7 @@ const UserChat = () => {
             {messages.map((msg, idx) => {
               const isMe = msg.sender?._id === currentUserId || msg.sender === currentUserId;
               return (
-                <div key={idx} id={`msg-${msg._id}`} className={`flex ${isMe ? 'justify-end' : 'justify-start'} group/msg relative mb-5`}>
+                <div key={msg._id || idx} id={`msg-${msg._id}`} className={`flex ${isMe ? 'justify-end' : 'justify-start'} group/msg relative mb-5`}>
                   <div className={`max-w-[85%] rounded-2xl px-4 py-3 pb-2 shadow-sm relative ${
                     isMe 
                     ? 'bg-gradient-to-r from-[#7C3AED] to-[#9333EA] text-white rounded-br-sm' 
@@ -306,13 +356,13 @@ const UserChat = () => {
                       </div>
                     )}
                     {msg.mediaUrl && (
-                      <img src={msg.mediaUrl} alt="Attachment" className="rounded-lg mb-2 w-full object-cover max-h-64 cursor-pointer" onClick={() => window.open(msg.mediaUrl, '_blank')} />
+                      <img src={msg.mediaUrl} alt="Attachment" loading="lazy" decoding="async" className="rounded-lg mb-2 w-full object-cover max-h-64 cursor-pointer" onClick={() => window.open(msg.mediaUrl, '_blank')} />
                     )}
                     {msg.text && <p className={`text-[13.5px] md:text-[14.5px] leading-relaxed pr-6 break-words whitespace-pre-wrap ${isMe ? 'text-white' : 'text-gray-800 dark:text-gray-200'}`}>{msg.text}</p>}
                     
                     {(msg.isChannelCard || msg.type === 'channel') && msg.channelId && (
                       <div className="mt-3 p-3 bg-white dark:bg-[#18112e] rounded-xl border border-purple-200 dark:border-purple-800/40 shadow-sm flex items-center gap-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/channel/${msg.channelId._id || msg.channelId}`)}>
-                        <img src={msg.channelId.imageUrls?.[0] || 'https://via.placeholder.com/80'} className="w-16 h-16 rounded-lg object-cover" alt="channel" />
+                        <img src={msg.channelId.imageUrls?.[0] || 'https://via.placeholder.com/80'} loading="lazy" decoding="async" className="w-16 h-16 rounded-lg object-cover" alt="channel" />
                         <div className="flex-1 overflow-hidden">
                           <h4 className="font-bold text-xs md:text-sm text-gray-900 dark:text-white truncate">{msg.channelId.name || 'Unknown Channel'}</h4>
                           <p className="text-[10px] md:text-[11px] text-gray-600 dark:text-gray-300 mt-1">{msg.channelId.category} • {msg.channelId.subscriberCount?.toLocaleString()} subs</p>
