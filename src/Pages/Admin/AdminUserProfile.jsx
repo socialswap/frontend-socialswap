@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import axiosInstance, { api } from '../../API/api';
 import SEOHead from '../../Component/SEO/SEOHead';
+import formatINR from '../../Utils/formatINR';
 
 const AdminUserProfile = () => {
   const { userId } = useParams();
@@ -276,7 +277,7 @@ const AdminUserProfile = () => {
                         <div>
                           <span className="text-[10px] text-gray-400 uppercase block font-semibold">Price</span>
                           <span className="text-xs font-bold text-[#7C3AED] dark:text-[#A855F7]">
-                            ${channel.price || '0'}
+                            {formatINR(channel.price || 0)}
                           </span>
                         </div>
                         <div>

@@ -17,7 +17,7 @@ self.addEventListener('push', function(event) {
     icon: '/logo192.png',
     badge: '/logo192.png',
     vibrate: [200, 100, 200],
-    tag: 'socialswap-chat',          // replaces previous notification instead of stacking
+    tag: data.tag || 'socialswap-chat', // same tag replaces the previous notification instead of stacking
     renotify: true,                   // still vibrates/sounds even if same tag
     data: {
       dateOfArrival: Date.now(),
@@ -38,8 +38,9 @@ self.addEventListener('push', function(event) {
         }
       }
 
-      // Only show the system notification if the user isn't actively viewing the app
-      if (!isAppFocused) {
+      // Chat skips the popup while the app is open (it shows its own toast).
+      // Payments set alwaysShow, because nothing else in the app announces them.
+      if (!isAppFocused || data.alwaysShow) {
         return self.registration.showNotification(data.title, options);
       }
     })

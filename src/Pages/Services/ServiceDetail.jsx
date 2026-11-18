@@ -261,7 +261,7 @@ const ServiceDetail = () => {
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link
                     to="/user/chat"
-                    state={{ requestDeal: service }}
+                    state={{ requestService: service }}
                     className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white/40 dark:bg-white/10 text-gray-900 dark:text-white border border-white/60 dark:border-white/10 hover:border-purple-500 font-bold text-sm transition-all"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -298,34 +298,34 @@ const ServiceDetail = () => {
             {/* PDF Portfolio / Showcase Section */}
             {service.pdfUrl && (
               <div className="mt-8 p-6 rounded-[28px] bg-gradient-to-br from-purple-900/20 via-purple-900/10 to-indigo-900/20 dark:from-[#1A142E]/80 dark:to-[#110C1F]/80 border border-purple-500/30 backdrop-blur-[16px] shadow-[0_15px_40px_rgba(124,58,237,0.15)] relative overflow-hidden">
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
-                  <div className="flex items-start gap-4">
+                <div className="flex flex-col gap-5">
+                  <div className="flex items-start gap-4 min-w-0">
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#7C3AED] to-[#EC4899] flex items-center justify-center text-white shrink-0 shadow-lg">
                       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="inline-block whitespace-nowrap px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30">
                           Work Showcase & Portfolio
                         </span>
                       </div>
                       <h3 className="text-xl font-black text-gray-900 dark:text-white leading-snug">
                         {service.pdfTitle || `${service.serviceName} - Work Portfolio PDF`}
                       </h3>
-                      <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-1.5 leading-relaxed">
                         Includes past projects, live work samples, client case studies, and clickable links.
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto shrink-0">
+                  <div className="flex flex-wrap items-center gap-2.5 w-full sm:pl-[72px]">
                     <a
                       href={service.pdfUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#A855F7] text-white font-bold text-xs shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                      className="flex-auto sm:flex-initial whitespace-nowrap inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-[#7C3AED] to-[#A855F7] text-white font-bold text-xs shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -335,7 +335,7 @@ const ServiceDetail = () => {
 
                     <button
                       onClick={() => setShowPdfViewer(!showPdfViewer)}
-                      className="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-2xl bg-white/40 dark:bg-white/10 text-gray-900 dark:text-white border border-white/60 dark:border-white/10 hover:border-purple-500 font-bold text-xs transition-all"
+                      className="flex-auto sm:flex-initial whitespace-nowrap inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-2xl bg-white/40 dark:bg-white/10 text-gray-900 dark:text-white border border-white/60 dark:border-white/10 hover:border-purple-500 font-bold text-xs transition-all"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -411,7 +411,7 @@ const ServiceDetail = () => {
 
                 <Link
                   to="/user/chat"
-                  state={{ requestDeal: service }}
+                  state={{ requestService: service }}
                   className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-white/40 dark:bg-white/10 text-gray-900 dark:text-white border border-white/60 dark:border-white/10 hover:border-purple-500 font-bold text-sm transition-all duration-300"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

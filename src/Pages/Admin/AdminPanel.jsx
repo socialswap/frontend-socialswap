@@ -113,7 +113,7 @@ const AdminPanel = () => {
       title: 'Estimated Earnings', 
       dataIndex: 'estimatedEarnings', 
       key: 'estimatedEarnings',
-      render: (value) => `$${value}`,
+      render: (value) => `₹${value}`,
       sorter: (a, b) => a.estimatedEarnings - b.estimatedEarnings
     },
     { title: 'Joined Date', dataIndex: 'joinedDate', key: 'joinedDate', render: (date) => moment(date).format('YYYY-MM-DD') },
@@ -146,7 +146,7 @@ const AdminPanel = () => {
       title: 'Sold Price', 
       dataIndex: 'soldPrice', 
       key: 'soldPrice',
-      render: (value) => `$${value}`,
+      render: (value) => `₹${value}`,
       sorter: (a, b) => a.soldPrice - b.soldPrice
     },
     { title: 'Joined Date', dataIndex: 'joinedDate', key: 'joinedDate', render: (date) => moment(date).format('YYYY-MM-DD') },
@@ -182,7 +182,7 @@ const AdminPanel = () => {
       <Form.Item name="videoCount" label="Video Count" rules={[{ required: true }]}>
         <InputNumber min={0} style={{ width: '100%' }} />
       </Form.Item>
-      <Form.Item name="estimatedEarnings" label="Estimated Monthly Earnings ($)" rules={[{ required: true }]}>
+      <Form.Item name="estimatedEarnings" label="Estimated Monthly Earnings (₹)" rules={[{ required: true }]}>
         <InputNumber min={0} step={0.01} style={{ width: '100%' }} />
       </Form.Item>
       <Form.Item name="category" label="Category" rules={[{ required: true }]}>

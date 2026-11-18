@@ -81,7 +81,7 @@ const FairPriceAnalyser = () => {
   const paybackMonths = monthlyRevenue > 0 ? (askingPrice / monthlyRevenue).toFixed(1) : 'N/A';
   const pricePerSub = subscribers > 0 ? (askingPrice / subscribers).toFixed(3) : '0';
 
-  const formatCurrency = (val) => `$${Number(val).toLocaleString()}`;
+  const formatCurrency = (val) => `₹${Number(val).toLocaleString()}`;
 
   return (
     <div className="space-y-12">
@@ -105,10 +105,10 @@ const FairPriceAnalyser = () => {
             {/* Input: Asking Price */}
             <div>
               <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">
-                Asking Price ($ USD)
+                Asking Price (₹)
               </label>
               <InputNumber
-                prefix="$"
+                prefix="₹"
                 min={0}
                 max={1000000}
                 value={askingPrice}
@@ -122,10 +122,10 @@ const FairPriceAnalyser = () => {
             {/* Input: Monthly Revenue */}
             <div>
               <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">
-                Monthly Net Revenue ($ USD)
+                Monthly Net Revenue (₹)
               </label>
               <InputNumber
-                prefix="$"
+                prefix="₹"
                 min={0}
                 max={500000}
                 value={monthlyRevenue}
@@ -242,8 +242,8 @@ const FairPriceAnalyser = () => {
 
               <div className="bg-white/5 p-3 rounded-2xl border border-white/10">
                 <span className="text-[11px] text-gray-400 block">Per Sub Value</span>
-                <span className="text-lg font-bold text-white">${pricePerSub}</span>
-                <span className="text-[10px] text-gray-400 block">USD / Subscriber</span>
+                <span className="text-lg font-bold text-white">₹{pricePerSub}</span>
+                <span className="text-[10px] text-gray-400 block">₹ / Subscriber</span>
               </div>
 
               <div className="bg-white/5 p-3 rounded-2xl border border-white/10">

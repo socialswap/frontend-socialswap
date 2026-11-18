@@ -7,6 +7,8 @@ import { jwtDecode } from 'jwt-decode';
 import EmojiPicker from 'emoji-picker-react';
 import useChatSounds from '../../Utils/useChatSounds';
 import SEOHead from '../../Component/SEO/SEOHead';
+import ServiceChatCard from '../../Component/Chat/ServiceChatCard';
+import formatINR from '../../Utils/formatINR';
 
 const SOCKET_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND || 'http://localhost:8090';
 
@@ -449,7 +451,8 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
   const filteredThreads = threads.filter(t => {
     const p = t.participants?.find(p => p._id !== currentUserId && p !== currentUserId);
     return p?.name?.toLowerCase().includes(searchChat.toLowerCase()) || 
-           p?.email?.toLowerCase().includes(searchChat.toLowerCase());
+           p?.email?.toLowerCase().includes(searchChat.toLowerCase()) ||
+           (searchChat.replace(/\D/g, '').length >= 3 && p?.mobile?.replace(/\D/g, '').includes(searchChat.replace(/\D/g, '')));
   });
 
   const filteredDeals = deals.filter(deal => 
@@ -581,6 +584,42 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                 </div>
               )}
             </div>
+            {activeThread && (() => {
+              const activeParticipant = activeThread.participants?.find(p => p._id !== currentUserId && p !== currentUserId);
+              const mobile = activeParticipant?.mobile;
+              if (!mobile) {
+                return (
+                  <span className="text-[11px] text-purple-100 bg-white/10 border border-white/20 rounded-full px-3 py-1 shrink-0" title="The buyer is asked for a number the next time they open chat">
+                    No phone yet
+                  </span>
+                );
+              }
+              const waDigits = mobile.replace(/\D/g, '');
+              return (
+                <div className="flex items-center gap-2 shrink-0 ml-2">
+                  <span className="hidden lg:inline text-xs text-white/90 font-medium">{mobile}</span>
+                  <a
+                    href={`tel:${mobile}`}
+                    title={`Call ${mobile}`}
+                    aria-label={`Call ${activeParticipant?.name || 'buyer'}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-[#7C3AED] hover:text-[#6D28D9] text-xs font-bold shadow-sm hover:shadow transition-shadow"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.5 4.49a1 1 0 01-.5 1.21l-2.26 1.13a11.04 11.04 0 005.52 5.52l1.13-2.26a1 1 0 011.21-.5l4.49 1.5a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.72 21 3 14.28 3 6V5z" /></svg>
+                    Call
+                  </a>
+                  <a
+                    href={`https://wa.me/${waDigits}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={`WhatsApp ${mobile}`}
+                    aria-label={`WhatsApp ${activeParticipant?.name || 'buyer'}`}
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#25D366] text-white hover:text-white shadow-sm hover:shadow transition-shadow"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.79-1.47-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.7.63.71.23 1.36.2 1.87.12.57-.09 1.75-.72 2-1.41.25-.69.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35zM12.04 21.5a9.45 9.45 0 01-4.82-1.32l-.35-.2-3.58.94.96-3.49-.23-.36a9.44 9.44 0 01-1.45-5.04c0-5.22 4.25-9.47 9.48-9.47 2.53 0 4.91.99 6.7 2.78a9.42 9.42 0 012.77 6.7c0 5.22-4.25 9.46-9.47 9.46zm8.06-17.53A11.33 11.33 0 0012.04.63C5.76.63.65 5.74.65 12.02c0 2 .52 3.96 1.52 5.69L.55 23.6l6.04-1.58a11.36 11.36 0 005.44 1.39c6.28 0 11.39-5.11 11.39-11.39 0-3.04-1.18-5.9-3.33-8.05z" /></svg>
+                  </a>
+                </div>
+              );
+            })()}
           </div>
 
           {!activeThread ? (
@@ -638,6 +677,17 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 dark:text-gray-300 truncate pr-6">{participant?.email}</p>
+                      {participant?.mobile && (
+                        <a
+                          href={`tel:${participant.mobile}`}
+                          onClick={(e) => e.stopPropagation()}
+                          title={`Call ${participant.mobile}`}
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-[#7C3AED] dark:text-[#A855F7] mt-0.5"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.5 4.49a1 1 0 01-.5 1.21l-2.26 1.13a11.04 11.04 0 005.52 5.52l1.13-2.26a1 1 0 011.21-.5l4.49 1.5a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.72 21 3 14.28 3 6V5z" /></svg>
+                          {participant.mobile}
+                        </a>
+                      )}
                     </div>
                     {unreadCount > 0 && (
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-[#F83758] text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-md">
@@ -697,10 +747,12 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                             <div className="flex-1 overflow-hidden">
                               <h4 className="font-bold text-xs md:text-sm text-gray-900 dark:text-white truncate">{msg.channelId.name || 'Unknown Channel'}</h4>
                               <p className="text-[10px] md:text-[11px] text-gray-600 dark:text-gray-300 mt-1">{msg.channelId.category} • {msg.channelId.subscriberCount?.toLocaleString()} subs</p>
-                              <p className="text-xs md:text-sm font-bold text-purple-600 dark:text-purple-400 mt-1">${msg.channelId.price}</p>
+                              <p className="text-xs md:text-sm font-bold text-purple-600 dark:text-purple-400 mt-1">{formatINR(msg.channelId.price)}</p>
                             </div>
                           </div>
                         )}
+
+                        {msg.type === 'service' && <ServiceChatCard service={msg.serviceId} />}
 
                         {(msg.isDealCard || msg.type === 'deal') && msg.dealId && (
                           <div className="mt-3 p-4 bg-white dark:bg-[#18112e] rounded-xl border border-gray-200 dark:border-purple-800/40 shadow-sm text-gray-800 dark:text-gray-200 relative overflow-hidden">
@@ -709,7 +761,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                         <div className="space-y-1 mb-2 bg-gray-50 dark:bg-[#231542] p-3 rounded-lg border border-gray-100 dark:border-purple-900/20 text-xs md:text-[13px]">
                               <p className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Status:</span> <span className={`font-semibold uppercase ${msg.dealId.status === 'accepted' ? 'text-green-600 dark:text-green-400' : msg.dealId.status === 'rejected' ? 'text-red-500 dark:text-red-400' : 'text-yellow-600 dark:text-yellow-400'}`}>{msg.dealId.status}</span></p>
                               {msg.dealId.payment && <p className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Payment:</span> <span className={`font-semibold uppercase ${msg.dealId.payment === 'paid' ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-300'}`}>{msg.dealId.payment}</span></p>}
-                              <p className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Price:</span> <span className="font-bold text-[#7C3AED] dark:text-[#A855F7]">${msg.dealId.dealPrice || msg.dealId.price}</span></p>
+                              <p className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Price:</span> <span className="font-bold text-[#7C3AED] dark:text-[#A855F7]">{formatINR(msg.dealId.dealPrice || msg.dealId.price)}</span></p>
                             </div>
                           </div>
                         )}
@@ -911,7 +963,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
                       <p>Date: {new Date(deal.createdAt).toLocaleDateString()}</p>
                     </div>
                     <div className="text-xl font-bold text-gray-900 dark:text-white">
-                      ${deal.dealPrice || deal.price}
+                      {formatINR(deal.dealPrice || deal.price)}
                     </div>
                   </div>
 
@@ -947,7 +999,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
             <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
               <h4 className="font-bold text-gray-900 dark:text-white mb-3">Channel Details</h4>
               <p className="flex justify-between mb-1 text-sm"><span className="text-gray-600 dark:text-gray-300">Name:</span> <span className="font-medium text-gray-800 dark:text-gray-200">{selectedDeal.channel?.name || 'N/A'}</span></p>
-              <p className="flex justify-between mb-1 text-sm"><span className="text-gray-600 dark:text-gray-300">Deal Price:</span> <span className="font-bold text-[#7C3AED] dark:text-[#A855F7]">${selectedDeal.dealPrice || selectedDeal.price}</span></p>
+              <p className="flex justify-between mb-1 text-sm"><span className="text-gray-600 dark:text-gray-300">Deal Price:</span> <span className="font-bold text-[#7C3AED] dark:text-[#A855F7]">{formatINR(selectedDeal.dealPrice || selectedDeal.price)}</span></p>
               <p className="flex justify-between mb-1 text-sm"><span className="text-gray-600 dark:text-gray-300">Buyer:</span> <span className="text-gray-800 dark:text-gray-200">{selectedDeal.buyer?.name} ({selectedDeal.buyer?.email})</span></p>
             </div>
 
@@ -1033,7 +1085,7 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
               filterOption={(input, option) =>
                 (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
               }
-              options={channels.map(c => ({ value: c._id, label: `${c.name} - $${c.price}` }))}
+              options={channels.map(c => ({ value: c._id, label: `${c.name} - ${formatINR(c.price)}` }))}
               onChange={handleChannelChange}
               className="w-full"
             />
@@ -1058,13 +1110,13 @@ const AdminChat = ({ isEmbedded = false, prefillUserId = null }) => {
 
           <Form.Item 
             name="dealPrice" 
-            label={<span className="text-gray-700 dark:text-gray-300 font-semibold">4. Negotiated Deal Price ($)</span>}
+            label={<span className="text-gray-700 dark:text-gray-300 font-semibold">4. Negotiated Deal Price (₹)</span>}
             rules={[{ required: true, message: 'Please enter the deal price' }]}
           >
             <InputNumber 
               className="w-full"
               placeholder="0.00"
-              prefix="$"
+              prefix="₹"
               min={0}
               size="large"
             />

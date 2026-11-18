@@ -42,12 +42,12 @@ const RevenueCalculator = () => {
 
   const formatCurrency = (val) => {
     if (val >= 1000000) {
-      return `$${(val / 1000000).toFixed(1)}M`;
+      return `₹${(val / 1000000).toFixed(1)}M`;
     }
     if (val >= 1000) {
-      return `$${(val / 1000).toFixed(1)}K`;
+      return `₹${(val / 1000).toFixed(1)}K`;
     }
-    return `$${val.toFixed(0)}`;
+    return `₹${val.toFixed(0)}`;
   };
 
   const formatViews = (val) => {
@@ -97,7 +97,7 @@ const RevenueCalculator = () => {
             </div>
 
             <p className="text-purple-100/80 text-sm mb-6">
-              {formatViews(dailyViews)} views/day × ${rpm.toFixed(contentType === 'shorts' ? 2 : 1)} RPM
+              {formatViews(dailyViews)} views/day × ₹{rpm.toFixed(contentType === 'shorts' ? 2 : 1)} RPM
             </p>
 
             {/* Timeframe Tabs */}
@@ -165,7 +165,7 @@ const RevenueCalculator = () => {
                   </Tooltip>
                 </label>
                 <span className="px-3 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-bold rounded-lg text-sm border border-emerald-200 dark:border-emerald-800">
-                  ${rpm.toFixed(contentType === 'shorts' ? 2 : 1)} RPM
+                  ₹{rpm.toFixed(contentType === 'shorts' ? 2 : 1)} RPM
                 </span>
               </div>
               <Slider
@@ -174,12 +174,12 @@ const RevenueCalculator = () => {
                 step={contentType === 'shorts' ? 0.01 : 0.1}
                 value={rpm}
                 onChange={setRpm}
-                tooltip={{ formatter: (val) => `$${val.toFixed(2)} RPM` }}
+                tooltip={{ formatter: (val) => `₹${val.toFixed(2)} RPM` }}
               />
               <div className="flex justify-between text-xs text-gray-400 mt-1">
-                <span>${contentType === 'shorts' ? '0.01' : '0.1'}</span>
-                <span>${contentType === 'shorts' ? '0.25' : '7.5'}</span>
-                <span>${contentType === 'shorts' ? '0.50' : '15.0'} max</span>
+                <span>₹{contentType === 'shorts' ? '0.01' : '0.1'}</span>
+                <span>₹{contentType === 'shorts' ? '0.25' : '7.5'}</span>
+                <span>₹{contentType === 'shorts' ? '0.50' : '15.0'} max</span>
               </div>
             </div>
 
@@ -204,7 +204,7 @@ const RevenueCalculator = () => {
                   >
                     <span>{niche.icon}</span>
                     <span>{niche.name}</span>
-                    <span className="font-semibold opacity-75">(${niche.rpm})</span>
+                    <span className="font-semibold opacity-75">(₹{niche.rpm})</span>
                   </button>
                 ))}
               </div>
@@ -249,8 +249,8 @@ const RevenueCalculator = () => {
               <InfoCircleOutlined />
               <span>
                 {contentType === 'long' 
-                  ? 'Long-form RPM typically ranges from $0.1 to $15+ depending on niche.' 
-                  : 'Shorts RPM typically ranges from $0.01 to $0.15 per 1,000 views.'}
+                  ? 'Long-form RPM typically ranges from ₹0.1 to ₹15+ depending on niche.' 
+                  : 'Shorts RPM typically ranges from ₹0.01 to ₹0.15 per 1,000 views.'}
               </span>
             </div>
           </div>
