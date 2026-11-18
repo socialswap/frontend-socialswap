@@ -10,6 +10,7 @@ import useChatSounds from '../../Utils/useChatSounds';
 import SEOHead from '../../Component/SEO/SEOHead';
 import ServiceChatCard from '../../Component/Chat/ServiceChatCard';
 import ChatPhonePrompt from '../../Component/Chat/ChatPhonePrompt';
+import ChatNotifyPrompt from '../../Component/Chat/ChatNotifyPrompt';
 import formatINR from '../../Utils/formatINR';
 
 const SOCKET_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND || 'http://localhost:8090';
@@ -517,6 +518,8 @@ const UserChat = () => {
             })}
             <div ref={messagesEndRef} />
           </div>
+
+          {userRole !== 'admin' && <ChatNotifyPrompt />}
 
           {/* Input Area */}
           <div className="p-3 bg-white dark:bg-[#18112e] border-t border-gray-100 dark:border-purple-900/30 flex flex-col">
