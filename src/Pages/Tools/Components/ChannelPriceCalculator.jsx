@@ -45,7 +45,7 @@ const ChannelPriceCalculator = () => {
   const maxValuation = Math.round(totalEstimatedValue * 1.15);
   const escrowDeposit = Math.round(totalEstimatedValue * 0.10);
 
-  const formatCurrency = (val) => `$${Number(val).toLocaleString()}`;
+  const formatCurrency = (val) => `₹${Number(val).toLocaleString()}`;
 
   return (
     <div className="space-y-12">
@@ -69,10 +69,10 @@ const ChannelPriceCalculator = () => {
             {/* Input: Monthly Revenue */}
             <div>
               <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">
-                Monthly Net Revenue ($ USD)
+                Monthly Net Revenue (₹)
               </label>
               <InputNumber
-                prefix="$"
+                prefix="₹"
                 min={0}
                 max={500000}
                 value={monthlyRevenue}

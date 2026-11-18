@@ -8,6 +8,9 @@ import { jwtDecode } from 'jwt-decode';
 import EmojiPicker from 'emoji-picker-react';
 import useChatSounds from '../../Utils/useChatSounds';
 import SEOHead from '../../Component/SEO/SEOHead';
+import ServiceChatCard from '../../Component/Chat/ServiceChatCard';
+import ChatPhonePrompt from '../../Component/Chat/ChatPhonePrompt';
+import formatINR from '../../Utils/formatINR';
 
 const SOCKET_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND || 'http://localhost:8090';
 
@@ -39,6 +42,10 @@ const UserChat = () => {
   const location = useLocation();
   const { playIncomingSound } = useChatSounds();
   const [requestProcessed, setRequestProcessed] = useState(false);
+
+  // Ask once for a number support can call; admins never get asked
+  const me = thread?.participants?.find((p) => String(p?._id || p) === String(currentUserId));
+  const needsPhone = Boolean(thread) && userRole !== 'admin' && !me?.mobile;
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState(null);
   const [activeEmojiId, setActiveEmojiId] = useState(null);
@@ -169,15 +176,23 @@ const UserChat = () => {
   }, [hasMoreMessages, loadingOlder, messages]);
 
   useEffect(() => {
-    if (socket && thread && location.state?.requestDeal && !requestProcessed) {
-      const channel = location.state.requestDeal;
-      const msgData = {
-        threadId: thread._id,
-        sender: currentUserId,
-        text: `I would like to start an Escrow Deal for this channel:`,
-        isChannelCard: true,
-        channelId: channel._id
-      };
+    const { requestDeal, requestService } = location.state || {};
+    if (socket && thread && (requestDeal || requestService) && !requestProcessed) {
+      const msgData = requestService
+        ? {
+            threadId: thread._id,
+            sender: currentUserId,
+            text: `Hi, I'm interested in this service. Please share more details:`,
+            isServiceCard: true,
+            serviceId: requestService._id
+          }
+        : {
+            threadId: thread._id,
+            sender: currentUserId,
+            text: `I would like to start an Escrow Deal for this channel:`,
+            isChannelCard: true,
+            channelId: requestDeal._id
+          };
       socket.emit('send_message', msgData);
       
       // Clean up state to prevent resending on refresh
@@ -366,10 +381,12 @@ const UserChat = () => {
                         <div className="flex-1 overflow-hidden">
                           <h4 className="font-bold text-xs md:text-sm text-gray-900 dark:text-white truncate">{msg.channelId.name || 'Unknown Channel'}</h4>
                           <p className="text-[10px] md:text-[11px] text-gray-600 dark:text-gray-300 mt-1">{msg.channelId.category} • {msg.channelId.subscriberCount?.toLocaleString()} subs</p>
-                          <p className="text-xs md:text-sm font-bold text-purple-600 dark:text-purple-400 mt-1">${msg.channelId.price}</p>
+                          <p className="text-xs md:text-sm font-bold text-purple-600 dark:text-purple-400 mt-1">{formatINR(msg.channelId.price)}</p>
                         </div>
                       </div>
                     )}
+
+                    {msg.type === 'service' && <ServiceChatCard service={msg.serviceId} />}
 
                     {(msg.isDealCard || msg.type === 'deal') && msg.dealId && (
                       <div className="mt-3 p-4 bg-white dark:bg-[#18112e] rounded-xl border border-gray-200 dark:border-purple-800/40 shadow-sm text-gray-800 dark:text-gray-200 relative overflow-hidden">
@@ -380,7 +397,7 @@ const UserChat = () => {
                           <p className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Status:</span> <span className={`font-semibold uppercase ${msg.dealId.status === 'accepted' ? 'text-green-600 dark:text-green-400' : msg.dealId.status === 'rejected' ? 'text-red-500 dark:text-red-400' : 'text-yellow-600 dark:text-yellow-400'}`}>{msg.dealId.status}</span></p>
                           {msg.dealId.payment && <p className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Payment:</span> <span className={`font-semibold uppercase ${msg.dealId.payment === 'paid' ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-300'}`}>{msg.dealId.payment}</span></p>}
                           {msg.dealId.channel?.name && <p className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Channel:</span> <span className="font-medium truncate max-w-[150px] text-gray-800 dark:text-gray-200">{msg.dealId.channel.name}</span></p>}
-                          <p className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Price:</span> <span className="font-bold text-[#7C3AED] dark:text-[#A855F7]">${msg.dealId.dealPrice || msg.dealId.price}</span></p>
+                          <p className="flex justify-between"><span className="text-gray-600 dark:text-gray-300">Price:</span> <span className="font-bold text-[#7C3AED] dark:text-[#A855F7]">{formatINR(msg.dealId.dealPrice || msg.dealId.price)}</span></p>
                         </div>
 
                         {msg.dealId.status === 'pending' && msg.dealId.buyer === currentUserId && (
@@ -503,6 +520,16 @@ const UserChat = () => {
 
           {/* Input Area */}
           <div className="p-3 bg-white dark:bg-[#18112e] border-t border-gray-100 dark:border-purple-900/30 flex flex-col">
+            {needsPhone ? (
+              <ChatPhonePrompt
+                onSaved={(mobile) => setThread((prev) => prev && ({
+                  ...prev,
+                  participants: (prev.participants || []).map((p) =>
+                    String(p?._id || p) === String(currentUserId) ? { ...p, mobile } : p
+                  )
+                }))}
+              />
+            ) : (<>
             {replyingTo && (
               <div className="flex items-center justify-between bg-gray-50 dark:bg-[#231542] p-2 mb-2 rounded border border-gray-200 dark:border-purple-900/40">
                 <div className="text-xs text-gray-600 dark:text-gray-300 truncate flex-1 pr-4">
@@ -546,6 +573,7 @@ const UserChat = () => {
                 <svg className="w-4 h-4 transform rotate-45 -ml-0.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
               </button>
             </div>
+            </>)}
           </div>
         </div>
 
@@ -603,7 +631,7 @@ const UserChat = () => {
                       <p>Date: {new Date(deal.createdAt).toLocaleDateString()}</p>
                     </div>
                     <div className="text-xl font-bold text-gray-900 dark:text-white">
-                      ${deal.dealPrice || deal.price}
+                      {formatINR(deal.dealPrice || deal.price)}
                     </div>
                   </div>
                   
@@ -646,7 +674,7 @@ const UserChat = () => {
             <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
               <h4 className="font-bold text-gray-900 dark:text-white mb-3">Channel Details</h4>
               <p className="flex justify-between mb-1 text-sm"><span className="text-gray-600 dark:text-gray-300">Name:</span> <span className="font-medium text-gray-800 dark:text-gray-200">{selectedDeal.channel?.name || 'N/A'}</span></p>
-              <p className="flex justify-between mb-1 text-sm"><span className="text-gray-600 dark:text-gray-300">Deal Price:</span> <span className="font-bold text-purple-600 dark:text-purple-400">${selectedDeal.dealPrice || selectedDeal.price}</span></p>
+              <p className="flex justify-between mb-1 text-sm"><span className="text-gray-600 dark:text-gray-300">Deal Price:</span> <span className="font-bold text-purple-600 dark:text-purple-400">{formatINR(selectedDeal.dealPrice || selectedDeal.price)}</span></p>
             </div>
 
             <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">

@@ -48,7 +48,8 @@ const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
-  const [activeTab, setActiveTab] = useState('users');
+  // ?tab=transactions lets a payment notification open the right tab
+  const [activeTab, setActiveTab] = useState(() => new URLSearchParams(window.location.search).get('tab') || 'users');
   const [openChatUserId, setOpenChatUserId] = useState(null);
   const [form] = Form.useForm();
   const tabScrollRef = useRef(null);

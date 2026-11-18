@@ -291,9 +291,18 @@ const AppContent = () => {
     setShowBanner(false);
   };
 
+  // Login and logout don't reload the page, so check on every route change and set
+  // push up once per signed-in token. Otherwise a user who logs in never subscribes.
+  const pushSetupToken = React.useRef(null);
   React.useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token || !('Notification' in window)) return;
+    if (!token) {
+      pushSetupToken.current = null;
+      setShowBanner(false);
+      return;
+    }
+    if (pushSetupToken.current === token || !('Notification' in window)) return;
+    pushSetupToken.current = token;
 
     const perm = Notification.permission;
     console.log('[Push] Permission on load:', perm);
@@ -306,7 +315,7 @@ const AppContent = () => {
       setShowBanner(true);
     }
     // 'denied' → nothing we can do silently
-  }, []);
+  }, [location.pathname]);
 
   const handleEnableClick = async () => {
     const perm = await Notification.requestPermission();

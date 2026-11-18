@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Tag, Button, Modal, Select, message, Descriptions, Form, InputNumber } from 'antd';
 import { EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import axiosInstance, { api } from '../../API/api';
+import formatINR from '../../Utils/formatINR';
 
 const { Option } = Select;
 
@@ -137,7 +138,7 @@ const AdminDeals = () => {
       title: 'Deal Price',
       dataIndex: 'dealPrice',
       key: 'dealPrice',
-      render: (price) => <span className="text-purple-600 font-bold">${price}</span>,
+      render: (price) => <span className="text-purple-600 font-bold">{formatINR(price)}</span>,
     },
     {
       title: 'Deal Status',
@@ -256,10 +257,10 @@ const AdminDeals = () => {
               </Descriptions.Item>
 
               <Descriptions.Item label="Actual Price (Channel Price)">
-                <span className="text-gray-500 line-through mr-2">${selectedDeal.originalPrice || selectedDeal.channel?.price || 0}</span>
+                <span className="text-gray-500 line-through mr-2">{formatINR(selectedDeal.originalPrice || selectedDeal.channel?.price || 0)}</span>
               </Descriptions.Item>
               <Descriptions.Item label="Negotiated Deal Price">
-                <span className="text-purple-600 font-bold text-lg">${selectedDeal.dealPrice}</span>
+                <span className="text-purple-600 font-bold text-lg">{formatINR(selectedDeal.dealPrice)}</span>
               </Descriptions.Item>
               
               <Descriptions.Item label="Buyer Info" span={1}>
@@ -355,7 +356,7 @@ const AdminDeals = () => {
               filterOption={(input, option) =>
                 (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
               }
-              options={filteredChannels.map(c => ({ value: c._id, label: `${c.name} - $${c.price}` }))}
+              options={filteredChannels.map(c => ({ value: c._id, label: `${c.name} - ${formatINR(c.price)}` }))}
               onChange={handleChannelChange}
             />
           </Form.Item>
@@ -378,13 +379,13 @@ const AdminDeals = () => {
 
           <Form.Item 
             name="dealPrice" 
-            label="4. Negotiated Deal Price ($)" 
+            label="4. Negotiated Deal Price (₹)" 
             rules={[{ required: true, message: 'Please enter the deal price' }]}
           >
             <InputNumber 
               className="w-full"
               placeholder="0.00"
-              prefix="$"
+              prefix="₹"
               min={0}
               size="large"
             />
